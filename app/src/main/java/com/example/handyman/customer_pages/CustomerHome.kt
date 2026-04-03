@@ -51,7 +51,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController) {
         })
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
 
         // Top right logout
         Text(

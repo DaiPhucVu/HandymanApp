@@ -19,9 +19,9 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 
 @Composable
-fun ChooseAccountType(navController: NavController) {
+fun ChooseAccountType(modifier: Modifier = Modifier, navController: NavController) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF7D56F3))
             .padding(24.dp),

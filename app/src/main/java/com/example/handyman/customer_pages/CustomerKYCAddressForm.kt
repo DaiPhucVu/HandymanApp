@@ -23,7 +23,7 @@ import com.google.firebase.database.FirebaseDatabase
 
 
 @Composable
-fun CustomerKYCAddressForm(navController: NavController) {
+fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
 
     val textFieldModifier = Modifier
@@ -60,7 +60,7 @@ fun CustomerKYCAddressForm(navController: NavController) {
             isValidPostCode && isValidDivision && isValidDistrict && isValidThana && isValidCity && isValidCountry
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(24.dp)

@@ -48,7 +48,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 

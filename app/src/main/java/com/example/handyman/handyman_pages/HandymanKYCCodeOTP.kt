@@ -33,10 +33,10 @@ fun HandymanKYCCodeOTP(modifier: Modifier = Modifier,navController: NavControlle
     Log.d("KYC", "currentEmail: $currentEmail")
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(24.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
         // Top bar
         Row(
@@ -104,7 +104,7 @@ fun HandymanKYCCodeOTP(modifier: Modifier = Modifier,navController: NavControlle
                 query.get().addOnSuccessListener { snapshot ->
                     for (child in snapshot.children) {
                         child.ref.child("isPhoneVerified").setValue(true)
-                        child.ref.child("kycStatus").setValue("Pending")
+                        child.ref.child("verificationStatus").setValue("")
                     }
                     navController.navigate("handymanKycSubmitted")
                 }.addOnFailureListener { error ->

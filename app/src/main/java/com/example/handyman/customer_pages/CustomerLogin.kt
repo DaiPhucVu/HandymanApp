@@ -42,16 +42,23 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
         modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.arrow_back),
-            contentDescription = "Back",
+        Box(
             modifier = Modifier
-                .align(Alignment.Start)
-                .clickable { navController.popBackStack() }
-        )
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_back),
+                contentDescription = "Back",
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable { navController.popBackStack() }
+                    .align(Alignment.CenterStart)
+            )
+        }
+
         Spacer(modifier = Modifier.height(12.dp))
 
         Text("Log in", fontSize = 24.sp)
@@ -113,16 +120,12 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
                             }
                             if (authenticated) {
                                 SessionManager.saveLoggedInEmail(context, email)
-                                if(isVerified == "Verified"){
-                                    val intent = Intent(context, MainJobBoard::class.java).apply {
-                                        putExtra("user_type", "customer")
-                                        Log.d("Navigation", "CustomerLogin authenticated")
-                                        Log.d("Navigation", "user_type: customer")
-                                    }
-                                    context.startActivity(intent)
-                                } else {
-                                    navController.navigate("customerHomeUnverified")
+                                val intent = Intent(context, MainJobBoard::class.java).apply {
+                                    putExtra("user_type", "customer")
+                                    Log.d("Navigation", "CustomerLogin authenticated")
+                                    Log.d("Navigation", "user_type: customer")
                                 }
+                                context.startActivity(intent)
                             } else {
                                 Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
                             }

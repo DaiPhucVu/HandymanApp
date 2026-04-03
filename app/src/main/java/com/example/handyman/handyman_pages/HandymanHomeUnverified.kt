@@ -38,6 +38,20 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 for (child in snapshot.children) {
                     firstName = child.child("firstName").getValue(String::class.java) ?: ""
                     lastName = child.child("lastName").getValue(String::class.java) ?: ""
+                    val verificationStatus = child.child("verificationStatus").getValue(String::class.java) ?: "unverified"
+
+                    if (verificationStatus.equals("pending", ignoreCase = true)) {
+                        navController.navigate("handymanHomeKYCProcessing") {
+                            popUpTo("handymanHomeUnverified") { inclusive = true }
+                        }
+                    } else if (verificationStatus.equals("approved", ignoreCase = true)) {
+                        // If somehow they get here but are approved, send to job board
+                        val intent = android.content.Intent(context, com.example.handyman.MainJobBoard::class.java).apply {
+                            putExtra("user_type", "handyman")
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        }
+                        context.startActivity(intent)
+                    }
                 }
             }
 
@@ -47,7 +61,7 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
         })
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Logout
@@ -68,7 +82,7 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
         )
 
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
@@ -134,7 +148,7 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             // Button
             Button(
                 onClick = {
-                    navController.navigate("handymanKycLanding")
+                    navController.navigate("handymanHomeKYCProcessing")
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367)),
                 modifier = Modifier
@@ -142,7 +156,7 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                     .height(56.dp),
                 shape = RoundedCornerShape(50)
             ) {
-                Text("Start verification", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Check Status", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
 
             Spacer(modifier = Modifier.weight(1f))

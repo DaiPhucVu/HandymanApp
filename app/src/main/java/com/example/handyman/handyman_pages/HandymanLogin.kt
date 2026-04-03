@@ -38,7 +38,7 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
     Log.d("Navigation:", "HandymanLogin launches")
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
@@ -130,10 +130,10 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
                             var isVerified = ""
                             for (child in snapshot.children) {
                                 val userPass = child.child("password").getValue(String::class.java)
-                                val verified = child.child("status").getValue(String::class.java)
+                                val verified = child.child("verificationStatus").getValue(String::class.java) ?: "unverified"
                                 if (userPass == password) {
                                     authenticated = true
-                                    isVerified = verified.toString()
+                                    isVerified = verified
                                     SessionManager.currentUserID = child.key
                                     SessionManager.currentUserName = child.child("firstName").getValue(String::class.java)
                                     break
@@ -141,12 +141,15 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
                             }
                             if (authenticated) {
                                 SessionManager.saveLoggedInEmail(context, email)
-                                if (isVerified == "Verified") {
+                                if (isVerified.equals("approved", ignoreCase = true)) {
                                     val intent = Intent(context, MainJobBoard::class.java).apply {
                                         putExtra("user_type", "handyman")
                                     }
                                     context.startActivity(intent)
+                                } else if (isVerified.equals("pending", ignoreCase = true)) {
+                                    navController.navigate("handymanHomeKYCProcessing")
                                 } else {
+                                    // Empty status or "unverified" both go here
                                     navController.navigate("handymanHomeUnverified")
                                 }
                             } else {

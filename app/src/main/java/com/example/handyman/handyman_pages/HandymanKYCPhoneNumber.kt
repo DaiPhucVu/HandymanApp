@@ -35,7 +35,7 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
     val isValidPhone = phoneNumber.matches(Regex("^\\+880\\s?1[3-9][0-9]{2}-?[0-9]{6}$"))
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(24.dp)

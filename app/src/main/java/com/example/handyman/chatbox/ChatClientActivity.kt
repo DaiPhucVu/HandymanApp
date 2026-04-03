@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import com.example.handyman.chatbox.ui.composables.ChatClientScreen
 import com.example.handyman.ui.theme.HandymanTheme
 import com.example.handyman.utils.SessionManager
@@ -15,7 +14,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ChatClientActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             HandymanTheme {
                 val chatID = intent.getStringExtra("chatID")

@@ -63,7 +63,7 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             isValidThana && isValidCity && isValidCountry
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(24.dp)

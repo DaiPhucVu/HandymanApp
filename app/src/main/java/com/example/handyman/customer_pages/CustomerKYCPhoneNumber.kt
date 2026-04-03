@@ -22,7 +22,7 @@ import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 
 @Composable
-fun CustomerKYCPhoneNumber(navController: NavController) {
+fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
     var phoneNumber by remember { mutableStateOf("") }
     val textFieldModifier = Modifier
@@ -32,7 +32,7 @@ fun CustomerKYCPhoneNumber(navController: NavController) {
     val isValidPhone = phoneNumber.matches(Regex("^\\+880\\s?1[3-9][0-9]{2}-?[0-9]{6}$"))
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(24.dp)

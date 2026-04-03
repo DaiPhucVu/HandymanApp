@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.handyman.R
 import com.google.firebase.database.FirebaseDatabase
+import com.example.handyman.utils.SessionManager
 import java.text.SimpleDateFormat
 import java.util.*
 import com.example.handyman.utils.getCurrentYearMonth
@@ -44,7 +45,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
             && password == confirmPassword
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
@@ -174,7 +175,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
                     "country" to "",
                     "postcode" to "",
                     "notes" to "",
-                    "status" to "Pending",
+                    "verificationStatus" to "",
                     "approvedBy" to "",
                     "createdAt" to timestamp,
                     "updatedAt" to timestamp
@@ -187,8 +188,9 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
                         incrementMetric("serviceAnalytics/2025/$year/$month/newHandymen")
                         incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
 
+                        SessionManager.saveLoggedInEmail(context, email)
                         Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
-                        navController.navigate("handymanLogin")
+                        navController.navigate("handymanKYCLanding")
                     }
                     .addOnFailureListener { error ->
                         Toast.makeText(context, "Failed to sign up: ${error.message}", Toast.LENGTH_LONG).show()

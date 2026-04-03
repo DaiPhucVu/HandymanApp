@@ -8,11 +8,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.systemBarsPadding
 import com.example.handyman.MainJobBoard
 import com.google.firebase.database.*
 import com.example.handyman.Navigation
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
     private var sessionStartTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         val sessionEmail = SessionManager.getLoggedInEmail(this)
 
@@ -50,14 +53,10 @@ class MainActivity : ComponentActivity() {
             HandymanTheme {
                 var startDestination by remember { mutableStateOf<String?>("landingPage") }
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    startDestination?.let {
-                        Navigation(
-                            modifier = Modifier.padding(innerPadding),
-                            startDestination = it
-                        )
-                    }
-                }
+                Navigation(
+                    modifier = Modifier.fillMaxSize().systemBarsPadding(),
+                    startDestination = startDestination ?: "landingPage"
+                )
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,10 +27,12 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
     val context = LocalContext.current
     var firstName by remember { mutableStateOf("...") }
     var lastName by remember { mutableStateOf("") }
+    var idApprovedStatus by remember { mutableStateOf("") }
 
     val currentEmail = SessionManager.getLoggedInEmail(context)
+    var refreshTrigger by remember { mutableStateOf(0) }
 
-    LaunchedEffect(currentEmail) {
+    LaunchedEffect(currentEmail, refreshTrigger) {
         val userRef = FirebaseDatabase.getInstance().getReference("User")
         val query = userRef.orderByChild("email").equalTo(currentEmail)
 
@@ -38,6 +41,7 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
                 for (child in snapshot.children) {
                     firstName = child.child("firstName").getValue(String::class.java) ?: ""
                     lastName = child.child("lastName").getValue(String::class.java) ?: ""
+                    idApprovedStatus = child.child("idApprovedStatus").getValue(String::class.java) ?: ""
                 }
             }
 
@@ -47,7 +51,7 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
         })
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         // Top right logout
         Text(
             "Log out",
@@ -66,7 +70,7 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
         )
 
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 48.dp)
         ) {
@@ -122,6 +126,48 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
                 contentDescription = "KYC Document Icon",
                 modifier = Modifier.size(100.dp).align(Alignment.CenterHorizontally)
             )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Application details list
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Application Details", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Identity Verification", fontSize = 14.sp)
+                        Text(
+                            text = if (idApprovedStatus.isEmpty()) "Pending" else idApprovedStatus.replaceFirstChar { it.uppercase() },
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = when (idApprovedStatus.lowercase()) {
+                                "approved" -> Color(0xFF4CAF50)
+                                "declined", "rejected" -> Color(0xFFF44336)
+                                else -> Color(0xFFE8A317)
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = { refreshTrigger++ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8A317)),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(50)
+            ) {
+                Text("Refresh Status", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 

@@ -20,9 +20,9 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 
 @Composable
-fun CustomerKYCSubmitted(navController: NavController) {
+fun CustomerKYCSubmitted(modifier: Modifier = Modifier, navController: NavController) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF6495ED)) // Cornflower Blue background
             .padding(24.dp),

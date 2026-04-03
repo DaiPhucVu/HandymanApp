@@ -18,9 +18,9 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 
 @Composable
-fun LandingPage(navController: NavController) {
+fun LandingPage(modifier: Modifier = Modifier, navController: NavController) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF7D56F3))
             .padding(horizontal = 24.dp),

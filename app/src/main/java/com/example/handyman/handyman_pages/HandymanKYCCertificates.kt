@@ -53,7 +53,7 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(24.dp)

@@ -22,7 +22,7 @@ import com.example.handyman.components.StepCircle
 import com.example.handyman.utils.SessionManager
 
 @Composable
-fun CustomerKYCCodeOTP(navController: NavController) {
+fun CustomerKYCCodeOTP(modifier: Modifier = Modifier, navController: NavController) {
     var otpCode by remember { mutableStateOf("") }
     val isValidOTP = otpCode.matches(Regex("^\\d{6}$"))
 
@@ -33,7 +33,7 @@ fun CustomerKYCCodeOTP(navController: NavController) {
 
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(24.dp)
@@ -99,9 +99,9 @@ fun CustomerKYCCodeOTP(navController: NavController) {
                 query.get().addOnSuccessListener { snapshot ->
                     for (child in snapshot.children) {
                         child.ref.child("isPhoneVerified").setValue(true)
-                        child.ref.child("kycStatus").setValue("Pending")
+                        child.ref.child("status").setValue("Verified")
                     }
-                    navController.navigate("customerKycSubmitted")
+                    navController.navigate("customerKycSuccess")
                 }.addOnFailureListener { error ->
                     Log.e("KYC", "Failed to update KYC status: ${error.message}")
                 }

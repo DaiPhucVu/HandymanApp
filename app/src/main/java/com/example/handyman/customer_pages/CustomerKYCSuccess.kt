@@ -20,9 +20,10 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 
 @Composable
-fun CustomerKYCSuccess(navController: NavController) {
+fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavController) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF20794B))
             .padding(horizontal = 24.dp, vertical = 16.dp),
@@ -55,10 +56,10 @@ fun CustomerKYCSuccess(navController: NavController) {
         Spacer(modifier = Modifier.height(48.dp))
 
         // Success Text
-        Text("Verification\nComplete!", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text("Account Created!", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Congratulations! You have been successfully verified. Your account is now ready to request services.",
+            "Congratulations! Your account has been successfully created. You can now start requesting services.",
             fontSize = 14.sp,
             color = Color.White,
             lineHeight = 20.sp,
@@ -70,8 +71,10 @@ fun CustomerKYCSuccess(navController: NavController) {
         // Get Started Button
         Button(
             onClick = {
-                // TODO: Navigate to next screen or home
-                navController.navigate("customerHome")
+                val intent = android.content.Intent(context, com.example.handyman.MainJobBoard::class.java).apply {
+                    putExtra("user_type", "customer")
+                }
+                context.startActivity(intent)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -79,7 +82,8 @@ fun CustomerKYCSuccess(navController: NavController) {
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB703))
         ) {
-            Text("Get started", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B1B1B))
+            Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B1B1B))
         }
     }
 }
+

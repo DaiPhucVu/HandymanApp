@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.database.FirebaseDatabase
 import com.example.handyman.R
+import com.example.handyman.utils.SessionManager
 import java.util.*
 import java.text.SimpleDateFormat
 import com.example.handyman.utils.getCurrentYearMonth
@@ -56,16 +57,27 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.arrow_back),
-            contentDescription = "Back",
+        Row(
             modifier = Modifier
-                .align(Alignment.Start)
-                .clickable { navController.popBackStack() }
-        )
-        Spacer(modifier = Modifier.height(12.dp))
+                .fillMaxWidth()
+                .height(56.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_back),
+                contentDescription = "Back",
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable { navController.popBackStack() }
+            )
 
-        Text("Create account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text("Create account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.weight(1.2f))
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Image(
@@ -80,14 +92,16 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
             value = firstName,
             onValueChange = { firstName = it },
             label = { Text("First name") },
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = lastName,
             onValueChange = { lastName = it },
             label = { Text("Last name") },
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
@@ -95,7 +109,8 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
             onValueChange = { email = it },
             label = { Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
@@ -111,7 +126,8 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
@@ -127,7 +143,8 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -172,8 +189,9 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
                         incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
 
                         Log.d("Signup", "Successfully created user.")
+                        SessionManager.saveLoggedInEmail(context, email)
                         Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
-                        navController.navigate("customerLogin")
+                        navController.navigate("customerKycAddressForm")
                     }
                     .addOnFailureListener { e ->
                         Log.e("Signup", "Error creating account", e)

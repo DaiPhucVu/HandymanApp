@@ -1,5 +1,7 @@
 package com.example.handyman
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -12,6 +14,7 @@ import com.example.handyman.customer_pages.CustomerSignup
 import com.example.handyman.customer_pages.CustomerHomeUnverified
 import com.example.handyman.customer_pages.CustomerKYCCodeOTP
 import com.example.handyman.customer_pages.CustomerKYCSubmitted
+import com.example.handyman.customer_pages.CustomerKYCSuccess
 import com.example.handyman.customer_pages.CustomerHomeKYCProcessing
 import com.example.handyman.customer_pages.CustomerKYCLanding
 import com.example.handyman.customer_pages.CustomerKYCCaptureID
@@ -38,83 +41,86 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
 
     NavHost(navController = navController, startDestination = startDestination, builder = {
         composable("landingPage") {
-            LandingPage(navController = navController)
+            LandingPage(Modifier.fillMaxSize(), navController)
         }
         composable("chooseAccountType") {
-            ChooseAccountType(navController = navController)
+            ChooseAccountType(Modifier.fillMaxSize(), navController)
         }
 
 //        Handyman pages
 
         composable("handymanSignup") {
-            HandymanSignup(modifier, navController)
+            HandymanSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanLogin") {
-            HandymanLogin(modifier, navController)
+            HandymanLogin(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanHomeUnverified") {
-            HandymanHomeUnverified(modifier, navController)
+            HandymanHomeUnverified(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKYCLanding") {
-            HandymanKYCLanding(modifier, navController)
+            HandymanKYCLanding(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKYCCaptureID") {
-            HandymanKYCCaptureID(modifier, navController)
+            HandymanKYCCaptureID(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKYCAddressForm") {
-            HandymanKYCAddressForm(modifier, navController)
+            HandymanKYCAddressForm(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKycPhoneNumber") {
-            HandymanKYCPhoneNumber(modifier, navController)
+            HandymanKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKycCodeOTP") {
-            HandymanKYCCodeOTP(modifier, navController)
+            HandymanKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKycSubmitted") {
-            HandymanKYCSubmitted(modifier, navController)
+            HandymanKYCSubmitted(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanHomeKYCProcessing") {
-            HandymanKYCProcessing(modifier, navController)
+            HandymanKYCProcessing(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKYCCertificates") {
-            HandymanKYCCertificates(modifier, navController)
+            HandymanKYCCertificates(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
 
 
 //        Customer pages
 
         composable("customerLogin") {
-            CustomerLogin(modifier, navController)
+            CustomerLogin(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerSignup") {
-            CustomerSignup(modifier, navController)
+            CustomerSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerHome") {
-            CustomerHome(modifier, navController)
+            CustomerHome(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerHomeUnverified") {
-            CustomerHomeUnverified(modifier, navController)
+            CustomerHomeUnverified(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerKycLanding") {
-            CustomerKYCLanding(navController = navController)
+            CustomerKYCLanding(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerKycCaptureID") {
-            CustomerKYCCaptureID(navController = navController)
+            CustomerKYCCaptureID(navController, Modifier.fillMaxSize().systemBarsPadding())
         }
         composable("customerKycAddressForm") {
-            CustomerKYCAddressForm(navController = navController)
+            CustomerKYCAddressForm(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerKycPhoneNumber") {
-            CustomerKYCPhoneNumber(navController = navController)
+            CustomerKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable ("customerKycCodeOTP" ){
-            CustomerKYCCodeOTP(navController = navController)
+            CustomerKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerKycSubmitted") {
-            CustomerKYCSubmitted(navController = navController)
+            CustomerKYCSubmitted(Modifier.fillMaxSize().systemBarsPadding(), navController)
+        }
+        composable("customerKycSuccess") {
+            CustomerKYCSuccess(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable ("customerHomeKYCProcessing"){
-            CustomerHomeKYCProcessing(navController = navController)
+            CustomerHomeKYCProcessing(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
 
     })
