@@ -11,6 +11,18 @@ object SessionManager {
   
     private const val PREF_NAME = "user_session"
     private const val KEY_EMAIL = "logged_in_email"
+    private const val KEY_USER_ID = "logged_in_user_id"
+    private const val KEY_USER_NAME = "logged_in_user_name"
+
+    fun saveSession(context: Context, email: String, userId: String, firstName: String) {
+        val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putString(KEY_EMAIL, email)
+            putString(KEY_USER_ID, userId)
+            putString(KEY_USER_NAME, firstName)
+            apply()
+        }
+    }
 
     fun saveLoggedInEmail(context: Context, email: String) {
         val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -20,6 +32,16 @@ object SessionManager {
     fun getLoggedInEmail(context: Context): String {
         val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         return prefs.getString(KEY_EMAIL, "") ?: ""
+    }
+
+    fun getLoggedInUserId(context: Context): String {
+        val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_USER_ID, "") ?: ""
+    }
+
+    fun getLoggedInUserName(context: Context): String {
+        val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_USER_NAME, "User") ?: "User"
     }
 
     fun clearSession(context: Context) {

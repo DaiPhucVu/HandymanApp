@@ -36,6 +36,10 @@ class SupportForm : AppCompatActivity() {
         spinnerCategory = findViewById(R.id.spinnerCategory)
         btnSubmit = findViewById(R.id.btnSubmit)
 
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
+
         // Set up Spinner
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

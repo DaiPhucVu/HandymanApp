@@ -38,6 +38,10 @@ class HandymanJobListDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.findViewById<ImageView>(R.id.ivBack).setOnClickListener {
+            findNavController().navigateUp()
+        }
+
         val args = HandymanJobBoardDetailsFragmentArgs.fromBundle(requireArguments())
 
         val customerId = args.customerId

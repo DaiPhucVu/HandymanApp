@@ -27,9 +27,13 @@ import com.example.handyman.utils.SessionManager
 import com.example.handyman.MainJobBoard
 
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 @Composable
 fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -41,6 +45,7 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -119,11 +124,13 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
                                 }
                             }
                             if (authenticated) {
-                                SessionManager.saveLoggedInEmail(context, email)
+                                val userId = SessionManager.currentUserID ?: ""
+                                val firstName = SessionManager.currentUserName ?: "User"
+                                SessionManager.saveSession(context, email, userId, firstName)
+                                
                                 val intent = Intent(context, MainJobBoard::class.java).apply {
                                     putExtra("user_type", "customer")
                                     Log.d("Navigation", "CustomerLogin authenticated")
-                                    Log.d("Navigation", "user_type: customer")
                                 }
                                 context.startActivity(intent)
                             } else {

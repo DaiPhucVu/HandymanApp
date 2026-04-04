@@ -23,6 +23,7 @@ fun LandingPage(modifier: Modifier = Modifier, navController: NavController) {
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF7D56F3))
+            .systemBarsPadding()
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly

@@ -18,16 +18,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.handyman.R
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 @Composable
 fun ChooseAccountType(modifier: Modifier = Modifier, navController: NavController) {
+    val scrollState = rememberScrollState()
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF7D56F3))
+            .systemBarsPadding()
+            .verticalScroll(scrollState)
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "Get started",
             fontSize = 24.sp,
@@ -99,5 +105,6 @@ fun ChooseAccountType(modifier: Modifier = Modifier, navController: NavControlle
                 )
             }
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }

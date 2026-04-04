@@ -20,11 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.database.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.handyman.JobPostingViewModel
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
 
 @Composable
-fun CustomerHome(modifier: Modifier = Modifier, navController: NavController) {
+fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, viewModel: JobPostingViewModel = viewModel()) {
     val context = LocalContext.current
     var firstName by remember { mutableStateOf("...") }
     var lastName by remember { mutableStateOf("") }
@@ -33,6 +35,8 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController) {
     val currentEmail = SessionManager.getLoggedInEmail(context)
 
     LaunchedEffect(currentEmail) {
+        val userId = SessionManager.getLoggedInUserId(context)
+        viewModel.customerId = userId
         val userRef = FirebaseDatabase.getInstance().getReference("User")
         val query = userRef.orderByChild("email").equalTo(currentEmail)
 
@@ -135,23 +139,95 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController) {
             // Grid of services (simplified layout)
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.fixture_replacement, "Fixture replacement")
-                    ServiceCard(R.drawable.plumbing, "Plumbing")
+                    ServiceCard(R.drawable.fixture_replacement, "Fixture replacement") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Fixture replacement"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Fixture replacement"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
+                    ServiceCard(R.drawable.plumbing, "Plumbing") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Plumbing"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Plumbing"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.smart_home, "Smart home")
-                    ServiceCard(R.drawable.appliance_repair, "Appliance repair")
+                    ServiceCard(R.drawable.smart_home, "Smart home") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Smart home"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Smart home"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
+                    ServiceCard(R.drawable.appliance_repair, "Appliance repair") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Appliance repair"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Appliance repair"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.painting, "Painting")
-                    ServiceCard(R.drawable.floor_repair, "Floor repair")
+                    ServiceCard(R.drawable.painting, "Painting") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Painting"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Painting"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
+                    ServiceCard(R.drawable.floor_repair, "Floor repair") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Floor repair"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Floor repair"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.wall_repair, "Wall repair")
-                    ServiceCard(R.drawable.small_appliance_repair, "Small appliance repair")
+                    ServiceCard(R.drawable.wall_repair, "Wall repair") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Wall repair"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Wall repair"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
+                    ServiceCard(R.drawable.small_appliance_repair, "Small appliance repair") {
+                        if (viewModel.isEditing) {
+                            viewModel.serviceCategory = "Small appliance repair"
+                            navController.navigate("jobPostingReview")
+                        } else {
+                            viewModel.clearData()
+                            viewModel.serviceCategory = "Small appliance repair"
+                            navController.navigate("jobPostingDescription")
+                        }
+                    }
                 }
             }
 

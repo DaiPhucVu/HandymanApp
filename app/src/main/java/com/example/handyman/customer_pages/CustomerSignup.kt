@@ -29,9 +29,13 @@ import java.text.SimpleDateFormat
 import com.example.handyman.utils.getCurrentYearMonth
 import com.example.handyman.utils.incrementMetric
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 @Composable
 fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -53,8 +57,8 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -189,7 +193,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
                         incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
 
                         Log.d("Signup", "Successfully created user.")
-                        SessionManager.saveLoggedInEmail(context, email)
+                        SessionManager.saveSession(context, email, userId, firstName)
                         Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
                         navController.navigate("customerKycAddressForm")
                     }

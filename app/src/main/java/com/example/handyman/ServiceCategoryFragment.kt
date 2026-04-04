@@ -20,12 +20,12 @@ import android.content.Intent
 
 
 private const val TAG = "ServiceCategoryFragment"
-val customerId = "customer2"
 
 class ServiceCategoryFragment : Fragment() {
     private val serviceCategoryViewModel: ServiceCategoryViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ServiceCategoryAdapter
+    private lateinit var customerId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +40,12 @@ class ServiceCategoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_service_category, container, false)
+        
+        customerId = SessionManager.getLoggedInUserId(requireContext())
+        val userName = SessionManager.getLoggedInUserName(requireContext())
+
+        // Update greeting
+        view.findViewById<android.widget.TextView>(R.id.tvGreeting)?.text = "Hello, $userName"
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = GridLayoutManager(context, 2)

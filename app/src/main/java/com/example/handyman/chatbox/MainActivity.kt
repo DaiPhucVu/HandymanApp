@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
                 var startDestination by remember { mutableStateOf<String?>("landingPage") }
 
                 Navigation(
-                    modifier = Modifier.fillMaxSize().systemBarsPadding(),
+                    modifier = Modifier.fillMaxSize(),
                     startDestination = startDestination ?: "landingPage"
                 )
             }

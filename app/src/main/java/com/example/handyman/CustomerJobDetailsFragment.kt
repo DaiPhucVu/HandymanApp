@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -34,6 +35,11 @@ class CustomerJobDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        view.findViewById<ImageView>(R.id.ivBack).setOnClickListener {
+            findNavController().navigateUp()
+        }
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerQuotedHandymen)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 

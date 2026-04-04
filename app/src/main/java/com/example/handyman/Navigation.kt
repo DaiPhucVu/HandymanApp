@@ -8,43 +8,44 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 //Customer pages
-import com.example.handyman.customer_pages.CustomerHome
-import com.example.handyman.customer_pages.CustomerLogin
-import com.example.handyman.customer_pages.CustomerSignup
-import com.example.handyman.customer_pages.CustomerHomeUnverified
-import com.example.handyman.customer_pages.CustomerKYCCodeOTP
-import com.example.handyman.customer_pages.CustomerKYCSubmitted
-import com.example.handyman.customer_pages.CustomerKYCSuccess
-import com.example.handyman.customer_pages.CustomerHomeKYCProcessing
-import com.example.handyman.customer_pages.CustomerKYCLanding
-import com.example.handyman.customer_pages.CustomerKYCCaptureID
-import com.example.handyman.customer_pages.CustomerKYCAddressForm
-import com.example.handyman.customer_pages.CustomerKYCPhoneNumber
-
-//Handyman pages
-import com.example.handyman.handyman_pages.HandymanSignup
-import com.example.handyman.handyman_pages.HandymanLogin
-import com.example.handyman.handyman_pages.HandymanHomeUnverified
-import com.example.handyman.handyman_pages.HandymanKYCLanding
-import com.example.handyman.handyman_pages.HandymanKYCCaptureID
-import com.example.handyman.handyman_pages.HandymanKYCAddressForm
-import com.example.handyman.handyman_pages.HandymanKYCPhoneNumber
-import com.example.handyman.handyman_pages.HandymanKYCCodeOTP
-import com.example.handyman.handyman_pages.HandymanKYCSubmitted
-import com.example.handyman.handyman_pages.HandymanKYCProcessing
-import com.example.handyman.handyman_pages.HandymanKYCCertificates
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.handyman.*
+import com.example.handyman.customer_pages.*
+import com.example.handyman.handyman_pages.*
 
 
 @Composable
 fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landingPage") {
     val navController = rememberNavController()
+    val jobPostingViewModel: JobPostingViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = startDestination, builder = {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier,
+        builder = {
         composable("landingPage") {
             LandingPage(Modifier.fillMaxSize(), navController)
         }
         composable("chooseAccountType") {
             ChooseAccountType(Modifier.fillMaxSize(), navController)
+        }
+
+        // New Job Posting Flow
+        composable("jobPostingDescription") {
+            JobPostingDescriptionScreen(navController, jobPostingViewModel)
+        }
+        composable("jobPostingLocation") {
+            JobPostingLocationScreen(navController, jobPostingViewModel)
+        }
+        composable("jobPostingSalary") {
+            JobPostingSalaryScreen(navController, jobPostingViewModel)
+        }
+        composable("jobPostingPhotos") {
+            JobPostingPhotoScreen(navController, jobPostingViewModel)
+        }
+        composable("jobPostingReview") {
+            JobPostingReviewScreen(navController, jobPostingViewModel)
         }
 
 //        Handyman pages
@@ -93,7 +94,7 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
             CustomerSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerHome") {
-            CustomerHome(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            CustomerHome(Modifier.fillMaxSize().systemBarsPadding(), navController, jobPostingViewModel)
         }
         composable("customerHomeUnverified") {
             CustomerHomeUnverified(Modifier.fillMaxSize().systemBarsPadding(), navController)

@@ -23,19 +23,11 @@ class ChooseAccountTypeActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-
-            NavHost(
-                navController = navController,
-                modifier = Modifier.fillMaxSize().systemBarsPadding(),
-                startDestination = "choose_account_type"
-            ) {
-                composable("choose_account_type") { ChooseAccountType(Modifier, navController) }
-                composable("customerSignup") { CustomerSignup(Modifier, navController) }
-                composable("handymanSignup") { HandymanSignup(Modifier, navController) }
-                composable("customerLogin") { CustomerLogin(Modifier, navController) }  // <-- ADD THIS
-                composable("handymanLogin") { HandymanLogin(Modifier, navController) }
-
+            com.example.handyman.ui.theme.HandymanTheme {
+                Navigation(
+                    modifier = Modifier.fillMaxSize(),
+                    startDestination = "chooseAccountType"
+                )
             }
         }
     }

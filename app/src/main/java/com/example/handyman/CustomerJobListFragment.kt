@@ -40,6 +40,10 @@ class CustomerJobListFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
+        view.findViewById<View>(R.id.btnBack).setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         adapter = CustomerJobListAdapter(
             onViewDetails = { job ->
                 // convert your stored String URIs back into Uri[]

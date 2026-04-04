@@ -188,7 +188,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
                         incrementMetric("serviceAnalytics/2025/$year/$month/newHandymen")
                         incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
 
-                        SessionManager.saveLoggedInEmail(context, email)
+                        SessionManager.saveSession(context, email, handymanId, firstName)
                         Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
                         navController.navigate("handymanKYCLanding")
                     }
