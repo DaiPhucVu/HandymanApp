@@ -52,7 +52,6 @@ class ChatClientViewModel : ViewModel() {
     }
 
     private fun listenForMessages() {
-        // Fetch messages from the "messages" collection of the specific chatID
         database.collection("chats")
             .document(chatID.value)
             .collection("messages")
@@ -63,9 +62,6 @@ class ChatClientViewModel : ViewModel() {
                 }
 
                 messages.clear()
-                // If there are messages then extract their data and
-                // make them into individual Message objects
-                // and loading the objects into "messages" List
                 snapshots.documents.mapNotNull { docRef ->
                     val senderId = docRef.getString("senderId")
                     val receiverId = docRef.getString("receiverId")
@@ -103,18 +99,15 @@ fun ChatClientScreen(
     viewModel: ChatClientViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    // Update chatID to the current one as it could still be on an old one
     LaunchedEffect(chatID) {
         chatID?.let { viewModel.updateChatID(it) }
     }
 
     val messages = viewModel.getMessages()
     var messageInput by remember { mutableStateOf("") }
-
     val listState = rememberLazyListState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Scroll to latest message
     LaunchedEffect(messages.size) {
         listState.animateScrollToItem(messages.size)
     }
@@ -155,6 +148,17 @@ fun ChatClientScreen(
                         y = 65.dp
                     )
             )
+//            Image(
+//                painter = painterResource(id = R.drawable.ic_overflow_dot_menu),
+//                contentDescription = "Overflow menu icon",
+//                modifier = Modifier
+//                    .align(alignment = Alignment.TopStart)
+//                    .offset(
+//                        x = 375.dp,
+//                        y = 56.dp
+//                    )
+//                    .requiredSize(size = 32.dp)
+//            )
         }
 
         // Chat display
@@ -287,3 +291,9 @@ fun SendButton(size: Dp, onClick: () -> Unit, modifier: Modifier = Modifier) {
         )
     }
 }
+
+//@Preview(widthDp = 412, heightDp = 915)
+//@Composable
+//private fun ChatClientPreview() {
+//    ChatClientScreen("User1", {})
+//}

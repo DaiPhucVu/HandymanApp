@@ -1,11 +1,3 @@
-/*
-The original purpose of this file was to display a list of all chat channels
-the logged in user has access to.
-The current implementation of the app has the chat channel opened using a button
-included in every job detail (check out files: QuotedHandymenAdapter,
-HandymanJobBoardDetailsFragment and HandymanJobListDetailsFragment) therefore
-this file is redundant, but can be used if the chat feature should be accessed independently
- */
 package com.example.handyman.chatbox.ui.composables
 
 import android.util.Log
@@ -44,6 +36,37 @@ class ChatListingViewModel : ViewModel() {
     }
 
     private fun fetchChatChannels() {
+        // Old version that list every user
+//        FirebaseFirestore.getInstance().collection("users").get().addOnCompleteListener { task ->
+//            val currentUID = FirebaseAuth.getInstance().currentUser?.uid
+//            if (task.isSuccessful && task.result != null) {
+//                channelList.clear()
+//                for (snapshot: QueryDocumentSnapshot in task.result) {
+//                    snapshot.getString("username")?.let { Log.d("Snapshot", it) }
+//
+//                    if (currentUID.equals(snapshot.id)) {
+//                        continue
+//                    }
+//
+//                    val uid = snapshot.getString("uid")
+//                    val username = snapshot.getString("username")
+//
+//                    if (uid != null && username != null) {
+//                        channelList.add(
+//                            ChatChannel(
+//                                uid = uid,
+//                                username = username,
+//                                lastMessage = "Test message",
+////                            profilePictureURL = R.mipmap.test_profile.toString()
+//                            )
+//                        )
+//                    }
+//                }
+//            } else {
+//                Log.e("Firestore", "Failed to fetch ChatChannels: " + task.exception)
+//            }
+//        }
+
         FirebaseFirestore.getInstance().collection("chats").get().addOnCompleteListener { task ->
             val currentUID = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -140,3 +163,56 @@ fun ChatListingScreen(
         }
     }
 }
+
+//@Preview(widthDp = 428, heightDp = 926)
+//@Composable
+//private fun ChatListingPreview() {
+//    val sampleChatChannels = listOf(
+//        ChatChannel(
+//            uid = "uid1",
+//            username = "User1",
+//            lastMessage = "Test message 1",
+//            profilePictureURL = R.mipmap.test_profile.toString()
+//        ),
+//        ChatChannel(
+//            uid = "uid2",
+//            username = "User2",
+//            lastMessage = "Test message 2",
+//            profilePictureURL = R.mipmap.test_profile.toString()
+//        )
+//    )
+//
+//    Box(
+//        modifier = Modifier
+//            .requiredWidth(412.dp)
+//            .requiredHeight(915.dp)
+//            .background(Color.White)
+//    ) {
+//        Box(
+//            modifier = Modifier.requiredHeight(190.dp).fillMaxWidth()
+//        ) {
+//            Box(
+//                modifier = Modifier
+//                    .align(alignment = Alignment.TopStart)
+//                    .offset(
+//                        x = 32.dp,
+//                        y = 56.dp,
+//                    )
+//            ) {
+//                BackButton(size = 35.dp, onClick = {})
+//            }
+//        }
+//
+//        ChatListingScreen(
+////            chatChannels = sampleChatChannels,
+//            onChannelClick = {},
+//            modifier = Modifier
+//                .requiredWidth(345.dp)
+//                .fillMaxHeight()
+//                .offset(
+//                    y = 175.dp
+//                )
+//                .align(Alignment.TopCenter)
+//        )
+//    }
+//}
