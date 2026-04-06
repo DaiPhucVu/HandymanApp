@@ -1,10 +1,10 @@
 package com.example.handyman.handyman_pages
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.ImageCapture
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.handyman.R
@@ -31,22 +31,67 @@ import com.example.handyman.components.StepCircle
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavController) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var showCamera by remember { mutableStateOf(false) }
+    var tempUri by remember { mutableStateOf<Uri?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
 
     val showActionIcons = selectedImageUri == null
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        selectedImageUri = uri
-        showCamera = false
+        if (uri != null) selectedImageUri = uri
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) selectedImageUri = tempUri
+    }
+
+    fun createImageUri(context: Context): Uri {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = context.cacheDir
+        val file = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+        return FileProvider.getUriForFile(
+            context,
+            "com.example.handyman.fileprovider",
+            file
+        )
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Select ID Photo") },
+            text = { Text("Choose a photo of your ID from your gallery or take a new one.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    val uri = createImageUri(context)
+                    tempUri = uri
+                    cameraLauncher.launch(uri)
+                    showDialog = false
+                }) {
+                    Text("Camera")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    galleryLauncher.launch("image/*")
+                    showDialog = false
+                }) {
+                    Text("Gallery")
+                }
+            }
+        )
     }
 
     Column(
@@ -142,7 +187,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     modifier = Modifier
                         .size(48.dp)
                         .clickable {
-                            galleryLauncher.launch("image/*")
+                            showDialog = true
                         }
                 )
 
@@ -150,7 +195,11 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     painter = painterResource(id = R.drawable.camera_shutter_button),
                     contentDescription = "Capture",
                     tint = Color.Unspecified,
-                    modifier = Modifier.size(72.dp)
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clickable {
+                            showDialog = true
+                        }
                 )
 
                 Icon(
@@ -168,6 +217,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                 Button(
                     onClick = {
                         if (selectedImageUri != null) {
+                            isUploading = true
                             val currentEmail = SessionManager.getLoggedInEmail(context)
                             val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
                             val query = handymanRef.orderByChild("email").equalTo(currentEmail)
@@ -185,22 +235,27 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                                             for (child in snapshot.children) {
                                                 child.ref.child("photoIdCard").setValue(downloadUrl)
                                                     .addOnSuccessListener {
+                                                        isUploading = false
                                                         navController.navigate("handymanKYCCertificates")
                                                     }
                                                     .addOnFailureListener { e ->
+                                                        isUploading = false
                                                         Log.e("KYC", "Failed to save photo URL: ${e.message}")
                                                     }
                                             }
 
                                             if (!snapshot.exists()) {
+                                                isUploading = false
                                                 Log.e("KYC", "No handyman found with email: $currentEmail")
                                             }
                                         }.addOnFailureListener { e ->
+                                            isUploading = false
                                             Log.e("KYC", "Query failed: ${e.message}")
                                         }
                                     }
                                 }
                                 .addOnFailureListener { e ->
+                                    isUploading = false
                                     Log.e("KYC", "Upload failed: ${e.message}")
                                 }
                         }
@@ -208,10 +263,19 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
+                    enabled = !isUploading,
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367))
                 ) {
-                    Text("Submit ID Card", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    if (isUploading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Submit ID Card", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -221,6 +285,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
+                    enabled = !isUploading,
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {

@@ -58,28 +58,31 @@ class ChatClientViewModel : ViewModel() {
             .collection("messages")
             .orderBy("timestamp")
             .addSnapshotListener { snapshots, error ->
-                if (snapshots == null || error != null) {
+                if (error != null) {
+                    Log.e("ChatViewModel", "Listen failed: ${error.message}")
                     return@addSnapshotListener
                 }
 
-                messages.clear()
-                // If there are messages then extract their data and
-                // make them into individual Message objects
-                // and loading the objects into "messages" List
-                snapshots.documents.mapNotNull { docRef ->
-                    val senderId = docRef.getString("senderId")
-                    val receiverId = docRef.getString("receiverId")
-                    val timestamp = docRef.getTimestamp("timestamp")
-                    val content = docRef.getString("content")
-                    if (senderId != null && receiverId != null && timestamp != null && content != null) {
-                        messages.add(
-                            Message(
-                                senderId = senderId,
-                                receiverId = receiverId,
-                                timestamp = timestamp,
-                                content = content
+                if (snapshots != null) {
+                    messages.clear()
+                    // If there are messages then extract their data and
+                    // make them into individual Message objects
+                    // and loading the objects into "messages" List
+                    for (doc in snapshots.documents) {
+                        val senderId = doc.getString("senderId")
+                        val receiverId = doc.getString("receiverId")
+                        val timestamp = doc.getTimestamp("timestamp")
+                        val content = doc.getString("content")
+                        if (senderId != null && receiverId != null && timestamp != null && content != null) {
+                            messages.add(
+                                Message(
+                                    senderId = senderId,
+                                    receiverId = receiverId,
+                                    timestamp = timestamp,
+                                    content = content
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }

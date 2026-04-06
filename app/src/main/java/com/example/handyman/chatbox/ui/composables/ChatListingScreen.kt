@@ -45,7 +45,7 @@ class ChatListingViewModel : ViewModel() {
 
     private fun fetchChatChannels() {
         FirebaseFirestore.getInstance().collection("chats").get().addOnCompleteListener { task ->
-            val currentUID = FirebaseAuth.getInstance().currentUser?.uid
+            val currentUID = com.example.handyman.utils.SessionManager.currentUserID
 
             if (task.isSuccessful && task.result != null) {
                 channelList.clear()

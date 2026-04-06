@@ -1,24 +1,104 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:gravity="center"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:background="#FFFFFF">
 
-    <TextView
-        android:id="@+id/tvSuccessMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="✅ Payment Successful!"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp"
-        android:textColor="@android:color/holo_green_dark"
-        android:layout_gravity="center" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="80dp">
 
-    <Button
-        android:id="@+id/btnReturnHome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Return to Home" />
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="40dp"
+                android:src="@drawable/verified_mark" />
+
+            <TextView
+                android:id="@+id/tvSuccessMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Payment Successful!"
+                android:textColor="#2E7D32"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Your job has been completed."
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnDownloadInvoice"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:drawableStart="@drawable/document_icon"
+                android:drawablePadding="8dp"
+                android:text="Download Invoice"
+                android:textColor="#8E24AA"
+                app:strokeColor="#8E24AA" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="32dp"
+                android:background="#EEEEEE" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How was the service?"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:numStars="5"
+                android:progressTint="#FFD700"
+                android:stepSize="1.0" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:hint="Share your experience (optional)">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etReviewComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:lines="4" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btnSubmitReview"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#8E24AA"
+                android:text="Submit Review"
+                app:cornerRadius="12dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

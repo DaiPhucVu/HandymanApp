@@ -66,7 +66,7 @@ class CustomerJobListAdapter(
                 "${item.jobDateFrom} — ${item.jobDateTo}"
 
             tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            tvLocation.text = "${item.jobLocation}, Melbourne, VIC"
+            tvLocation.text = item.jobLocation
 
             // Determine status
             val displayStatus = when {
@@ -105,7 +105,11 @@ class CustomerJobListAdapter(
                 status.setBackgroundResource(R.drawable.status_done)
             } else {
                 updateBttn.visibility = View.VISIBLE
-                btnProceedToPayment.visibility = View.VISIBLE
+                if (item.jobStatus == "Done") {
+                    btnProceedToPayment.visibility = View.VISIBLE
+                } else {
+                    btnProceedToPayment.visibility = View.GONE
+                }
             }
 
             detailsBttn.setOnClickListener { onViewDetails(item) }

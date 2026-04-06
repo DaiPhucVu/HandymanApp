@@ -1,48 +1,153 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:background="#F8F9FA">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <!-- Header with Back Arrow -->
+    <RelativeLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="60dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:paddingTop="12dp">
+
+        <ImageView
+            android:id="@+id/ivBackArrow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:padding="8dp"
+            android:src="@drawable/arrow_back"
+            app:tint="@android:color/black" />
 
         <TextView
-            android:id="@+id/tvJobTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Job Title"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_centerInParent="true"
+            android:text="Payment"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
-        <TextView
-            android:id="@+id/tvJobDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Job Description"
-            android:layout_marginBottom="8dp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
+        android:clipToPadding="false"
+        android:padding="20dp">
 
-        <TextView
-            android:id="@+id/tvRequestedAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Requested Amount: BDT ..."
-            android:textColor="@android:color/holo_red_dark"
-            android:layout_marginBottom="24dp" />
-
-        <Button
-            android:id="@+id/btnPayCash"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pay with Cash"
-            android:layout_marginBottom="16dp" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnPayBkash"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Pay with bKash" />
-    </LinearLayout>
-</ScrollView>
+            <!-- Job Summary Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvJobTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Job Title"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvJobDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:alpha="0.7"
+                        android:text="Job Description"
+                        android:textSize="14sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#EEEEEE" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Amount"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvRequestedAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="BDT 0.00"
+                        android:textColor="#8E24AA"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Select Payment Method"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Payment Options -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btnPayBkash"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginBottom="16dp"
+                    android:backgroundTint="#E91E63"
+                    android:drawableStart="@drawable/credit_card"
+                    android:drawablePadding="12dp"
+                    android:paddingStart="20dp"
+                    android:text="Pay with bKash"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    app:cornerRadius="12dp" />
+
+                <Button
+                    android:id="@+id/btnPayCash"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:backgroundTint="@android:color/white"
+                    android:drawableStart="@drawable/credit_card"
+                    android:drawablePadding="12dp"
+                    android:paddingStart="20dp"
+                    android:text="Pay with Cash"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#DDDDDD"
+                    app:strokeWidth="1dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

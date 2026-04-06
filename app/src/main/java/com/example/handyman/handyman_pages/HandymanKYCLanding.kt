@@ -13,13 +13,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.handyman.R
 import com.example.handyman.components.StepCircle
 import com.example.handyman.components.DividerLine
+import com.example.handyman.utils.SessionManager
 
 @Composable
 fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavController) {
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -44,6 +47,20 @@ fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavControll
                     }
             )
             Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Medium)
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = "Logout",
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {
+                    SessionManager.clearSession(context)
+                    navController.navigate("chooseAccountType") {
+                        popUpTo(0)
+                    }
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))

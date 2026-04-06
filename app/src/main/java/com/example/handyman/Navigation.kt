@@ -53,6 +53,9 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         composable("handymanSignup") {
             HandymanSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
+        composable("handymanSkills") {
+            HandymanSkillsScreen(navController)
+        }
         composable("handymanLogin") {
             HandymanLogin(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
@@ -82,6 +85,12 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         }
         composable("handymanKYCCertificates") {
             HandymanKYCCertificates(Modifier.fillMaxSize().systemBarsPadding(), navController)
+        }
+        composable("handymanProfile") {
+            HandymanProfileScreen(navController)
+        }
+        composable("handymanProfilePictureUpload") {
+            HandymanProfilePictureUpload(navController)
         }
 
 
@@ -122,6 +131,12 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         }
         composable ("customerHomeKYCProcessing"){
             CustomerHomeKYCProcessing(Modifier.fillMaxSize().systemBarsPadding(), navController)
+        }
+        composable("customerProfilePictureUpload") {
+            CustomerProfilePictureUpload(navController)
+        }
+        composable("customerProfile") {
+            CustomerProfileScreen(navController)
         }
 
     })

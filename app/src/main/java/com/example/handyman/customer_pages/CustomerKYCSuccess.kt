@@ -23,9 +23,10 @@ import com.example.handyman.R
 fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF20794B))
+            .systemBarsPadding()
             .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

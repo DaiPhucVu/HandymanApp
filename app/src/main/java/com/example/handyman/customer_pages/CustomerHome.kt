@@ -25,12 +25,16 @@ import com.example.handyman.JobPostingViewModel
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
 
+import coil.compose.rememberAsyncImagePainter
+
 @Composable
 fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, viewModel: JobPostingViewModel = viewModel()) {
     val context = LocalContext.current
     var firstName by remember { mutableStateOf("...") }
     var lastName by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("Dhaka City") }
+
+    var profileImageUrl by remember { mutableStateOf<String?>(null) }
 
     val currentEmail = SessionManager.getLoggedInEmail(context)
 
@@ -46,6 +50,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                     firstName = child.child("firstName").getValue(String::class.java) ?: ""
                     lastName = child.child("lastName").getValue(String::class.java) ?: ""
                     city = child.child("city").getValue(String::class.java) ?: "Dhaka City"
+                    profileImageUrl = child.child("profileImageUrl").getValue(String::class.java)
                 }
             }
 
@@ -58,23 +63,38 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
     Box(modifier = modifier.fillMaxSize()) {
 
         // Top right logout
-        Text(
-            "Log out",
-            color = Color(0xFF30386D),
-            fontSize = 18.sp,
+        Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 24.dp, end = 24.dp)
-                .clickable {
-                    // Clear session
-                    SessionManager.clearSession(context)
-                    // Navigate to login, removing the back stack
-                    navController.navigate("chooseAccountType") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
+                .padding(top = 24.dp, end = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Profile",
+                color = Color(0xFF30386D),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate("customerProfile")
                     }
-                }
-        )
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                "Log out",
+                color = Color(0xFF30386D),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .clickable {
+                        // Clear session
+                        SessionManager.clearSession(context)
+                        // Navigate to login, removing the back stack
+                        navController.navigate("chooseAccountType") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+            )
+        }
 
         Column(
             modifier = modifier
@@ -82,12 +102,27 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 .padding(16.dp)
         ) {
             // Header
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.dp),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.size(60.dp).padding(end = 8.dp)
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { navController.navigate("customerProfile") }
+            ) {
+                if (profileImageUrl != null && profileImageUrl!!.isNotEmpty()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(profileImageUrl),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .padding(end = 8.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.character_customer),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier.size(60.dp).padding(end = 8.dp)
+                    )
+                }
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -242,20 +277,30 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 Icon(
                     painter = painterResource(id = R.drawable.home_icon),
                     contentDescription = "Home",
-                    tint = Color(0xFF8A4DFF),
-                    modifier = Modifier.size(30.dp)
+                    tint = Color(0xFF30386D),
+                    modifier = Modifier.size(30.dp).clickable { /* Already home */ }
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.list_icon),
                     contentDescription = "List",
                     tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp).clickable {
+                        val userId = SessionManager.getLoggedInUserId(context)
+                        val intent = android.content.Intent(context, com.example.handyman.MainJobBoard::class.java).apply {
+                            putExtra("customerId", userId)
+                            putExtra("user_type", "customer")
+                        }
+                        context.startActivity(intent)
+                    }
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.chat_icon),
                     contentDescription = "Chat",
                     tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp).clickable {
+                        val intent = android.content.Intent(context, com.example.handyman.chatbox.ChatListingActivity::class.java)
+                        context.startActivity(intent)
+                    }
                 )
             }
         }

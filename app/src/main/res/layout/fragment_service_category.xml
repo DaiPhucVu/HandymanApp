@@ -11,91 +11,143 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Top Card (scrolls away with content) -->
-        <LinearLayout
+        <!-- Top Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center"
-            android:background="@drawable/rectangle_box"
-            android:layout_margin="10dp">
-
-            <!-- Avatar -->
-            <ImageView
-                android:id="@+id/ivAvatar"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/sample_handyman"
-                android:scaleType="centerCrop" />
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:gravity="center_vertical"
+                android:background="@color/white">
+
+                <!-- Avatar and All Jobs Button Column -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginEnd="20dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivAvatar"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/sample_handyman"
+                        android:scaleType="centerCrop"
+                        app:shapeAppearanceOverlay="@style/CircleAppearance" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnAllJobs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:text="All Jobs"
+                        android:textSize="11sp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:background="@drawable/button_background_purple"
+                        android:textColor="@android:color/white"
+                        android:layout_marginTop="10dp"
+                        android:textAllCaps="false"
+                        android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvGreeting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hello, Minnie J."
+                        android:textColor="@color/black"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-black"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Welcome back!"
+                        android:textColor="@color/darker_gray"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="4dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/ivVerifiedIcon"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginEnd="6dp"
+                            android:src="@drawable/verified_mark" />
+
+                        <TextView
+                            android:id="@+id/tvVerified"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Verified"
+                            android:textSize="13sp"
+                            android:textColor="#2E7D32"
+                            android:textStyle="bold"
+                            android:background="#DCF3E3"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/ivLocationIcon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginEnd="6dp"
+                            android:src="@drawable/location"
+                            app:tint="@color/darker_gray" />
+
+                        <TextView
+                            android:id="@+id/tvLocation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dhaka City"
+                            android:textSize="13sp"
+                            android:textColor="@color/darker_gray" />
+                    </LinearLayout>
+                </LinearLayout>
+
                 <ImageView
                     android:id="@+id/ivLogout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:src="@drawable/ic_logout"
                     android:contentDescription="Logout"
-                    android:layout_marginEnd="16dp"
-                    android:layout_gravity="end"/>
+                    android:layout_gravity="top|end"
+                    android:padding="4dp"
+                    app:tint="#30386D"/>
 
-                <TextView
-                    android:id="@+id/tvGreeting"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hello, Minnie J."
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="4dp">
-
-                    <ImageView
-                        android:id="@+id/ivVerifiedIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_marginEnd="4dp"
-                        android:src="@drawable/verified_mark" />
-
-                    <TextView
-                        android:id="@+id/tvVerified"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Verified"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/darker_gray" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/ivLocationIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_marginEnd="4dp"
-                        android:src="@drawable/location" />
-
-                    <TextView
-                        android:id="@+id/tvLocation"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Dhaka City"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/darker_gray" />
-                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- RecyclerView fills remaining space -->
         <androidx.recyclerview.widget.RecyclerView

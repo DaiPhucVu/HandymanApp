@@ -261,16 +261,27 @@
                         android:textSize="14sp"/>
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/btnMessage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Message"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="@android:color/holo_blue_light"
-                    android:textSize="12sp"
-                    android:layout_marginTop="10dp"/>
+                    <Button
+                        android:id="@+id/btnViewProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View Profile"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#2D2E5E"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
+
+                    <Button
+                        android:id="@+id/btnMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Message"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="@android:color/holo_blue_light"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -279,23 +290,35 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
         android:layout_margin="20dp">
 
         <Button
-            android:id="@+id/btnReturn"
-            android:layout_width="0dp"
+            android:id="@+id/btnQuote"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:backgroundTint="#ff33b5e5"
+            android:text="Quote Job"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btnReturn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:backgroundTint="@android:color/darker_gray"
             android:text="Return"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:padding="12dp"
-            android:layout_marginEnd="6dp"/>
+            android:padding="12dp"/>
     </LinearLayout>
 
         </LinearLayout>

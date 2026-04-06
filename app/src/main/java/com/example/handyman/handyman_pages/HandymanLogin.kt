@@ -4,7 +4,9 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,11 +39,14 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
 
     Log.d("Navigation:", "HandymanLogin launches")
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
+            .verticalScroll(scrollState)
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 

@@ -45,6 +45,7 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .verticalScroll(scrollState)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally

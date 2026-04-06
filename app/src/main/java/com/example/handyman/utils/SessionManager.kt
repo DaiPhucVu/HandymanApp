@@ -22,6 +22,8 @@ object SessionManager {
             putString(KEY_USER_NAME, firstName)
             apply()
         }
+        currentUserID = userId
+        currentUserName = firstName
     }
 
     fun saveLoggedInEmail(context: Context, email: String) {
@@ -47,11 +49,10 @@ object SessionManager {
     fun clearSession(context: Context) {
         val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit().clear().apply()
-    }
-
-    fun clearSessionXML(context: Context) {
-        val sharedPref = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
-        sharedPref.edit().clear().apply()
+        
+        // Also clear the legacy "UserSession" if it exists to be safe
+        val legacyPrefs = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        legacyPrefs.edit().clear().apply()
     }
 
 }

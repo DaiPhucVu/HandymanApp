@@ -2,7 +2,9 @@ package com.example.handyman.customer_pages
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +37,8 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
         modifier = modifier
             .fillMaxSize()
             .background(Color.White)
+            .imePadding()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp)
     ) {
         // Top bar
@@ -89,26 +93,22 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
 
         Button(
             onClick = {
-                val currentEmail = SessionManager.getLoggedInEmail(context)
-                val userRef = FirebaseDatabase.getInstance().getReference("User")
-                val query = userRef.orderByChild("email").equalTo(currentEmail)
-
-                query.get().addOnSuccessListener { snapshot ->
-                    for (child in snapshot.children) {
-                        child.ref.child("phoneNumber").setValue(phoneNumber)
-                            .addOnSuccessListener {
-                                navController.navigate("customerKycCodeOTP")
-                            }
-                            .addOnFailureListener { error ->
-                                Log.e("KYC", "Failed to save phone number: ${error.message}")
-                            }
-                    }
-                    if (!snapshot.exists()) {
-                        Log.e("KYC", "No user found with email: $currentEmail")
-                    }
-                }.addOnFailureListener { error ->
-                    Log.e("KYC", "Failed to query user: ${error.message}")
+                val userId = SessionManager.currentUserID
+                if (userId == null) {
+                    Log.e("KYC", "No logged-in user ID found")
+                    return@Button
                 }
+
+                FirebaseDatabase.getInstance().getReference("User")
+                    .child(userId)
+                    .child("phoneNumber")
+                    .setValue(phoneNumber)
+                    .addOnSuccessListener {
+                        navController.navigate("customerKycCodeOTP")
+                    }
+                    .addOnFailureListener { error ->
+                        Log.e("KYC", "Failed to save phone number: ${error.message}")
+                    }
             },
             enabled = isValidPhone,
             modifier = Modifier

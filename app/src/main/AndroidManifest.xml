@@ -16,18 +16,21 @@
                 android:name=".chatbox.MainActivity"
                 android:exported="true"
                 android:label="@string/app_name"
-                android:theme="@style/AppTheme">
+                android:theme="@style/AppTheme"
+                android:screenOrientation="portrait"
+                android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".MainJobBoard" android:theme="@style/AppTheme"/>
-        <activity android:name=".chatbox.ChatListingActivity" android:theme="@style/AppTheme"/>
-        <activity android:name=".chatbox.ChatClientActivity" android:theme="@style/AppTheme"/>
-        <activity android:name=".SupportForm" />
-        <activity android:name=".ChooseAccountTypeActivity" android:exported="true" />
+        <activity android:name=".MainJobBoard" android:theme="@style/AppTheme" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".HandymanProfileActivity" android:theme="@style/AppTheme" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".chatbox.ChatListingActivity" android:theme="@style/AppTheme" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".chatbox.ChatClientActivity" android:theme="@style/AppTheme" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".SupportForm" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ChooseAccountTypeActivity" android:exported="true" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
 
         <provider
                 android:name="androidx.core.content.FileProvider"

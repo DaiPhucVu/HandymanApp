@@ -5,6 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +30,7 @@ import com.example.handyman.utils.incrementMetric
 @Composable
 fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -47,8 +50,9 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
+            .imePadding()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row (
@@ -178,7 +182,9 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
                     "verificationStatus" to "",
                     "approvedBy" to "",
                     "createdAt" to timestamp,
-                    "updatedAt" to timestamp
+                    "updatedAt" to timestamp,
+                    "averageRating" to 0.0,
+                    "reviewCount" to 0
                 )
 
                 val ref = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanId)
@@ -190,7 +196,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
 
                         SessionManager.saveSession(context, email, handymanId, firstName)
                         Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
-                        navController.navigate("handymanKYCLanding")
+                        navController.navigate("handymanProfilePictureUpload")
                     }
                     .addOnFailureListener { error ->
                         Toast.makeText(context, "Failed to sign up: ${error.message}", Toast.LENGTH_LONG).show()

@@ -45,17 +45,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        val sessionEmail = SessionManager.getLoggedInEmail(this)
-
-        Log.d("Session", "Restoring session for: $sessionEmail")
 
         setContent {
             HandymanTheme {
-                var startDestination by remember { mutableStateOf<String?>("landingPage") }
-
                 Navigation(
                     modifier = Modifier.fillMaxSize(),
-                    startDestination = startDestination ?: "landingPage"
+                    startDestination = "landingPage"
                 )
             }
         }

@@ -170,9 +170,45 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layoutHandyman"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/layoutLocation"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/character_handyman" />
+
+            <TextView
+                android:id="@+id/tvHandymanName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Handyman: "
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnViewProfile"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View Profile"
+                android:textAllCaps="false"
+                android:textColor="#8E24AA" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layoutHandyman"
             android:layout_marginTop="10dp">
 
             <HorizontalScrollView

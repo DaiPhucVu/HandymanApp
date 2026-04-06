@@ -1,5 +1,6 @@
 package com.example.handyman
 
+import android.util.Log
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,7 +42,8 @@ class CustomerJobListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         view.findViewById<View>(R.id.btnBack).setOnClickListener {
-            findNavController().popBackStack()
+            val action = CustomerJobListFragmentDirections.actionCustomerJobListFragmentToServiceCategoryFragment()
+            findNavController().navigate(action)
         }
 
         adapter = CustomerJobListAdapter(
@@ -74,7 +76,7 @@ class CustomerJobListFragment : Fragment() {
             },
             onEdit = { job ->
                 val customerRef = FirebaseDatabase.getInstance()
-                    .getReference("dummyCustomers")
+                    .getReference("User")
                     .child(customerId)
                     .child("notAssignedJobs")
 
@@ -125,7 +127,7 @@ class CustomerJobListFragment : Fragment() {
             },
             onDelete = fun(job: Job) {
                 val customerRef = FirebaseDatabase.getInstance()
-                    .getReference("dummyCustomers")
+                    .getReference("User")
                     .child(customerId)
                     .child("notAssignedJobs")
 
@@ -149,7 +151,7 @@ class CustomerJobListFragment : Fragment() {
 
                                     // Step 1: Set job status to "Inactive"
                                     val jobRef = FirebaseDatabase.getInstance()
-                                        .getReference("DummyJob")
+                                        .getReference("Job")
                                         .child(job.jobId)
 
                                     jobRef.child("jobStatus").setValue("Inactive")
@@ -171,7 +173,7 @@ class CustomerJobListFragment : Fragment() {
                                     // Step 2: Remove the job ID from notAssignedJobs and allJobs in customer
                                     customerSnapshot.children.forEach { it.ref.removeValue() }
                                     FirebaseDatabase.getInstance()
-                                        .getReference("dummyCustomers")
+                                        .getReference("User")
                                         .child(customerId)
                                         .child("allJobs")
                                         .orderByValue().equalTo(job.jobId)
@@ -181,7 +183,7 @@ class CustomerJobListFragment : Fragment() {
 
                                                 // Step 3: Add the job ID to the cancelledJobs list
                                                 FirebaseDatabase.getInstance()
-                                                    .getReference("dummyCustomers")
+                                                    .getReference("User")
                                                     .child(customerId)
                                                     .child("cancelledJobs")
                                                     .push()
@@ -206,7 +208,7 @@ class CustomerJobListFragment : Fragment() {
                                             // Step 5: Remove the job ID from each handyman's quotedJobs and allJobs list
                                             handymenList.forEach { handymanId ->
                                                 val handymanRef = FirebaseDatabase.getInstance()
-                                                    .getReference("dummyHandymen")
+                                                    .getReference("Handyman")
                                                     .child(handymanId)
 
                                                 // Iterate through both quotedJobs and allJobs lists
@@ -291,7 +293,7 @@ class CustomerJobListFragment : Fragment() {
                     .setPositiveButton("OK") { _, _ ->
                         val newStatus = nextStatuses[chosen]
                         val jobRef = FirebaseDatabase.getInstance()
-                            .getReference("DummyJob")
+                            .getReference("Job")
                             .child(job.jobId)
 
                         jobRef.child("jobStatusCustomer")
@@ -341,12 +343,12 @@ class CustomerJobListFragment : Fragment() {
                                                 }
 
                                                 val custRef = FirebaseDatabase.getInstance()
-                                                    .getReference("dummyCustomers")
+                                                    .getReference("User")
                                                     .child(customerId)
                                                 moveJobId(custRef, custFrom, toList, job.jobId)
 
                                                 val hmRef = FirebaseDatabase.getInstance()
-                                                    .getReference("dummyHandymen")
+                                                    .getReference("Handyman")
                                                     .child(job.assignedTo)
                                                 moveJobId(hmRef, hmFrom, toList, job.jobId)
 
@@ -430,25 +432,35 @@ class CustomerJobListFragment : Fragment() {
 
     private fun fetchJobsForCategory(category: String) {
         val listRef = FirebaseDatabase.getInstance()
-            .getReference("dummyCustomers")
+            .getReference("User")
             .child(customerId)
             .child(category)
+
+        Log.d("CustomerJobList", "Fetching jobs for customer: $customerId, category: $category")
 
         listRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(listSnap: DataSnapshot) {
                 val jobIds = listSnap.children
                     .mapNotNull { it.getValue(String::class.java) }
+                
+                Log.d("CustomerJobList", "Found ${jobIds.size} job IDs: $jobIds")
                 fetchJobsByIds(jobIds)
             }
             override fun onCancelled(error: DatabaseError) {
+                Log.e("CustomerJobList", "Error loading $category: ${error.message}")
                 Toast.makeText(context, "Error loading $category", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun fetchJobsByIds(jobIds: List<String>) {
+        if (jobIds.isEmpty()) {
+            adapter.submitList(emptyList())
+            return
+        }
+
         FirebaseDatabase.getInstance()
-            .getReference("DummyJob")
+            .getReference("Job")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val jobs = snapshot.children.mapNotNull { jobSnap ->
@@ -457,10 +469,13 @@ class CustomerJobListFragment : Fragment() {
                         val parsed = jobSnap.getValue(Job::class.java) ?: return@mapNotNull null
                         parsed.copy(jobId = key)
                     }
+                    Log.d("CustomerJobList", "Fetched ${jobs.size} jobs from Job")
                     adapter.hideStatus = currentCategoryKey == "cancelledJobs"
                     adapter.submitList(jobs)
                 }
-                override fun onCancelled(error: DatabaseError) {}
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("CustomerJobList", "Error loading Job data: ${error.message}")
+                }
             })
     }
 }

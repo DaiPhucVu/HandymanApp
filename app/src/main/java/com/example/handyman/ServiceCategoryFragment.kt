@@ -60,6 +60,11 @@ class ServiceCategoryFragment : Fragment() {
 
         val avatar = view.findViewById<View>(R.id.ivAvatar)
         avatar.setOnClickListener {
+            // Optional: can keep or remove
+        }
+
+        val btnAllJobs = view.findViewById<View>(R.id.btnAllJobs)
+        btnAllJobs.setOnClickListener {
             val action = ServiceCategoryFragmentDirections
                 .actionServiceCategoryFragmentToCustomerJobListFragment(customerId)
             Navigation.findNavController(view).navigate(action)
@@ -75,7 +80,7 @@ class ServiceCategoryFragment : Fragment() {
         logoutIcon.setOnClickListener {
 
             // Clear session
-            SessionManager.clearSessionXML(requireContext())
+            SessionManager.clearSession(requireContext())
             Log.d("Navigation:", "User clicks Logout")
 
 

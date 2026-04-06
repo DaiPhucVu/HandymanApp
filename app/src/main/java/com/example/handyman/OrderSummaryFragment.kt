@@ -56,7 +56,7 @@ class OrderSummaryFragment : Fragment() {
         view.findViewById<TextView>(R.id.tvDate).text = if (dateFrom == dateTo)
             dateFrom else "$dateFrom — $dateTo"
         view.findViewById<TextView>(R.id.tvTime).text = "$timeFrom — $timeTo"
-        view.findViewById<TextView>(R.id.tvAddress).text = "$location, Melbourne, VIC"
+        view.findViewById<TextView>(R.id.tvAddress).text = location
 
         view.findViewById<Button>(R.id.btnSubmitRequest)
             .setOnClickListener {
@@ -82,12 +82,12 @@ class OrderSummaryFragment : Fragment() {
                 )
 
                 val dbRef    = FirebaseDatabase.getInstance().reference
-                val custPath = "dummyCustomers/$customerId"
+                val custPath = "User/$customerId"
                 val allKey   = dbRef.child(custPath).child("allJobs").push().key!!
                 val naKey    = dbRef.child(custPath).child("notAssignedJobs").push().key!!
 
                 val updates = mapOf(
-                    "/DummyJob/$jobId"              to job,
+                    "/Jobs/$jobId"              to job,
                     "$custPath/allJobs/$allKey"        to jobId,
                     "$custPath/notAssignedJobs/$naKey" to jobId
                 )

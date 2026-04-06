@@ -1,11 +1,20 @@
 package com.example.handyman
 
-import java.time.LocalDateTime
+import com.google.firebase.database.IgnoreExtraProperties
 
+@IgnoreExtraProperties
 data class Job(
     val jobId: String = "",
     val createdAt: String = "",
     val customerId: String = "",
+    val postedBy: String? = null,    // Added for compatibility
+    val postedAt: Any? = null,      // Added for compatibility
+    val title: String? = null,       // Added for compatibility
+    val description: String? = null, // Added for compatibility
+    val location: String? = null,    // Added for compatibility
+    val category: String? = null,    // Added for compatibility
+    val status: String? = null,      // Added for compatibility
+    val lastUpdated: Any? = null,    // Added for compatibility
     val jobCat: String = "",
     val jobDesc: String = "",
     val jobDateFrom: String = "",
@@ -25,5 +34,11 @@ data class Job(
     val jobStatusCustomer : String? = null,
     val jobStatusHandyman : String? = null,
     val lastUpdate: String = "",
-    val quotedHandymen: Map<String, String>? = null,
+    // Change problematic Map types to Any? to prevent crash if [] is found
+    val quotedHandymen: Any? = null,
+    val finishedBy: String? = null,
+    val assignedAt: Any? = null,
+    val assignedBy: Any? = null,
+    val assignment: Any? = null,
+    val assignmentHistory: Any? = null
 )

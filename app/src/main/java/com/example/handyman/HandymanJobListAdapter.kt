@@ -45,12 +45,13 @@ class HandymanJobListAdapter(
 
 
         fun bind(item: Job) {
-            // Bind your Job data to the views
-            tvJobTitle.text = item.jobCat
-            tvJobDesc.text = item.jobDesc
+            // Bind your Job data to the views with fallback logic
+            tvJobTitle.text = item.title ?: item.jobCat
+            tvJobDesc.text = item.description ?: item.jobDesc
+
             if (item.paymentStatus == "done" && !item.custpay.isNullOrBlank()) {
                 tvSalary.text = "Paid: BDT ${item.custpay}"
-            } else if (item.jobSalaryFrom.isNotBlank() && item.jobSalaryTo.isNotBlank()) {
+            } else if (!item.jobSalaryFrom.isNullOrBlank() && !item.jobSalaryTo.isNullOrBlank()) {
                 if (item.jobPaymentOption == "Per Day") {
                     tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
                 } else {
@@ -65,11 +66,10 @@ class HandymanJobListAdapter(
                 tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
             }
             tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            tvLocation.text = "${item.jobLocation}, Melbourne, VIC"
+            tvLocation.text = item.location ?: item.jobLocation
 
-            val hasQuoted = item.quotedHandymen
-                .orEmpty()
-                .containsValue(handymanId)
+            val hasQuoted = (item.quotedHandymen as? Map<*, *>)
+                ?.containsValue(handymanId) == true
             val isAssigned = item.assignedTo == handymanId
             val hasOverall = item.jobStatus == "In-progress" || item.jobStatus == "Done"
 

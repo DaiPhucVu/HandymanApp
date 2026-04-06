@@ -1,21 +1,30 @@
 package com.example.handyman
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -65,7 +74,7 @@ class CustomerJobDetailsFragment : Fragment() {
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
         jobTitle.text = serviceName
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
-        val jobRef = FirebaseDatabase.getInstance().getReference("DummyJob").child(jobId)
+        val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
 
         jobRef.get().addOnSuccessListener { snapshot ->
             val paymentStatus = snapshot.child("paymentStatus").getValue(String::class.java) ?: ""
@@ -95,12 +104,35 @@ class CustomerJobDetailsFragment : Fragment() {
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
         locationDisplay.text = "$location, Melbourne, VIC"
 
+        val layoutHandyman = view.findViewById<LinearLayout>(R.id.layoutHandyman)
+        val tvHandymanName = view.findViewById<TextView>(R.id.tvHandymanName)
+        val btnViewProfile = view.findViewById<Button>(R.id.btnViewProfile)
+
+        if (assignedTo.isNotBlank()) {
+            layoutHandyman.visibility = View.VISIBLE
+            FirebaseDatabase.getInstance().getReference("Handyman").child(assignedTo)
+                .get().addOnSuccessListener { snapshot ->
+                    val fName = snapshot.child("firstName").getValue(String::class.java) ?: ""
+                    val lName = snapshot.child("lastName").getValue(String::class.java) ?: ""
+                    tvHandymanName.text = "Handyman: $fName $lName"
+                }
+            
+            btnViewProfile.setOnClickListener {
+                val intent = Intent(requireContext(), HandymanProfileActivity::class.java).apply {
+                    putExtra("handymanId", assignedTo)
+                }
+                startActivity(intent)
+            }
+        } else {
+            layoutHandyman.visibility = View.GONE
+        }
+
         // Initialize the adapter with the empty list.
-        adapter = QuotedHandymenAdapter(handymanList, jobId, assignedTo, "customer2", requireContext())
+        adapter = QuotedHandymenAdapter(handymanList, jobId, assignedTo, customerId, requireContext())
         recyclerView.adapter = adapter
 
         val quotedHandymenRef = FirebaseDatabase.getInstance()
-            .getReference("DummyJob")
+            .getReference("Job")
             .child(jobId)
             .child("quotedHandymen")
 
@@ -188,6 +220,10 @@ class CustomerJobDetailsFragment : Fragment() {
                                 .load(url)
                                 .into(imageView)
 
+                            imageView.setOnClickListener {
+                                showEnlargedImage(url)
+                            }
+
                             // Add the ImageView to the LinearLayout container.
                             photosContainer.addView(imageView)
                         }
@@ -201,5 +237,51 @@ class CustomerJobDetailsFragment : Fragment() {
                 // Handle error when listing files.
                 photoScroll.visibility = View.GONE
             }
+    }
+
+    private fun showEnlargedImage(imageUrl: String) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_enlarged_image, null)
+        val enlargedImageView = dialogView.findViewById<ImageView>(R.id.ivEnlargedImage)
+        val btnClose = dialogView.findViewById<ImageView>(R.id.ivCloseDialog)
+        val progressBar = dialogView.findViewById<ProgressBar>(R.id.pbLoading)
+
+        progressBar.visibility = View.VISIBLE
+
+        Glide.with(this)
+            .load(imageUrl)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    progressBar.visibility = View.GONE
+                    Log.e("GlideError", "Failed to load image: $imageUrl", e)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    progressBar.visibility = View.GONE
+                    return false
+                }
+            })
+            .into(enlargedImageView)
+
+        val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+            .setView(dialogView)
+            .create()
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

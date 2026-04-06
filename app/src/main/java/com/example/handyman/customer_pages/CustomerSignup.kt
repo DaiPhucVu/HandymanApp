@@ -57,6 +57,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .verticalScroll(scrollState)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -182,7 +183,9 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
                     "status" to "Pending",
                     "approvedBy" to "",
                     "createdAt" to timestamp,
-                    "updatedAt" to timestamp
+                    "updatedAt" to timestamp,
+                    "averageRating" to 0.0,
+                    "reviewCount" to 0
                 )
 
                 Log.d("Signup", "Attempting to create user: $userData")

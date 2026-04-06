@@ -290,6 +290,11 @@
                 android:name="jobId"
                 app:argType="string" />
         </action>
+        <action
+            android:id="@+id/action_customerJobListFragment_to_serviceCategoryFragment"
+            app:destination="@id/serviceCategoryFragment"
+            app:popUpTo="@id/serviceCategoryFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/customerJobDetailsFragment"
@@ -676,10 +681,15 @@
         <argument
             android:name="customerId"
             app:argType="string" />
+        <argument
+            android:name="jobId"
+            app:argType="string" />
 
         <action
             android:id="@+id/action_paymentSuccessFragment_to_customerJobListFragment"
-            app:destination="@id/customerJobListFragment">
+            app:destination="@id/customerJobListFragment"
+            app:popUpTo="@id/customerJobListFragment"
+            app:popUpToInclusive="true">
             <argument
                 android:name="customerId"
                 app:argType="string" />

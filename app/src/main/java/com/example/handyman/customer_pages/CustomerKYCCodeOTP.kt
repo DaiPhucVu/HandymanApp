@@ -101,7 +101,7 @@ fun CustomerKYCCodeOTP(modifier: Modifier = Modifier, navController: NavControll
                         child.ref.child("isPhoneVerified").setValue(true)
                         child.ref.child("status").setValue("Verified")
                     }
-                    navController.navigate("customerKycSuccess")
+                    navController.navigate("customerProfilePictureUpload")
                 }.addOnFailureListener { error ->
                     Log.e("KYC", "Failed to update KYC status: ${error.message}")
                 }

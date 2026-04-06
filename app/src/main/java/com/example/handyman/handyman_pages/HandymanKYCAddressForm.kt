@@ -2,9 +2,11 @@ package com.example.handyman.handyman_pages
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,12 +21,15 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 
 @Composable
 fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     val textFieldModifier = Modifier
         .fillMaxWidth()
@@ -66,147 +71,157 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
         modifier = modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(24.dp)
+            .imePadding()
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
         // Top Bar
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 8.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
                 contentDescription = "Back",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { navController.navigate("handymanKycCaptureID") }
+                    .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Step UI
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(scrollState)
         ) {
-            StepCircle(stepNumber = 1, isActive = true)
-            DividerLine()
-            StepCircle(stepNumber = 2, isActive = true)
-            DividerLine()
-            StepCircle(stepNumber = 3, isActive = true)
-            DividerLine()
-            StepCircle(stepNumber = 4, isActive = false)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Step UI
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                StepCircle(stepNumber = 1, isActive = true)
+                DividerLine()
+                StepCircle(stepNumber = 2, isActive = true)
+                DividerLine()
+                StepCircle(stepNumber = 3, isActive = true)
+                DividerLine()
+                StepCircle(stepNumber = 4, isActive = false)
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Header
+            Text("Confirm your address", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Tell us you live so we can bring our excellent service straight to your home.",
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Input Fields
+            OutlinedTextField(
+                value = houseNumber,
+                onValueChange = { houseNumber = it },
+                label = { Text("House number") },
+                modifier = textFieldModifier,
+                isError = houseNumber.isNotBlank() && !isValidHouseNumber
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = street,
+                onValueChange = { street = it },
+                label = { Text("Street") },
+                modifier = textFieldModifier,
+                isError = street.isNotBlank() && !isValidStreet
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = area,
+                    onValueChange = { area = it },
+                    label = { Text("Area/Neighborhood") },
+                    modifier = Modifier.weight(1f),
+                    isError = area.isNotBlank() && !isValidArea
+                )
+                OutlinedTextField(
+                    value = postCode,
+                    onValueChange = { postCode = it },
+                    label = { Text("Post code") },
+                    modifier = Modifier.weight(1f),
+                    isError = postCode.isNotBlank() && !isValidPostCode
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = division,
+                    onValueChange = { division = it },
+                    label = { Text("Division") },
+                    modifier = Modifier.weight(1f),
+                    isError = division.isNotBlank() && !isValidDivision
+                )
+                OutlinedTextField(
+                    value = district,
+                    onValueChange = { district = it },
+                    label = { Text("District") },
+                    modifier = Modifier.weight(1f),
+                    isError = district.isNotBlank() && !isValidDistrict
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = thana,
+                    onValueChange = { thana = it },
+                    label = { Text("Thana") },
+                    modifier = Modifier.weight(1f),
+                    isError = thana.isNotBlank() && !isValidThana
+                )
+                OutlinedTextField(
+                    value = city,
+                    onValueChange = { city = it },
+                    label = { Text("City") },
+                    modifier = Modifier.weight(1f),
+                    isError = city.isNotBlank() && !isValidCity
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = country,
+                onValueChange = { country = it },
+                label = { Text("Country") },
+                modifier = textFieldModifier,
+                isError = country.isNotBlank() && !isValidCountry
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = note,
+                onValueChange = { note = it },
+                label = { Text("Additional note (optional)") },
+                modifier = textFieldModifier
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Header
-        Text("Confirm your address", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            "Tell us you live so we can bring our excellent service straight to your home.",
-            fontSize = 14.sp,
-            color = Color.Gray
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Input Fields
-        OutlinedTextField(
-            value = houseNumber,
-            onValueChange = { houseNumber = it },
-            label = { Text("House number") },
-            modifier = textFieldModifier,
-            isError = houseNumber.isNotBlank() && !isValidHouseNumber
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = street,
-            onValueChange = { street = it },
-            label = { Text("Street") },
-            modifier = textFieldModifier,
-            isError = street.isNotBlank() && !isValidStreet
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(
-                value = area,
-                onValueChange = { area = it },
-                label = { Text("Area/Neighborhood") },
-                modifier = Modifier.weight(1f),
-                isError = area.isNotBlank() && !isValidArea
-            )
-            OutlinedTextField(
-                value = postCode,
-                onValueChange = { postCode = it },
-                label = { Text("Post code") },
-                modifier = Modifier.weight(1f),
-                isError = postCode.isNotBlank() && !isValidPostCode
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(
-                value = division,
-                onValueChange = { division = it },
-                label = { Text("Division") },
-                modifier = Modifier.weight(1f),
-                isError = division.isNotBlank() && !isValidDivision
-            )
-            OutlinedTextField(
-                value = district,
-                onValueChange = { district = it },
-                label = { Text("District") },
-                modifier = Modifier.weight(1f),
-                isError = district.isNotBlank() && !isValidDistrict
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(
-                value = thana,
-                onValueChange = { thana = it },
-                label = { Text("Thana") },
-                modifier = Modifier.weight(1f),
-                isError = thana.isNotBlank() && !isValidThana
-            )
-            OutlinedTextField(
-                value = city,
-                onValueChange = { city = it },
-                label = { Text("City") },
-                modifier = Modifier.weight(1f),
-                isError = city.isNotBlank() && !isValidCity
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = country,
-            onValueChange = { country = it },
-            label = { Text("Country") },
-            modifier = textFieldModifier,
-            isError = country.isNotBlank() && !isValidCountry
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = note,
-            onValueChange = { note = it },
-            label = { Text("Additional note (optional)") },
-            modifier = textFieldModifier
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {

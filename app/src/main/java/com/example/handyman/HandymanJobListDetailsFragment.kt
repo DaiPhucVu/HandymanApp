@@ -3,6 +3,7 @@ package com.example.handyman
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -14,12 +15,18 @@ import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.handyman.chatbox.ChatClientActivity
 import com.example.handyman.utils.SessionManager
 import com.google.android.gms.tasks.Tasks
@@ -27,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
+import java.util.Locale
 
 class HandymanJobListDetailsFragment : Fragment() {
     override fun onCreateView(
@@ -62,7 +70,7 @@ class HandymanJobListDetailsFragment : Fragment() {
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
         jobTitle.text = serviceName
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
-        val jobRef = FirebaseDatabase.getInstance().getReference("DummyJob").child(jobId)
+        val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
 
         jobRef.get().addOnSuccessListener { snapshot ->
             val paymentStatus = snapshot.child("paymentStatus").getValue(String::class.java) ?: ""
@@ -93,60 +101,78 @@ class HandymanJobListDetailsFragment : Fragment() {
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
         locationDisplay.text = "$location, Melbourne, VIC"
 
+        val customerNameDisplay = view.findViewById<TextView>(R.id.tvTitle)
+        val customerRatingDisplay = view.findViewById<TextView>(R.id.tvRating)
+        val btnViewProfile = view.findViewById<Button>(R.id.btnViewProfile)
+        val ivProfile = view.findViewById<ImageView>(R.id.ivProfile)
+        
+        customerNameDisplay.text = "Loading..."
+        
+        // Fetch customer name and rating from Firebase
+        val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
+        userRef.get().addOnSuccessListener { snapshot ->
+            val firstName = snapshot.child("firstName").getValue(String::class.java)
+            val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
+            val rating = (snapshot.child("averageRating").getValue(Double::class.java) ?: 0.0)
+            val profileImageUrl = snapshot.child("profileImageUrl").getValue(String::class.java)
+            
+            if (firstName != null) {
+                customerNameDisplay.text = "$firstName $lastName"
+                customerRatingDisplay.text = String.format(Locale.getDefault(), "%.1f", rating)
+            } else {
+                customerNameDisplay.text = "Customer"
+            }
+
+            if (!profileImageUrl.isNullOrEmpty()) {
+                Glide.with(this)
+                    .load(profileImageUrl)
+                    .placeholder(R.drawable.sample_handyman)
+                    .circleCrop()
+                    .into(ivProfile)
+            }
+        }
+
+        btnViewProfile.setOnClickListener {
+            // Navigate to customer profile if such a fragment exists, or just show a toast for now
+            Toast.makeText(context, "Viewing profile of $customerId", Toast.LENGTH_SHORT).show()
+        }
+
         val btnMessage: Button = view.findViewById(R.id.btnMessage)
 
         val btnReturn: Button = view.findViewById(R.id.btnReturn)
 
         btnMessage.setOnClickListener {
             val context = requireContext()
+            val currentHandymanId = SessionManager.currentUserID ?: return@setOnClickListener
+            val compositeChatId = "${jobId}_${currentHandymanId}"
 
             // Fetch document from Firestore that contains chatroom of job
-            val chatRef = FirebaseFirestore.getInstance().collection("chats").document(jobId)
+            val chatRef = FirebaseFirestore.getInstance().collection("chats").document(compositeChatId)
             chatRef.get().addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
                     // Load memberInfos array from document
-                    val memberInfos: List<Map<String, String>> = documentSnapshot.get("memberInfos") as List<Map<String, String>>
+                    val memberInfos = documentSnapshot.get("memberInfos") as? List<Map<String, String>> ?: emptyList()
 
-                    // Loop through all maps in memberInfos to check if this chatroom belongs to current user
-                    for ((index, member) in memberInfos.withIndex()) {
-                        if (member["uid"] == SessionManager.currentUserID) {
-                            // If current user is in the second (last) map of array
-                            // open ChatClientActivity with information of the other user
-                            // (whose information should be stored in first map of array)
-                            if (index == memberInfos.size - 1) {
-                                val intent = Intent(context, ChatClientActivity::class.java).apply {
-                                    putExtra("chatID", jobId)
-                                    putExtra("uid", memberInfos[0]["uid"])
-                                    putExtra("username", memberInfos[0]["username"])
-                                }
-                                context.startActivity(intent)
-                            }
-                            else {
-                                // Else if current user is in the first map of array
-                                // open ChatClientActivity with information of the other user
-                                // (whose information should be stored in second (last) map of array)
-                                val intent = Intent(context, ChatClientActivity::class.java).apply {
-                                    putExtra("chatID", jobId)
-                                    putExtra("uid", memberInfos[1]["uid"])
-                                    putExtra("username", memberInfos[1]["username"])
-                                }
-                                context.startActivity(intent)
-                            }
-                        }
+                    // Find the other member (the customer)
+                    val otherMember = memberInfos.find { it["uid"] != currentHandymanId }
+                    
+                    val intent = Intent(context, ChatClientActivity::class.java).apply {
+                        putExtra("chatID", compositeChatId)
+                        putExtra("uid", otherMember?.get("uid") ?: customerId)
+                        putExtra("username", otherMember?.get("username") ?: "Customer")
                     }
+                    context.startActivity(intent)
                 }
                 else {
-                    Log.e(
-                        "PrototypeIssue",
-                        "Due to limitations during development of this prototype\n" +
-                                "The chatroom for this job is *not* automatically created on the Firestore\n" +
-                                "The chatroom must be manually added by creating a new document with id the same as this job id: $jobId \n" +
-                                "Add into the document a String field named 'chatID' whose value is the same as the document id\n" +
-                                "Then add user infos by including an array that contains two maps, each map containing a 'uid' key and a 'username' key\n" +
-                                "The 'uid' values must match the users that are part of the job (1 customer and 1 handyman)\n" +
-                                "The chat feature does not currently support more than two members per chatroom"
-                    )
-                    Toast.makeText(context, "Please read the log with tag 'PrototypeIssue'", Toast.LENGTH_LONG).show()
+                    // Chat doesn't exist, create it
+                    // First fetch customer name
+                    val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
+                    userRef.child("firstName").get().addOnSuccessListener { snapshot ->
+                        val cName = snapshot.getValue(String::class.java) ?: "Customer"
+                        createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, cName)
+                    }.addOnFailureListener {
+                        createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, "Customer")
+                    }
                 }
             }
         }
@@ -157,6 +183,31 @@ class HandymanJobListDetailsFragment : Fragment() {
         }
 
         displayJobImages(view, jobId)
+    }
+
+    private fun createAndOpenChat(context: android.content.Context, chatId: String, jobId: String, handymanId: String, customerId: String, customerName: String) {
+        val hName = SessionManager.getLoggedInUserName(context)
+        val newChat = hashMapOf(
+            "chatID" to chatId,
+            "jobId" to jobId,
+            "memberInfos" to listOf(
+                mapOf("uid" to customerId, "username" to customerName),
+                mapOf("uid" to handymanId, "username" to hName)
+            )
+        )
+        FirebaseFirestore.getInstance().collection("chats").document(chatId)
+            .set(newChat)
+            .addOnSuccessListener {
+                val intent = Intent(context, ChatClientActivity::class.java).apply {
+                    putExtra("chatID", chatId)
+                    putExtra("uid", customerId)
+                    putExtra("username", customerName)
+                }
+                context.startActivity(intent)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Failed to create chat: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun displayJobImages(rootView: View, jobId: String) {
@@ -201,6 +252,10 @@ class HandymanJobListDetailsFragment : Fragment() {
                                 .load(url)
                                 .into(imageView)
 
+                            imageView.setOnClickListener {
+                                showEnlargedImage(url)
+                            }
+
                             // Add the ImageView to the LinearLayout container.
                             photosContainer.addView(imageView)
                         }
@@ -214,5 +269,51 @@ class HandymanJobListDetailsFragment : Fragment() {
                 // Handle error when listing files.
                 photoScroll.visibility = View.GONE
             }
+    }
+
+    private fun showEnlargedImage(imageUrl: String) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_enlarged_image, null)
+        val enlargedImageView = dialogView.findViewById<ImageView>(R.id.ivEnlargedImage)
+        val btnClose = dialogView.findViewById<ImageView>(R.id.ivCloseDialog)
+        val progressBar = dialogView.findViewById<ProgressBar>(R.id.pbLoading)
+
+        progressBar.visibility = View.VISIBLE
+
+        Glide.with(this)
+            .load(imageUrl)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    progressBar.visibility = View.GONE
+                    Log.e("GlideError", "Failed to load image: $imageUrl", e)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    progressBar.visibility = View.GONE
+                    return false
+                }
+            })
+            .into(enlargedImageView)
+
+        val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+            .setView(dialogView)
+            .create()
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

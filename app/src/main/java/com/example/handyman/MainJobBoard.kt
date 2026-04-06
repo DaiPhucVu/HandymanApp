@@ -22,7 +22,14 @@ class MainJobBoard : AppCompatActivity() {
 
         // Navigations
         val startDestination = when(userType) {
-            "customer" -> R.id.serviceCategoryFragment
+            "customer" -> {
+                val targetFragment = intent.getStringExtra("target_fragment")
+                if (targetFragment == "customerJobList") {
+                    R.id.customerJobListFragment
+                } else {
+                    R.id.serviceCategoryFragment
+                }
+            }
             "handyman" -> R.id.handymanJobBoardFragment
 
             else -> {

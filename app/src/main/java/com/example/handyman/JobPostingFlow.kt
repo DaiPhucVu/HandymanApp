@@ -74,7 +74,11 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Describe your problem")
+        JobPostingTopBar(navController, "Describe your problem", onBack = {
+            if (!navController.popBackStack()) {
+                navController.navigate("customerHome")
+            }
+        })
         JobPostingProgressBar(currentStep = 1)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -491,10 +495,10 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             imageUris = viewModel.imageUris.map { it.toString() }
         )
 
-        val userPath = "dummyCustomers/$customerId"
+        val userPath = "User/$customerId"
         
         val updates = hashMapOf<String, Any>(
-            "/DummyJob/$jobId" to job,
+            "/Job/$jobId" to job,
             "$userPath/allJobs/${dbRef.child(userPath).child("allJobs").push().key!!}" to jobId,
             "$userPath/notAssignedJobs/${dbRef.child(userPath).child("notAssignedJobs").push().key!!}" to jobId
         )

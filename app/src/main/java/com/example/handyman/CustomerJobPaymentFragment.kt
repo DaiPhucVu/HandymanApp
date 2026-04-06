@@ -34,8 +34,13 @@ class CustomerJobPaymentFragment : Fragment() {
         requestedAmountView = view.findViewById(R.id.tvRequestedAmount)
         btnPayCash = view.findViewById(R.id.btnPayCash)
         btnPayBkash = view.findViewById(R.id.btnPayBkash)
+        val ivBackArrow = view.findViewById<android.widget.ImageView>(R.id.ivBackArrow)
 
-        database = FirebaseDatabase.getInstance().getReference("DummyJob").child(args.jobId)
+        ivBackArrow.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        database = FirebaseDatabase.getInstance().getReference("Job").child(args.jobId)
 
         database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -92,7 +97,7 @@ class CustomerJobPaymentFragment : Fragment() {
 
                     database.updateChildren(updates).addOnSuccessListener {
                         val action = CustomerJobPaymentFragmentDirections
-                            .actionCustomerJobPaymentFragmentToPaymentSuccessFragment(args.customerId)
+                            .actionCustomerJobPaymentFragmentToPaymentSuccessFragment(args.customerId, args.jobId)
                         findNavController().navigate(action)
                     }
                 } else {

@@ -447,7 +447,7 @@ class JobEditFragment : Fragment() {
             )
 
             val dbRef = Firebase.database
-                .getReference("DummyJob")
+                .getReference("Job")
                 .child(jobId)
 
             dbRef.updateChildren(updates)

@@ -21,7 +21,7 @@ import com.example.handyman.R
 @Composable
 fun HandymanKYCSubmitted(modifier: Modifier = Modifier,navController: NavController) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF6495ED)) // Blue background
             .padding(24.dp),

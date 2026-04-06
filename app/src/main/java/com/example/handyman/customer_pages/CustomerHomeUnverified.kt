@@ -20,12 +20,16 @@ import androidx.navigation.NavController
 import com.google.firebase.database.*
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
     var firstName by remember { mutableStateOf("...") }
     var lastName by remember { mutableStateOf("") }
+    var profileImageUrl by remember { mutableStateOf<String?>(null) }
 
     val currentEmail = SessionManager.getLoggedInEmail(context)
 
@@ -38,6 +42,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 for (child in snapshot.children) {
                     firstName = child.child("firstName").getValue(String::class.java) ?: ""
                     lastName = child.child("lastName").getValue(String::class.java) ?: ""
+                    profileImageUrl = child.child("profileImageUrl").getValue(String::class.java)
                 }
             }
 
@@ -52,24 +57,39 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Top right logout
-        Text(
-            "Log out",
-            color = Color(0xFF30386D),
-            fontSize = 18.sp,
+        // Top right logout and Profile
+        Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 24.dp, end = 24.dp)
-                .clickable {
-                    // Clear session
-                    SessionManager.clearSession(context)
-                    // Navigate to login, removing the back stack
-                    navController.navigate("chooseAccountType") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
+                .padding(top = 24.dp, end = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Profile",
+                color = Color(0xFF30386D),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate("customerProfile")
                     }
-                }
-        )
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                "Log out",
+                color = Color(0xFF30386D),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .clickable {
+                        // Clear session
+                        SessionManager.clearSession(context)
+                        // Navigate to login, removing the back stack
+                        navController.navigate("chooseAccountType") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+            )
+        }
 
 
         Column(
@@ -80,14 +100,27 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
 
             Spacer(modifier = Modifier.height(16.dp))
             // Header Section
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.dp),
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(60.dp)
-                        .padding(end = 8.dp)
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { navController.navigate("customerProfile") }
+            ) {
+                if (profileImageUrl != null && profileImageUrl!!.isNotEmpty()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(profileImageUrl),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .padding(end = 8.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.character_customer),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier.size(60.dp).padding(end = 8.dp)
+                    )
+                }
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(

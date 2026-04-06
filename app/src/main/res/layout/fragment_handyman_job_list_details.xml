@@ -262,6 +262,17 @@
                 </LinearLayout>
 
                 <Button
+                    android:id="@+id/btnViewProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View Profile"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/holo_blue_light"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+
+                <Button
                     android:id="@+id/btnMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -270,7 +281,7 @@
                     android:textColor="@android:color/white"
                     android:backgroundTint="@android:color/holo_blue_light"
                     android:textSize="12sp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="4dp"/>
 
             </LinearLayout>
         </LinearLayout>

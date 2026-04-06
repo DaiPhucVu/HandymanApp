@@ -23,23 +23,30 @@ import com.google.firebase.database.DatabaseError
 import com.example.handyman.MainJobBoard
 import com.example.handyman.ChooseAccountType
 import android.content.Intent
+import android.widget.Button
+import android.widget.TextView
 
 class HandymanJobBoardFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: HandymanJobBoardAdapter
-    val handymanID = "handyman8"
+    private lateinit var handymanID: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        handymanID = SessionManager.getLoggedInUserId(requireContext()) ?: ""
         val view = inflater.inflate(R.layout.fragment_handyman_job_board, container, false)
+
+        val tvGreeting = view.findViewById<TextView>(R.id.tvGreeting)
+        val userName = SessionManager.getLoggedInUserName(requireContext())
+        tvGreeting.text = "Hello, $userName"
 
         val logoutIcon = view.findViewById<View>(R.id.ivLogout)
         logoutIcon.setOnClickListener {
             // Clear session
-            SessionManager.clearSessionXML(requireContext())
+            SessionManager.clearSession(requireContext())
 
             // Redirect to ChooseAccountTypeActivity
             val intent = Intent(requireContext(), ChooseAccountTypeActivity::class.java)
@@ -74,7 +81,7 @@ class HandymanJobBoardFragment : Fragment() {
             },
             onQuoteJob = { job, quoteJobBttn ->
                 val jobQuotesRef = FirebaseDatabase.getInstance()
-                    .getReference("DummyJob")
+                    .getReference("Job")
                     .child(job.jobId)
                     .child("quotedHandymen")
 
@@ -82,7 +89,7 @@ class HandymanJobBoardFragment : Fragment() {
                     .setValue(handymanID)
                     .addOnSuccessListener {
                         val handymanRef = FirebaseDatabase.getInstance()
-                            .getReference("dummyHandymen")
+                            .getReference("Handyman")
                             .child(handymanID)
 
                         handymanRef.child("quotedJobs")
@@ -134,8 +141,14 @@ class HandymanJobBoardFragment : Fragment() {
 
         val avatar = view.findViewById<View>(R.id.ivAvatar)
         avatar.setOnClickListener {
+            val intent = Intent(requireContext(), HandymanProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        val btnYourJobs = view.findViewById<Button>(R.id.btnYourJobs)
+        btnYourJobs.setOnClickListener {
             val action = HandymanJobBoardFragmentDirections.actionHandymanJobBoardFragmentToHandymanJobListFragment(handymanID)
-            Navigation.findNavController(view).navigate(action)
+            findNavController().navigate(action)
         }
 
         return view
@@ -151,7 +164,7 @@ class HandymanJobBoardFragment : Fragment() {
         val rootRef = db.reference
 
         // Step 1: Load cancelledJobs list for the current handyman
-        rootRef.child("dummyHandymen")
+        rootRef.child("Handyman")
             .child(handymanID)
             .child("cancelledJobs")
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -161,7 +174,7 @@ class HandymanJobBoardFragment : Fragment() {
                         .toSet()
 
                     // Step 2: Now load all jobs
-                    rootRef.child("DummyJob")
+                    rootRef.child("Job")
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val availableJobs = snapshot.children.mapNotNull { child ->

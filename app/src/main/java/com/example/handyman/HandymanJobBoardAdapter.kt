@@ -37,10 +37,12 @@ class HandymanJobBoardAdapter(
         private val detailsBttn: Button = itemView.findViewById(R.id.btnViewDetails)
 
         fun bind(item: Job) {
-            // Bind your Job data to the views
-            tvJobTitle.text = item.jobCat
-            tvJobDesc.text = item.jobDesc
-            if (item.jobSalaryFrom != "" && item.jobSalaryTo != "") {
+            // Bind your Job data to the views with fallbacks
+            tvJobTitle.text = item.title ?: item.jobCat
+            tvJobDesc.text = item.description ?: item.jobDesc
+
+            // Handle Salary display with fallbacks
+            if (!item.jobSalaryFrom.isNullOrBlank() && !item.jobSalaryTo.isNullOrBlank()) {
                 if (item.jobPaymentOption == "Per Day") {
                     tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
                 } else {
@@ -49,13 +51,17 @@ class HandymanJobBoardAdapter(
             } else {
                 tvSalary.text = "To be negotiated"
             }
+
+            // Dates and Time
             if (item.jobDateFrom == item.jobDateTo) {
                 tvDate.text = "${item.jobDateFrom}"
             } else {
                 tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
             }
             tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            tvLocation.text = "${item.jobLocation}, Melbourne, VIC"
+
+            // Location with fallback
+            tvLocation.text = item.location ?: item.jobLocation
 
             quoteJobBttn.setOnClickListener {
                 onQuoteJob(item, quoteJobBttn)

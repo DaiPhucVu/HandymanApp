@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Carpenter"
+                    android:text="Handyman"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="14sp"/>
             </LinearLayout>
@@ -88,7 +88,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Bottom row: two buttons aligned to the right -->
+        <!-- Bottom row: three buttons aligned to the right -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,17 +97,30 @@
             android:gravity="end">
 
             <Button
+                android:id="@+id/btnViewProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Profile"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#30386D"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:textSize="12sp"/>
+
+            <Button
                 android:id="@+id/btnAssign"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:text="Assign"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:backgroundTint="@android:color/holo_blue_light"
-                android:paddingHorizontal="16dp"
+                android:backgroundTint="#30386D"
+                android:paddingHorizontal="12dp"
                 android:paddingVertical="8dp"
-                android:textSize="14sp"/>
+                android:textSize="12sp"/>
 
             <Button
                 android:id="@+id/btnMessage"
@@ -116,10 +129,10 @@
                 android:text="Message"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:backgroundTint="@android:color/holo_blue_light"
-                android:paddingHorizontal="16dp"
+                android:backgroundTint="#30386D"
+                android:paddingHorizontal="12dp"
                 android:paddingVertical="8dp"
-                android:textSize="14sp"/>
+                android:textSize="12sp"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
