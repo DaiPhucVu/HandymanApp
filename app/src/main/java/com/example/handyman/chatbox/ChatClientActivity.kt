@@ -40,7 +40,7 @@ class ChatClientActivity : ComponentActivity() {
 
 internal fun sendMessage(chatID: String, receiverID: String, content: String = "") {
     val message = hashMapOf(
-//            "senderId" to auth.currentUser?.uid,  // Use this line when integrated with Firebase Auth
+//            "senderId" to auth.currentUser?.uid,
         "senderId" to SessionManager.currentUserID,
         "receiverId" to receiverID,
         "timestamp" to FieldValue.serverTimestamp(),  // Use Firebase server time for more consistency
