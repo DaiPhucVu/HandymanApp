@@ -33,6 +33,9 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import java.util.UUID
 import java.util.Locale
 
@@ -66,27 +69,13 @@ class HandymanJobListDetailsFragment : Fragment() {
         val paymentOption = args.paymentOption
         val assignedTo = args.assignedTo
         val jobStatus = args.jobStatus
+        val argLat = args.latitude
+        val argLng = args.longitude
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
         jobTitle.text = serviceName
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
-
-        jobRef.get().addOnSuccessListener { snapshot ->
-            val paymentStatus = snapshot.child("paymentStatus").getValue(String::class.java) ?: ""
-            val custpay = snapshot.child("custpay").getValue(String::class.java) ?: ""
-
-            if (paymentStatus == "done" && custpay.isNotBlank()) {
-                salaryDisplay.text = "Paid: BDT $custpay"
-            } else if (salaryFrom.isNotBlank() && salaryTo.isNotBlank()) {
-                salaryDisplay.text = if (paymentOption == "Per Day")
-                    "BDT $salaryFrom-$salaryTo/day"
-                else
-                    "BDT $salaryFrom-$salaryTo"
-            } else {
-                salaryDisplay.text = "To be negotiated"
-            }
-        }
 
         val jobDescDisplay = view.findViewById<TextView>(R.id.tvJobSubtitle)
         jobDescDisplay.text = jobDescription
@@ -111,6 +100,7 @@ class HandymanJobListDetailsFragment : Fragment() {
         // Fetch customer name and rating from Firebase
         val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
         userRef.get().addOnSuccessListener { snapshot ->
+            if (!isAdded) return@addOnSuccessListener
             val firstName = snapshot.child("firstName").getValue(String::class.java)
             val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
             val rating = (snapshot.child("averageRating").getValue(Double::class.java) ?: 0.0)
@@ -133,13 +123,61 @@ class HandymanJobListDetailsFragment : Fragment() {
         }
 
         btnViewProfile.setOnClickListener {
-            // Navigate to customer profile if such a fragment exists, or just show a toast for now
-            Toast.makeText(context, "Viewing profile of $customerId", Toast.LENGTH_SHORT).show()
+            val intent = Intent(requireContext(), CustomerProfileActivity::class.java).apply {
+                putExtra("userId", customerId)
+            }
+            startActivity(intent)
         }
 
         val btnMessage: Button = view.findViewById(R.id.btnMessage)
 
         val btnReturn: Button = view.findViewById(R.id.btnReturn)
+
+        // Setup MapView
+        val mapView = view.findViewById<MapView>(R.id.mapView)
+        mapView.setMultiTouchControls(true)
+
+        jobRef.get().addOnSuccessListener { snapshot ->
+            if (!isAdded) return@addOnSuccessListener
+            
+            // Handle Map Coordinates
+            var lat = snapshot.child("latitude").getValue(Double::class.java)
+            var lng = snapshot.child("longitude").getValue(Double::class.java)
+
+            // If not in snapshot, fallback to arguments
+            if (lat == null || lat == 0.0) lat = argLat.toDouble()
+            if (lng == null || lng == 0.0) lng = argLng.toDouble()
+
+            if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
+                mapView.visibility = View.VISIBLE
+                val jobLocation = GeoPoint(lat, lng)
+                mapView.controller.setZoom(16.0)
+                mapView.controller.setCenter(jobLocation)
+
+                val marker = Marker(mapView)
+                marker.position = jobLocation
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                marker.title = "Job Location"
+                mapView.overlays.add(marker)
+                mapView.invalidate()
+            } else {
+                mapView.visibility = View.GONE
+            }
+
+            val paymentStatus = snapshot.child("paymentStatus").getValue(String::class.java) ?: ""
+            val custpay = snapshot.child("custpay").getValue(String::class.java) ?: ""
+
+            if (paymentStatus == "done" && custpay.isNotBlank()) {
+                salaryDisplay.text = "Paid: BDT $custpay"
+            } else if (salaryFrom.isNotBlank() && salaryTo.isNotBlank()) {
+                salaryDisplay.text = if (paymentOption == "Per Day")
+                    "BDT $salaryFrom-$salaryTo/day"
+                else
+                    "BDT $salaryFrom-$salaryTo"
+            } else {
+                salaryDisplay.text = "To be negotiated"
+            }
+        }
 
         btnMessage.setOnClickListener {
             val context = requireContext()
@@ -231,6 +269,9 @@ class HandymanJobListDetailsFragment : Fragment() {
                 // Wait for all download URL tasks to succeed.
                 Tasks.whenAllSuccess<Uri>(downloadUrlTasks)
                     .addOnSuccessListener { uriList ->
+                        if (!isAdded) return@addOnSuccessListener
+                        val context = context ?: return@addOnSuccessListener
+
                         // Convert URI list to a list of string URLs.
                         val imageUrls = uriList.map { it.toString() }
 
@@ -242,7 +283,7 @@ class HandymanJobListDetailsFragment : Fragment() {
 
                         // Dynamically create ImageViews and load the images using Glide.
                         for (url in imageUrls) {
-                            val imageView = ImageView(requireContext())
+                            val imageView = ImageView(context)
                             val params = LinearLayout.LayoutParams(400, 400)
                             params.setMargins(8, 8, 8, 8)
                             imageView.layoutParams = params
@@ -272,7 +313,8 @@ class HandymanJobListDetailsFragment : Fragment() {
     }
 
     private fun showEnlargedImage(imageUrl: String) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_enlarged_image, null)
+        val context = context ?: return
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_enlarged_image, null)
         val enlargedImageView = dialogView.findViewById<ImageView>(R.id.ivEnlargedImage)
         val btnClose = dialogView.findViewById<ImageView>(R.id.ivCloseDialog)
         val progressBar = dialogView.findViewById<ProgressBar>(R.id.pbLoading)
@@ -288,6 +330,7 @@ class HandymanJobListDetailsFragment : Fragment() {
                     target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
+                    if (!isAdded) return false
                     progressBar.visibility = View.GONE
                     Log.e("GlideError", "Failed to load image: $imageUrl", e)
                     return false
@@ -300,13 +343,14 @@ class HandymanJobListDetailsFragment : Fragment() {
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
+                    if (!isAdded) return false
                     progressBar.visibility = View.GONE
                     return false
                 }
             })
             .into(enlargedImageView)
 
-        val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        val dialog = AlertDialog.Builder(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
             .setView(dialogView)
             .create()
 

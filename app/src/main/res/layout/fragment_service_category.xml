@@ -130,7 +130,7 @@
                             android:id="@+id/tvLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Dhaka City"
+                            android:text="Location..."
                             android:textSize="13sp"
                             android:textColor="@color/darker_gray" />
                     </LinearLayout>

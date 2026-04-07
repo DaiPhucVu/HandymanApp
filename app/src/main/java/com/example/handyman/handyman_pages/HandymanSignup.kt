@@ -196,7 +196,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
 
                         SessionManager.saveSession(context, email, handymanId, firstName)
                         Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
-                        navController.navigate("handymanProfilePictureUpload")
+                        navController.navigate("handymanSkills")
                     }
                     .addOnFailureListener { error ->
                         Toast.makeText(context, "Failed to sign up: ${error.message}", Toast.LENGTH_LONG).show()

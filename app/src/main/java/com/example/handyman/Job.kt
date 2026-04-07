@@ -34,11 +34,15 @@ data class Job(
     val jobStatusCustomer : String? = null,
     val jobStatusHandyman : String? = null,
     val lastUpdate: String = "",
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     // Change problematic Map types to Any? to prevent crash if [] is found
     val quotedHandymen: Any? = null,
     val finishedBy: String? = null,
     val assignedAt: Any? = null,
     val assignedBy: Any? = null,
     val assignment: Any? = null,
-    val assignmentHistory: Any? = null
+    val assignmentHistory: Any? = null,
+    val isReviewedByCustomer: Boolean = false,
+    val isReviewedByHandyman: Boolean = false
 )

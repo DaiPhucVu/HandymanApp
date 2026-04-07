@@ -15,6 +15,7 @@ class CustomerJobListAdapter(
     private val onEdit: (Job) -> Unit,
     private val onDelete: (Job) -> Unit,
     private val onUpdate: (Job) -> Unit,
+    private val onLeaveReview: (Job) -> Unit,
     val onProceedToPayment: (Job) -> Unit,
     var hideStatus: Boolean = false
 ) : ListAdapter<Job, CustomerJobListAdapter.ViewHolder>(CustomerJobListDiff) {
@@ -43,10 +44,11 @@ class CustomerJobListAdapter(
         private val updateBttn: Button = itemView.findViewById(R.id.btnUpdate)
         private val status: TextView = itemView.findViewById(R.id.tvStatus)
         private val btnProceedToPayment: Button = itemView.findViewById(R.id.btnProceedToPayment)
+        private val btnLeaveReview: Button = itemView.findViewById(R.id.btnLeaveReview)
 
 
         fun bind(item: Job) {
-            // Bind your Job data to the views
+            // ... (rest of the bind method)
             tvJobTitle.text = item.jobCat
             tvJobDesc.text = item.jobDesc
             if (item.paymentStatus == "done" && !item.custpay.isNullOrBlank()) {
@@ -68,27 +70,17 @@ class CustomerJobListAdapter(
             tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
             tvLocation.text = item.jobLocation
 
-            // Determine status
-            val displayStatus = when {
-                item.assignedTo.isBlank() -> "Not assigned"
-                item.jobStatusCustomer.isNullOrBlank() || item.jobStatusHandyman.isNullOrBlank() ->
-                    "Assigned"
-                else -> item.jobStatusCustomer!!
-            }
-//            status.text = displayStatus
-//
-//            when (displayStatus) {
-//                "Not assigned" -> status.setBackgroundResource(R.drawable.status_not_assigned)
-//                "Assigned"     -> status.setBackgroundResource(R.drawable.status_assigned)
-//                "In-progress"  -> status.setBackgroundResource(R.drawable.status_in_progress)
-//                "Done"         -> status.setBackgroundResource(R.drawable.status_done)
-//            }
-
             if (hideStatus) {
                 status.visibility = View.GONE
                 status.text = ""
             } else {
                 status.visibility = View.VISIBLE
+                val displayStatus = when {
+                    item.assignedTo.isBlank() -> "Not assigned"
+                    item.jobStatusCustomer.isNullOrBlank() || item.jobStatusHandyman.isNullOrBlank() ->
+                        "Assigned"
+                    else -> item.jobStatusCustomer!!
+                }
                 status.text = displayStatus
 
                 when (displayStatus) {
@@ -98,13 +90,16 @@ class CustomerJobListAdapter(
                     "Done"         -> status.setBackgroundResource(R.drawable.status_done)
                 }
             }
+
             if (item.paymentStatus == "done") {
                 updateBttn.visibility = View.GONE
                 btnProceedToPayment.visibility = View.GONE
+                btnLeaveReview.visibility = if (item.isReviewedByCustomer) View.GONE else View.VISIBLE
                 status.text = "Payment: Done"
                 status.setBackgroundResource(R.drawable.status_done)
             } else {
                 updateBttn.visibility = View.VISIBLE
+                btnLeaveReview.visibility = View.GONE
                 if (item.jobStatus == "Done") {
                     btnProceedToPayment.visibility = View.VISIBLE
                 } else {
@@ -115,6 +110,7 @@ class CustomerJobListAdapter(
             detailsBttn.setOnClickListener { onViewDetails(item) }
             edit.setOnClickListener    { onEdit(item) }
             delete.setOnClickListener  { onDelete(item) }
+            btnLeaveReview.setOnClickListener { onLeaveReview(item) }
 
             // Disable update until someone is assigned
             if (item.assignedTo.isBlank()) {

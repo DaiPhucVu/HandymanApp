@@ -200,7 +200,7 @@ fun HandymanSkillsScreen(navController: NavController) {
                         )
                         database.child(userId).updateChildren(updates)
                             .addOnSuccessListener {
-                                navController.navigate("handymanProfile")
+                                navController.navigate("handymanKYCLanding")
                             }
                             .addOnFailureListener {
                                 Toast.makeText(context, "Failed to save skills", Toast.LENGTH_SHORT).show()

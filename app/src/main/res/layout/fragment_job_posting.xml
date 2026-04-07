@@ -212,6 +212,21 @@
                 android:background="@drawable/rounded_box"
                 android:padding="8dp"
                 android:textSize="15sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Or pick on map:"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:textColor="@android:color/darker_gray"/>
+
+            <org.osmdroid.views.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rectangle_box" />
         </LinearLayout>
 
         <LinearLayout

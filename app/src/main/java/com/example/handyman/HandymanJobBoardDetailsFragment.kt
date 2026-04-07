@@ -33,6 +33,9 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import java.util.UUID
 
 class HandymanJobBoardDetailsFragment : Fragment() {
@@ -65,6 +68,8 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val paymentOption = args.paymentOption
         val assignedTo = args.assignedTo
         val jobStatus = args.jobStatus
+        val argLat = args.latitude
+        val argLng = args.longitude
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
         jobTitle.text = serviceName
@@ -89,7 +94,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val timeDisplay = view.findViewById<TextView>(R.id.tvTime)
         timeDisplay.text = "$timeFrom — $timeTo"
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
-        locationDisplay.text = "$location, Melbourne, VIC"
+        locationDisplay.text = location
 
         val customerNameDisplay = view.findViewById<TextView>(R.id.tvTitle)
         val customerRatingDisplay = view.findViewById<TextView>(R.id.tvRating)
@@ -101,19 +106,23 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         userRef.get().addOnSuccessListener { snapshot ->
             val firstName = snapshot.child("firstName").getValue(String::class.java)
             val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
-            val rating = (snapshot.child("averageRating").getValue(Double::class.java) ?: 0.0)
+            val rating = snapshot.child("averageRating").getValue(Double::class.java) ?: 0.0
+            val reviewCount = snapshot.child("reviewCount").getValue(Int::class.java) ?: 0
             
             if (firstName != null) {
                 customerNameDisplay.text = "$firstName $lastName"
-                customerRatingDisplay.text = String.format("%.1f", rating)
+                customerRatingDisplay.text = if (reviewCount > 0) String.format("%.1f", rating) else "No rating yet"
             } else {
                 customerNameDisplay.text = "Customer"
+                customerRatingDisplay.text = "No rating yet"
             }
         }
 
         btnViewProfile.setOnClickListener {
-            // Implementation for viewing customer profile can be added here
-            Toast.makeText(context, "Customer Profile View coming soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(requireContext(), CustomerProfileActivity::class.java).apply {
+                putExtra("userId", customerId)
+            }
+            startActivity(intent)
         }
 
         val btnMessage: Button = view.findViewById(R.id.btnMessage)
@@ -122,6 +131,10 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val btnQuote: Button = view.findViewById(R.id.btnQuote)
 
         val currentHandymanId = SessionManager.getLoggedInUserId(requireContext())
+        
+        // Setup MapView
+        val mapView = view.findViewById<MapView>(R.id.mapView)
+        mapView.setMultiTouchControls(true)
         
         // Show Quote button if not assigned or not quoted by this handyman
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
@@ -135,16 +148,56 @@ class HandymanJobBoardDetailsFragment : Fragment() {
             } else {
                 btnQuote.visibility = View.GONE
             }
+
+            // Handle Map Coordinates
+            var lat = snapshot.child("latitude").getValue(Double::class.java)
+            var lng = snapshot.child("longitude").getValue(Double::class.java)
+            
+            // If not in snapshot, fallback to arguments
+            if (lat == null || lat == 0.0) lat = argLat.toDouble()
+            if (lng == null || lng == 0.0) lng = argLng.toDouble()
+
+            if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
+                mapView.visibility = View.VISIBLE
+                val jobLocation = GeoPoint(lat, lng)
+                mapView.controller.setZoom(16.0)
+                mapView.controller.setCenter(jobLocation)
+
+                val marker = Marker(mapView)
+                marker.position = jobLocation
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                marker.title = "Job Location"
+                mapView.overlays.add(marker)
+                mapView.invalidate()
+            } else {
+                mapView.visibility = View.GONE
+            }
         }
 
         btnQuote.setOnClickListener {
             // Logic to quote the job
             if (currentHandymanId != null) {
-                val quotesRef = jobRef.child("quotedHandymen")
-                quotesRef.push().setValue(currentHandymanId).addOnSuccessListener {
-                    Toast.makeText(context, "Job Quoted Successfully", Toast.LENGTH_SHORT).show()
-                    btnQuote.visibility = View.GONE
-                }
+                val jobQuoteRef = jobRef.child("quotedHandymen").push()
+                val handymanQuoteRef = FirebaseDatabase.getInstance()
+                    .getReference("Handyman")
+                    .child(currentHandymanId)
+                    .child("quotedJobs")
+                    .push()
+
+                val updates = hashMapOf<String, Any>(
+                    "/Job/$jobId/quotedHandymen/${jobQuoteRef.key}" to currentHandymanId,
+                    "/Handyman/$currentHandymanId/quotedJobs/${handymanQuoteRef.key}" to jobId,
+                    "/Handyman/$currentHandymanId/allJobs/${FirebaseDatabase.getInstance().getReference("Handyman").child(currentHandymanId).child("allJobs").push().key}" to jobId
+                )
+
+                FirebaseDatabase.getInstance().reference.updateChildren(updates)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Job Quoted Successfully", Toast.LENGTH_SHORT).show()
+                        btnQuote.visibility = View.GONE
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(context, "Failed to quote job: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
             }
         }
 
@@ -238,6 +291,8 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                 // Wait for all download URL tasks to succeed.
                 Tasks.whenAllSuccess<Uri>(downloadUrlTasks)
                     .addOnSuccessListener { uriList ->
+                        if (!isAdded) return@addOnSuccessListener
+                        
                         // Convert URI list to a list of string URLs.
                         val imageUrls = uriList.map { it.toString() }
 
@@ -249,7 +304,8 @@ class HandymanJobBoardDetailsFragment : Fragment() {
 
                         // Dynamically create ImageViews and load the images using Glide.
                         for (url in imageUrls) {
-                            val imageView = ImageView(requireContext())
+                            val context = context ?: break
+                            val imageView = ImageView(context)
                             val params = LinearLayout.LayoutParams(400, 400)
                             params.setMargins(8, 8, 8, 8)
                             imageView.layoutParams = params
@@ -279,7 +335,8 @@ class HandymanJobBoardDetailsFragment : Fragment() {
     }
 
     private fun showEnlargedImage(imageUrl: String) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_enlarged_image, null)
+        val context = context ?: return
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_enlarged_image, null)
         val enlargedImageView = dialogView.findViewById<ImageView>(R.id.ivEnlargedImage)
         val btnClose = dialogView.findViewById<ImageView>(R.id.ivCloseDialog)
         val progressBar = dialogView.findViewById<ProgressBar>(R.id.pbLoading)
@@ -313,7 +370,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
             })
             .into(enlargedImageView)
 
-        val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        val dialog = AlertDialog.Builder(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
             .setView(dialogView)
             .create()
 

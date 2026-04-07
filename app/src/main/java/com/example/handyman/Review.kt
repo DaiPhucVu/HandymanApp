@@ -7,5 +7,6 @@ data class Review(
     val handymanId: String = "",
     val rating: Float = 0f,
     val comment: String = "",
-    val timestamp: String = ""
+    val timestamp: String = "",
+    val reviewerType: String = "customer" // "customer" or "handyman"
 )

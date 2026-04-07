@@ -147,7 +147,8 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
                             if (authenticated) {
                                 val userId = SessionManager.currentUserID ?: ""
                                 val firstName = SessionManager.currentUserName ?: "Handyman"
-                                SessionManager.saveSession(context, email, userId, firstName)
+                                val city = snapshot.children.first().child("city").getValue(String::class.java) ?: ""
+                                SessionManager.saveSession(context, email, userId, firstName, city)
                                 if (isVerified.equals("approved", ignoreCase = true)) {
                                     val intent = Intent(context, MainJobBoard::class.java).apply {
                                         putExtra("user_type", "handyman")

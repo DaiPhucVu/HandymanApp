@@ -16,6 +16,7 @@ class HandymanJobListAdapter(
     private val onViewDetails: (Job) -> Unit,
     private val onDelete: (Job) -> Unit,
     private val onUpdate: (Job) -> Unit,
+    private val onLeaveReview: (Job) -> Unit,
     val onPaymentProceed: (Job) -> Unit
 ) : ListAdapter<Job, HandymanJobListAdapter.ViewHolder>(HandymanJobListDiff) {
 
@@ -41,6 +42,7 @@ class HandymanJobListAdapter(
         private val delete: ImageView = itemView.findViewById(R.id.ivDelete)
         private val updateBttn   = itemView.findViewById<Button>(R.id.btnUpdate)
         private val status: TextView = itemView.findViewById(R.id.tvStatus)
+        val btnLeaveReview: Button = itemView.findViewById(R.id.btnLeaveReview)
         val btnProceedPayment: Button = itemView.findViewById(R.id.btnProceedPayment)
 
 
@@ -49,9 +51,9 @@ class HandymanJobListAdapter(
             tvJobTitle.text = item.title ?: item.jobCat
             tvJobDesc.text = item.description ?: item.jobDesc
 
-            if (item.paymentStatus == "done" && !item.custpay.isNullOrBlank()) {
+            if (item.paymentStatus == "done" && item.custpay != null && item.custpay.isNotEmpty()) {
                 tvSalary.text = "Paid: BDT ${item.custpay}"
-            } else if (!item.jobSalaryFrom.isNullOrBlank() && !item.jobSalaryTo.isNullOrBlank()) {
+            } else if (item.jobSalaryFrom != null && item.jobSalaryFrom.isNotEmpty() && item.jobSalaryTo != null && item.jobSalaryTo.isNotEmpty()) {
                 if (item.jobPaymentOption == "Per Day") {
                     tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
                 } else {
@@ -61,7 +63,7 @@ class HandymanJobListAdapter(
                 tvSalary.text = "To be negotiated"
             }
             if (item.jobDateFrom == item.jobDateTo) {
-                tvDate.text = "${item.jobDateFrom}"
+                tvDate.text = item.jobDateFrom
             } else {
                 tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
             }
@@ -99,11 +101,17 @@ class HandymanJobListAdapter(
             if (item.paymentStatus == "done") {
                 updateBttn.visibility = View.GONE
                 btnProceedPayment.visibility = View.GONE
+                btnLeaveReview.visibility = if (item.isReviewedByHandyman) View.GONE else View.VISIBLE
                 status.text = "Payment: Done"
                 status.setBackgroundResource(R.drawable.status_done)
             } else {
                 updateBttn.visibility = View.VISIBLE
-                btnProceedPayment.visibility = View.VISIBLE
+                btnLeaveReview.visibility = View.GONE
+                if (item.jobStatus == "Done") {
+                    btnProceedPayment.visibility = if (item.handypay.isNotBlank()) View.GONE else View.VISIBLE
+                } else {
+                    btnProceedPayment.visibility = View.GONE
+                }
             }
 
             detailsBttn.setOnClickListener {
@@ -114,7 +122,7 @@ class HandymanJobListAdapter(
                 onDelete(item)
             }
 
-            if (item.assignedTo.isNullOrBlank()) {
+            if (item.assignedTo != null && item.assignedTo.isEmpty()) {
                 // No handyman assigned at all
                 updateBttn.isEnabled = false
                 updateBttn.alpha = 0.5f
@@ -158,6 +166,9 @@ class HandymanJobListAdapter(
             }
             btnProceedPayment.setOnClickListener {
                 onPaymentProceed(item)
+            }
+            btnLeaveReview.setOnClickListener {
+                onLeaveReview(item)
             }
         }
     }

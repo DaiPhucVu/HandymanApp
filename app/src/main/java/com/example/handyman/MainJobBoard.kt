@@ -17,6 +17,24 @@ class MainJobBoard : AppCompatActivity() {
         val userType = intent.getStringExtra("user_type")
         Log.d("Navigation", "$userType")
 
+        if (userType != null) {
+            val currentEmail = SessionManager.getLoggedInEmail(this)
+            val table = if (userType == "customer") "User" else "Handyman"
+            val userRef = com.google.firebase.database.FirebaseDatabase.getInstance().getReference(table)
+            userRef.orderByChild("email").equalTo(currentEmail)
+                .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                    override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                        for (child in snapshot.children) {
+                            val city = child.child("city").getValue(String::class.java) ?: ""
+                            if (city.isNotEmpty()) {
+                                SessionManager.saveLoggedInCity(this@MainJobBoard, city)
+                            }
+                        }
+                    }
+                    override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+                })
+        }
+
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navGraph = navHostFragment.navController.navInflater.inflate(R.navigation.nav_graph)
 

@@ -88,7 +88,8 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         Image(
             painter = painterResource(id = R.drawable.character_customer),
             contentDescription = "Customer Graphic",
-            modifier = Modifier.size(160.dp)
+            modifier = Modifier
+                .size(160.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))

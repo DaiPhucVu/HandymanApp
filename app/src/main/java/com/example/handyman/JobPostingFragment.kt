@@ -15,10 +15,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
 import androidx.core.content.FileProvider
+import androidx.preference.PreferenceManager
+import com.example.handyman.utils.SessionManager
+import org.osmdroid.config.Configuration
 import java.io.File
 import java.util.UUID
 
 class JobPostingFragment : Fragment() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Initialize OSMDroid configuration
+        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -64,6 +73,11 @@ class JobPostingFragment : Fragment() {
                     // Route to go back to the service list (Fragment world)
                     composable("customerHome") {
                         findNavController().popBackStack()
+                    }
+                    composable("allJobsList") {
+                        val customerId = SessionManager.getLoggedInUserId(requireContext())
+                        val action = JobPostingFragmentDirections.actionJobPostingFragmentToCustomerJobListFragment(customerId)
+                        findNavController().navigate(action)
                     }
                 }
             }

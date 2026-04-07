@@ -246,6 +246,7 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     for (child in snapshot.children) {
                         child.ref.updateChildren(addressData)
                             .addOnSuccessListener {
+                                SessionManager.saveLoggedInCity(context, city)
                                 navController.navigate("handymanKYCPhoneNumber")
                             }
                             .addOnFailureListener { e ->

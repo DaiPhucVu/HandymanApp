@@ -29,6 +29,8 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.handyman.R
+import com.example.handyman.MainJobBoard
+import android.content.Intent
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -195,10 +197,13 @@ fun HandymanProfilePictureUpload(navController: NavController) {
                                             child.ref.child("profileImageUrl").setValue(downloadUri.toString())
                                         }
                                         Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
-                                        // Navigate to Skills
-                                        navController.navigate("handymanSkills") {
-                                            popUpTo(0)
+                                        
+                                        // Start the MainJobBoard Activity for Handyman
+                                        val intent = Intent(context, MainJobBoard::class.java).apply {
+                                            putExtra("user_type", "handyman")
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                         }
+                                        context.startActivity(intent)
                                     }
                             }
                         }

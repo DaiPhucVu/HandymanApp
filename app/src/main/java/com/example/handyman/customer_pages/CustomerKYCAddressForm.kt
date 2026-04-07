@@ -241,6 +241,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     .child(userId)
                     .updateChildren(addressData)
                     .addOnSuccessListener {
+                        SessionManager.saveLoggedInCity(context, city.trim())
                         navController.navigate("customerKycPhoneNumber")
                     }
                     .addOnFailureListener { error ->

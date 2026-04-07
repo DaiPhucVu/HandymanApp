@@ -73,7 +73,8 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.character_customer),
             contentDescription = "Customer Graphic",
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier
+                .size(120.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -127,7 +128,8 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
                             if (authenticated) {
                                 val userId = SessionManager.currentUserID ?: ""
                                 val firstName = SessionManager.currentUserName ?: "User"
-                                SessionManager.saveSession(context, email, userId, firstName)
+                                val city = snapshot.children.first().child("city").getValue(String::class.java) ?: ""
+                                SessionManager.saveSession(context, email, userId, firstName, city)
                                 
                                 val intent = Intent(context, MainJobBoard::class.java).apply {
                                     putExtra("user_type", "customer")

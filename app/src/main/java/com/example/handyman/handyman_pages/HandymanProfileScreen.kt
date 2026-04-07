@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.handyman.R
+import com.example.handyman.Review
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -50,6 +51,7 @@ fun HandymanProfileScreen(navController: NavController) {
     val database = FirebaseDatabase.getInstance().getReference("Handyman")
 
     var handymanData by remember { mutableStateOf<Map<String, Any>?>(null) }
+    var reviews by remember { mutableStateOf<List<Review>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(userId) {
@@ -57,7 +59,26 @@ fun HandymanProfileScreen(navController: NavController) {
             database.child(userId).addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     handymanData = snapshot.value as? Map<String, Any>
-                    isLoading = false
+                    
+                    // Fetch reviews for this handyman
+                    val reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews")
+                    reviewsRef.orderByChild("handymanId").equalTo(userId)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(reviewSnapshot: DataSnapshot) {
+                                val reviewList = mutableListOf<Review>()
+                                for (child in reviewSnapshot.children) {
+                                    val review = child.getValue(Review::class.java)
+                                    if (review != null && review.reviewerType == "customer") {
+                                        reviewList.add(review)
+                                    }
+                                }
+                                reviews = reviewList.sortedByDescending { it.timestamp }
+                                isLoading = false
+                            }
+                            override fun onCancelled(error: DatabaseError) {
+                                isLoading = false
+                            }
+                        })
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -188,23 +209,87 @@ fun HandymanProfileScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Edit Button
-                Button(
-                    onClick = { 
-                        navController.navigate("handymanKYCLanding")
-                    },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D2E5E)),
-                    shape = RoundedCornerShape(25.dp)
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Complete Verification")
+                // Reviews Section
+                if (reviews.isNotEmpty()) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text("Customer Reviews", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        reviews.forEach { review ->
+                            HandymanReviewItem(review)
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.5f))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+
+                // Edit/KYC Button
+                val verificationStatus = handymanData?.get("verificationStatus") as? String ?: "pending"
+                
+                if (verificationStatus.lowercase() == "approved" && intentHandymanId == null) {
+                    Button(
+                        onClick = { 
+                            navController.navigate("handymanEditProfile")
+                        },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D2E5E)),
+                        shape = RoundedCornerShape(25.dp)
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Edit Profile")
+                    }
+                } else if (intentHandymanId == null) {
+                    Button(
+                        onClick = { 
+                            navController.navigate("handymanKYCLanding")
+                        },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8A317)),
+                        shape = RoundedCornerShape(25.dp)
+                    ) {
+                        Text("Complete Verification")
+                    }
                 }
                 
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
+    }
+}
+
+@Composable
+fun HandymanReviewItem(review: Review) {
+    var customerName by remember { mutableStateOf("Customer") }
+    
+    LaunchedEffect(review.customerId) {
+        FirebaseDatabase.getInstance().getReference("User")
+            .child(review.customerId)
+            .get().addOnSuccessListener { snapshot ->
+                val first = snapshot.child("firstName").getValue(String::class.java) ?: ""
+                val last = snapshot.child("lastName").getValue(String::class.java) ?: ""
+                if (first.isNotEmpty()) customerName = "$first $last"
+            }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(customerName, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFF2D2E5E), modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(review.rating.toString(), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        if (review.comment.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(review.comment, fontSize = 14.sp, color = Color.Gray)
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(review.timestamp.split("T").firstOrNull() ?: "", fontSize = 12.sp, color = Color.LightGray)
     }
 }
 

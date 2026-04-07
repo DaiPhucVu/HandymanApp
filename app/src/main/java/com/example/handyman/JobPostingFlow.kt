@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,6 +35,24 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.android.gms.tasks.Tasks
 import java.time.LocalDateTime
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
+import java.io.File
+import android.location.Geocoder
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 @Composable
 fun JobPostingProgressBar(currentStep: Int) {
@@ -188,6 +207,53 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
 
 @Composable
 fun JobPostingLocationScreen(navController: NavController, viewModel: JobPostingViewModel) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val geocoder = remember { Geocoder(context) }
+
+    fun searchAddress(address: String, mapView: MapView) {
+        if (address.isBlank()) return
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                val results = geocoder.getFromLocationName(address, 1)
+                if (results != null && results.isNotEmpty()) {
+                    val location = results[0]
+                    withContext(Dispatchers.Main) {
+                        viewModel.latitude = location.latitude
+                        viewModel.longitude = location.longitude
+                        val p = GeoPoint(location.latitude, location.longitude)
+                        mapView.controller.animateTo(p)
+                        mapView.controller.setZoom(16.0)
+                        
+                        val existingMarker = mapView.overlays.filterIsInstance<Marker>().firstOrNull()
+                            ?: Marker(mapView).also { mapView.overlays.add(it) }
+                        existingMarker.position = p
+                        existingMarker.title = "Selected Location"
+                        mapView.invalidate()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun updateAddressFromLocation(lat: Double, lng: Double) {
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                val results = geocoder.getFromLocation(lat, lng, 1)
+                if (results != null && results.isNotEmpty()) {
+                    val address = results[0].getAddressLine(0)
+                    withContext(Dispatchers.Main) {
+                        viewModel.locationAddress = address
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp)) {
         Spacer(modifier = Modifier.height(16.dp))
         JobPostingTopBar(navController, "Location")
@@ -196,27 +262,97 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
         Spacer(modifier = Modifier.height(16.dp))
         Text("Where do you need help?", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         
+        var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+
         OutlinedTextField(
             value = viewModel.locationAddress,
             onValueChange = { viewModel.locationAddress = it },
             label = { Text("Enter your address") },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            trailingIcon = {
+                IconButton(onClick = { mapViewRef?.let { searchAddress(viewModel.locationAddress, it) } }) {
+                    Icon(painter = painterResource(id = R.drawable.search_icon), contentDescription = "Search", tint = Color.Gray)
+                }
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = {
+                mapViewRef?.let { searchAddress(viewModel.locationAddress, it) }
+            })
         )
 
         Spacer(modifier = Modifier.height(16.dp))
         
-        // Map Placeholder
-        Box(
-            modifier = Modifier.fillMaxWidth().height(300.dp).background(Color(0xFFEEEEEE), RoundedCornerShape(12.dp)).border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(painter = painterResource(id = R.drawable.location), contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.Gray)
-                Text("Map of Bangladesh will be here", color = Color.Gray)
-                Text("(Pinpoint feature coming soon)", fontSize = 12.sp, color = Color.Gray)
+        // OpenStreetMap Implementation
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(350.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp)),
+            factory = { ctx ->
+                MapView(ctx).apply {
+                    mapViewRef = this
+                    setMultiTouchControls(true)
+                    controller.setZoom(14.0)
+                    
+                    // Initial center
+                    val startPoint = if (viewModel.latitude != 0.0) 
+                        GeoPoint(viewModel.latitude, viewModel.longitude)
+                        else GeoPoint(23.6850, 90.3563) // Dhaka
+                    controller.setCenter(startPoint)
+
+                    val marker = Marker(this)
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    if (viewModel.latitude != 0.0) {
+                        marker.position = startPoint
+                        overlays.add(marker)
+                    }
+                    
+                    val mapEventsReceiver = object : MapEventsReceiver {
+                        override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                            viewModel.latitude = p.latitude
+                            viewModel.longitude = p.longitude
+                            updateAddressFromLocation(p.latitude, p.longitude)
+                            
+                            marker.position = p
+                            marker.title = "Selected Location"
+                            if (!overlays.contains(marker)) {
+                                overlays.add(marker)
+                            }
+                            invalidate()
+                            return true
+                        }
+
+                        override fun longPressHelper(p: GeoPoint): Boolean = false
+                    }
+
+                    overlays.add(MapEventsOverlay(mapEventsReceiver))
+
+                    addMapListener(object : MapListener {
+                        override fun onScroll(event: ScrollEvent?): Boolean {
+                            // Update marker/address when user finishes scrolling
+                            // For simplicity, we can do it on zoom or scroll completion
+                            return false
+                        }
+
+                        override fun onZoom(event: ZoomEvent?): Boolean = false
+                    })
+                }
+            },
+            update = { mapView ->
+                // Ensure marker stays synced if viewModel changes from elsewhere
             }
-        }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = if (viewModel.latitude != 0.0) 
+                "Selected: ${String.format("%.4f", viewModel.latitude)}, ${String.format("%.4f", viewModel.longitude)}" 
+                else "Tap on the map to pin-point your location",
+            fontSize = 12.sp,
+            color = if (viewModel.latitude != 0.0) Color(0xFF2F3367) else Color.Gray
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -465,16 +601,17 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
     val context = LocalContext.current
 
     // Reset editing state when entering review
-    LaunchedEffect(Unit) {
-        viewModel.isEditing = false
-    }
+    // LaunchedEffect(Unit) {
+    //     viewModel.isEditing = false
+    // }
 
     fun submitJobToFirebase() {
         isSubmitting = true
         val database = FirebaseDatabase.getInstance()
         val dbRef = database.reference
         
-        val jobId = UUID.randomUUID().toString()
+        val isEditing = viewModel.jobId.isNotBlank()
+        val jobId = if (isEditing) viewModel.jobId else UUID.randomUUID().toString()
         val customerId = viewModel.customerId.ifBlank { SessionManager.currentUserID ?: SessionManager.getLoggedInUserId(context) }
         
         val job = Job(
@@ -488,6 +625,8 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             jobTimeFrom = viewModel.timeFrom,
             jobTimeTo = viewModel.timeTo,
             jobLocation = viewModel.locationAddress,
+            latitude = viewModel.latitude,
+            longitude = viewModel.longitude,
             jobSalaryFrom = viewModel.salaryMin,
             jobSalaryTo = viewModel.salaryMax,
             jobPaymentOption = viewModel.paymentOption,
@@ -497,11 +636,13 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
 
         val userPath = "User/$customerId"
         
-        val updates = hashMapOf<String, Any>(
-            "/Job/$jobId" to job,
-            "$userPath/allJobs/${dbRef.child(userPath).child("allJobs").push().key!!}" to jobId,
-            "$userPath/notAssignedJobs/${dbRef.child(userPath).child("notAssignedJobs").push().key!!}" to jobId
-        )
+        val updates = hashMapOf<String, Any>()
+        updates["/Job/$jobId"] = job
+        
+        if (!isEditing) {
+            updates["$userPath/allJobs/${dbRef.child(userPath).child("allJobs").push().key!!}"] = jobId
+            updates["$userPath/notAssignedJobs/${dbRef.child(userPath).child("notAssignedJobs").push().key!!}"] = jobId
+        }
 
         dbRef.updateChildren(updates)
             .addOnSuccessListener {
@@ -583,7 +724,8 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             confirmButton = {
                 Button(onClick = { 
                     showPopup = false
-                    navController.navigate("customerHome") // Or wherever after confirmation
+                    // Navigate to all jobs page (CustomerJobListFragment)
+                    navController.navigate("allJobsList")
                 }) { Text("OK") }
             },
             title = { Text("Confirmed") },

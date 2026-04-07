@@ -111,6 +111,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                         modifier = Modifier
                             .size(60.dp)
                             .clip(RoundedCornerShape(30.dp))
+                            .clickable { navController.navigate("customerProfile") }
                             .padding(end = 8.dp),
                         contentScale = ContentScale.Crop
                     )
@@ -118,7 +119,10 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                     Image(
                         painter = painterResource(id = R.drawable.character_customer),
                         contentDescription = "Profile Picture",
-                        modifier = Modifier.size(60.dp).padding(end = 8.dp)
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clickable { navController.navigate("customerProfile") }
+                            .padding(end = 8.dp)
                     )
                 }
                 Column {

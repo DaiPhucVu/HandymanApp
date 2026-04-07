@@ -32,7 +32,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
     val context = LocalContext.current
     var firstName by remember { mutableStateOf("...") }
     var lastName by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("Dhaka City") }
+    var city by remember { mutableStateOf(SessionManager.getLoggedInCity(context).ifEmpty { "Dhaka City" }) }
 
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
 
@@ -101,10 +101,8 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Header
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { navController.navigate("customerProfile") }
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 if (profileImageUrl != null && profileImageUrl!!.isNotEmpty()) {
                     Image(
@@ -113,6 +111,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                         modifier = Modifier
                             .size(60.dp)
                             .clip(RoundedCornerShape(30.dp))
+                            .clickable { navController.navigate("customerProfile") }
                             .padding(end = 8.dp),
                         contentScale = ContentScale.Crop
                     )
@@ -120,10 +119,13 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                     Image(
                         painter = painterResource(id = R.drawable.character_customer),
                         contentDescription = "Profile Picture",
-                        modifier = Modifier.size(60.dp).padding(end = 8.dp)
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clickable { navController.navigate("customerProfile") }
+                            .padding(end = 8.dp)
                     )
                 }
-                Column {
+                Column(modifier = Modifier.clickable { navController.navigate("customerProfile") }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             "Hello, $firstName $lastName.",

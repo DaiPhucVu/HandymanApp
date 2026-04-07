@@ -43,6 +43,25 @@ class HandymanJobBoardFragment : Fragment() {
         val userName = SessionManager.getLoggedInUserName(requireContext())
         tvGreeting.text = "Hello, $userName"
 
+        val tvLocation = view.findViewById<TextView>(R.id.tvLocation)
+        val currentCity = SessionManager.getLoggedInCity(requireContext())
+        if (currentCity.isNotEmpty()) {
+            tvLocation.text = currentCity
+        }
+
+        // Listen for city updates from Firebase
+        val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanID)
+        handymanRef.child("city").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val city = snapshot.getValue(String::class.java)
+                if (!city.isNullOrEmpty()) {
+                    tvLocation.text = city
+                    SessionManager.saveLoggedInCity(requireContext(), city)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
         val logoutIcon = view.findViewById<View>(R.id.ivLogout)
         logoutIcon.setOnClickListener {
             // Clear session
@@ -75,7 +94,9 @@ class HandymanJobBoardFragment : Fragment() {
                         paymentOption = job.jobPaymentOption,
                         imageUris = null,
                         assignedTo = job.assignedTo,
-                        jobStatus = job.jobStatus
+                        jobStatus = job.jobStatus,
+                        latitude = job.latitude?.toFloat() ?: 0f,
+                        longitude = job.longitude?.toFloat() ?: 0f
                     )
                 findNavController().navigate(action)
             },
@@ -195,10 +216,18 @@ class HandymanJobBoardFragment : Fragment() {
                                     if (jobId in cancelledJobs) return@mapNotNull null
 
                                     // 5) Check quotedHandymen
-                                    val quoted = child
-                                        .child("quotedHandymen")
-                                        .children
-                                        .mapNotNull { it.getValue(String::class.java) }
+                                    val quotedSnapshot = child.child("quotedHandymen")
+                                    val quoted = if (quotedSnapshot.exists()) {
+                                        if (quotedSnapshot.value is Map<*, *>) {
+                                            (quotedSnapshot.value as Map<*, *>).values.mapNotNull { it?.toString() }
+                                        } else if (quotedSnapshot.value is List<*>) {
+                                            (quotedSnapshot.value as List<*>).mapNotNull { it?.toString() }
+                                        } else {
+                                            emptyList<String>()
+                                        }
+                                    } else {
+                                        emptyList<String>()
+                                    }
 
                                     // 6) Skip if already quoted
                                     if (handymanID in quoted) return@mapNotNull null

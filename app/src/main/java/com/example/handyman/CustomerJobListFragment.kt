@@ -7,10 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.EditText
+import android.widget.RatingBar
 import android.widget.Spinner
 import android.widget.Toast
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +24,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import androidx.navigation.fragment.navArgs
 import java.time.LocalDateTime
+import java.util.UUID
 import com.example.handyman.utils.getCurrentYearMonth
 import com.example.handyman.utils.incrementMetric
 
@@ -93,30 +99,25 @@ class CustomerJobListFragment : Fragment() {
                                 return
                             }
 
-                            // Proceed with edit navigation
-                            val urisArray: Array<Uri> = job.imageUris
-                                .map { Uri.parse(it) }
-                                .toTypedArray()
+                            val viewModel: JobPostingViewModel = ViewModelProvider(requireActivity())[JobPostingViewModel::class.java]
+                            viewModel.isEditing = true
+                            viewModel.jobId = job.jobId
+                            viewModel.customerId = customerId
+                            viewModel.serviceCategory = job.jobCat
+                            viewModel.problemDesc = job.jobDesc
+                            viewModel.dateFrom = job.jobDateFrom
+                            viewModel.dateTo = job.jobDateTo
+                            viewModel.timeFrom = job.jobTimeFrom
+                            viewModel.timeTo = job.jobTimeTo
+                            viewModel.locationAddress = job.jobLocation
+                            viewModel.latitude = job.latitude ?: 0.0
+                            viewModel.longitude = job.longitude ?: 0.0
+                            viewModel.salaryMin = job.jobSalaryFrom
+                            viewModel.salaryMax = job.jobSalaryTo
+                            viewModel.paymentOption = job.jobPaymentOption
+                            viewModel.imageUris = job.imageUris.map { Uri.parse(it) }
 
-                            val action =
-                                CustomerJobListFragmentDirections
-                                    .actionCustomerJobListFragmentToJobEditFragment(
-                                        customerId     = customerId,
-                                        jobId          = job.jobId,
-                                        serviceCategory= job.jobCat,
-                                        problemDesc    = job.jobDesc,
-                                        dateFrom       = job.jobDateFrom,
-                                        dateTo         = job.jobDateTo,
-                                        timeFrom       = job.jobTimeFrom,
-                                        timeTo         = job.jobTimeTo,
-                                        location       = job.jobLocation,
-                                        salaryFrom     = job.jobSalaryFrom,
-                                        salaryTo       = job.jobSalaryTo,
-                                        paymentOption  = job.jobPaymentOption,
-                                        imageUris      = urisArray,
-                                        assignedTo     = job.assignedTo,
-                                        jobStatus      = job.jobStatus
-                                    )
+                            val action = CustomerJobListFragmentDirections.actionCustomerJobListFragmentToJobPostingFragment(serviceCategory = job.jobCat)
                             findNavController().navigate(action)
                         }
 
@@ -382,6 +383,10 @@ class CustomerJobListFragment : Fragment() {
                         jobId = job.jobId
                     )
                 findNavController().navigate(action)
+            },
+
+            onLeaveReview = { job ->
+                showHandymanReviewDialog(job)
             }
         )
         recyclerView.adapter = adapter
@@ -408,6 +413,91 @@ class CustomerJobListFragment : Fragment() {
 
         fetchJobsForCategory("allJobs")
         return view
+    }
+
+    private fun showHandymanReviewDialog(job: Job) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_customer_review, null)
+        val ratingBar = dialogView.findViewById<RatingBar>(R.id.ratingBar)
+        val etComment = dialogView.findViewById<EditText>(R.id.etComment)
+        val tvTitle = dialogView.findViewById<TextView>(R.id.tvReviewTitle)
+        
+        tvTitle.text = "How was your experience with this handyman?"
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Review Handyman")
+            .setView(dialogView)
+            .setPositiveButton("Submit") { _, _ ->
+                val rating = ratingBar.rating
+                val comment = etComment.text.toString()
+
+                if (rating == 0f) {
+                    Toast.makeText(context, "Please provide a rating", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val reviewId = UUID.randomUUID().toString()
+                val review = Review(
+                    reviewId = reviewId,
+                    jobId = job.jobId,
+                    customerId = customerId,
+                    handymanId = job.assignedTo,
+                    rating = rating,
+                    comment = comment,
+                    timestamp = java.time.LocalDateTime.now().toString(),
+                    reviewerType = "customer"
+                )
+
+                FirebaseDatabase.getInstance().getReference("Reviews").child(reviewId)
+                    .setValue(review)
+                    .addOnSuccessListener {
+                        updateAverageRating(job.assignedTo, "Handyman")
+                        // Mark job as reviewed by customer
+                        FirebaseDatabase.getInstance().getReference("Job")
+                            .child(job.jobId)
+                            .child("isReviewedByCustomer")
+                            .setValue(true)
+                        
+                        Toast.makeText(context, "Review submitted!", Toast.LENGTH_SHORT).show()
+                        fetchJobsForCategory(currentCategoryKey)
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun updateAverageRating(userId: String, userType: String) {
+        val reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews")
+        val idField = if (userType == "Handyman") "handymanId" else "customerId"
+        val reviewerType = if (userType == "Handyman") "customer" else "handyman"
+
+        reviewsRef.orderByChild(idField).equalTo(userId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    var totalRating = 0f
+                    var count = 0
+                    for (child in snapshot.children) {
+                        val review = child.getValue(Review::class.java)
+                        if (review != null && review.reviewerType == reviewerType) {
+                            totalRating += review.rating
+                            count++
+                        }
+                    }
+
+                    if (count > 0) {
+                        val average = totalRating / count
+                        val userRef = FirebaseDatabase.getInstance().getReference(userType).child(userId)
+                        val updates = mapOf(
+                            "averageRating" to average,
+                            "reviewCount" to count
+                        )
+                        userRef.updateChildren(updates)
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 
     private fun moveJobId(

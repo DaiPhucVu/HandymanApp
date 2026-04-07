@@ -77,7 +77,7 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                     }
 
                     if (status.trim().equals("approved", ignoreCase = true)) {
-                        navController.navigate("handymanProfilePictureUpload") {
+                        navController.navigate("handymanApprovedSplash") {
                             popUpTo(0)
                         }
                     }

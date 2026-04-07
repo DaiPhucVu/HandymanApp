@@ -89,6 +89,9 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         composable("handymanProfile") {
             HandymanProfileScreen(navController)
         }
+        composable("handymanEditProfile") {
+            HandymanEditProfile(navController)
+        }
         composable("handymanProfilePictureUpload") {
             HandymanProfilePictureUpload(navController)
         }
@@ -137,6 +140,12 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         }
         composable("customerProfile") {
             CustomerProfileScreen(navController)
+        }
+        composable("customerEditProfile") {
+            CustomerEditProfile(navController)
+        }
+        composable("handymanApprovedSplash") {
+            HandymanApprovedSplashScreen(navController)
         }
 
     })

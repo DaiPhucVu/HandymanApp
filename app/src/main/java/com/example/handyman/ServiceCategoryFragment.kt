@@ -47,6 +47,25 @@ class ServiceCategoryFragment : Fragment() {
         // Update greeting
         view.findViewById<android.widget.TextView>(R.id.tvGreeting)?.text = "Hello, $userName"
 
+        val tvLocation = view.findViewById<android.widget.TextView>(R.id.tvLocation)
+        val currentCity = SessionManager.getLoggedInCity(requireContext())
+        if (currentCity.isNotEmpty()) {
+            tvLocation.text = currentCity
+        }
+
+        // Listen for city updates from Firebase
+        val customerRef = com.google.firebase.database.FirebaseDatabase.getInstance().getReference("User").child(customerId)
+        customerRef.child("city").addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                val city = snapshot.getValue(String::class.java)
+                if (!city.isNullOrEmpty()) {
+                    tvLocation.text = city
+                    SessionManager.saveLoggedInCity(requireContext(), city)
+                }
+            }
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+        })
+
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
@@ -59,9 +78,14 @@ class ServiceCategoryFragment : Fragment() {
         adapter.submitList(serviceCategoryViewModel.categories)
 
         val avatar = view.findViewById<View>(R.id.ivAvatar)
-        avatar.setOnClickListener {
-            // Optional: can keep or remove
+        val tvGreeting = view.findViewById<View>(R.id.tvGreeting)
+        val profileClickListener = View.OnClickListener {
+            val action = ServiceCategoryFragmentDirections
+                .actionServiceCategoryFragmentToCustomerProfileFragment()
+            Navigation.findNavController(view).navigate(action)
         }
+        avatar.setOnClickListener(profileClickListener)
+        tvGreeting.setOnClickListener(profileClickListener)
 
         val btnAllJobs = view.findViewById<View>(R.id.btnAllJobs)
         btnAllJobs.setOnClickListener {

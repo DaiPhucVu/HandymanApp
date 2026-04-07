@@ -74,8 +74,10 @@ fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavControll
             onClick = {
                 val intent = android.content.Intent(context, com.example.handyman.MainJobBoard::class.java).apply {
                     putExtra("user_type", "customer")
+                    addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
                 context.startActivity(intent)
+                (context as? android.app.Activity)?.finish()
             },
             modifier = Modifier
                 .fillMaxWidth()

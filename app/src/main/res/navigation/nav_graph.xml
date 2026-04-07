@@ -27,7 +27,15 @@
                 android:name="customerId"
                 app:argType="string"/>
         </action>
+        <action
+            android:id="@+id/action_serviceCategoryFragment_to_customerProfileFragment"
+            app:destination="@id/customerProfileFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/customerProfileFragment"
+        android:name="com.example.handyman.CustomerProfileFragment"
+        android:label="CustomerProfileFragment" />
 
     <fragment
         android:id="@+id/jobPostingFragment"
@@ -39,7 +47,8 @@
             app:argType="string"/>
         <argument
             android:name="customerId"
-            app:argType="string"/>
+            app:argType="string"
+            android:defaultValue=""/>
         <action
             android:id="@+id/action_jobPostingFragment_to_orderSummaryFragment"
             app:destination="@id/orderSummaryFragment">
@@ -91,8 +100,24 @@
                 android:name="jobStatus"
                 app:argType="string"
                 android:defaultValue=""/>
+            <argument
+                android:name="latitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
+            <argument
+                android:name="longitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
+        </action>
+        <action
+            android:id="@+id/action_jobPostingFragment_to_customerJobListFragment"
+            app:destination="@id/customerJobListFragment">
+            <argument
+                android:name="customerId"
+                app:argType="string"/>
         </action>
     </fragment>
+
     <fragment
         android:id="@+id/orderSummaryFragment"
         android:name="com.example.handyman.OrderSummaryFragment"
@@ -153,6 +178,7 @@
             android:id="@+id/action_orderSummaryFragment_to_serviceCategoryFragment"
             app:destination="@id/serviceCategoryFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/jobRequestDoneFragment"
         android:name="com.example.handyman.JobRequestDoneFragment"
@@ -162,6 +188,7 @@
             android:id="@+id/action_jobRequestDoneFragment_to_serviceCategoryFragment"
             app:destination="@id/serviceCategoryFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/customerJobListFragment"
         android:name="com.example.handyman.CustomerJobListFragment"
@@ -224,61 +251,21 @@
                 android:name="jobStatus"
                 app:argType="string"
                 android:defaultValue=""/>
+            <argument
+                android:name="latitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
+            <argument
+                android:name="longitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
         </action>
         <action
-            android:id="@+id/action_customerJobListFragment_to_jobEditFragment"
-            app:destination="@id/jobEditFragment">
-            <argument
-                android:name="customerId"
-                app:argType="string" />
-            <argument
-                android:name="jobId"
-                app:argType="string" />
+            android:id="@+id/action_customerJobListFragment_to_jobPostingFragment"
+            app:destination="@id/jobPostingFragment">
             <argument
                 android:name="serviceCategory"
                 app:argType="string" />
-            <argument
-                android:name="problemDesc"
-                app:argType="string" />
-            <argument
-                android:name="dateFrom"
-                app:argType="string" />
-            <argument
-                android:name="dateTo"
-                app:argType="string" />
-            <argument
-                android:name="timeFrom"
-                app:argType="string" />
-            <argument
-                android:name="timeTo"
-                app:argType="string" />
-            <argument
-                android:name="location"
-                app:argType="string" />
-            <argument
-                android:name="salaryFrom"
-                app:argType="string"
-                android:defaultValue=""/>
-            <argument
-                android:name="salaryTo"
-                app:argType="string"
-                android:defaultValue=""/>
-            <argument
-                android:name="paymentOption"
-                app:argType="string"
-                android:defaultValue=""/>
-            <argument
-                android:name="imageUris"
-                app:argType="android.net.Uri[]"
-                app:nullable="true" />
-            <argument
-                android:name="assignedTo"
-                app:argType="string"
-                android:defaultValue=""/>
-            <argument
-                android:name="jobStatus"
-                app:argType="string"
-                android:defaultValue=""/>
         </action>
         <action
             android:id="@+id/action_customerJobListFragment_to_customerJobPaymentFragment"
@@ -296,6 +283,7 @@
             app:popUpTo="@id/serviceCategoryFragment"
             app:popUpToInclusive="true" />
     </fragment>
+
     <fragment
         android:id="@+id/customerJobDetailsFragment"
         android:name="com.example.handyman.CustomerJobDetailsFragment"
@@ -352,7 +340,19 @@
             android:name="jobStatus"
             app:argType="string"
             android:defaultValue=""/>
+        <argument
+            android:name="latitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <argument
+            android:name="longitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <action
+            android:id="@+id/action_customerJobDetailsFragment_to_jobPostingFragment"
+            app:destination="@id/jobPostingFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/handymanJobBoardFragment"
         android:name="com.example.handyman.HandymanJobBoardFragment"
@@ -412,6 +412,14 @@
                 android:name="jobStatus"
                 app:argType="string"
                 android:defaultValue=""/>
+            <argument
+                android:name="latitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
+            <argument
+                android:name="longitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
         </action>
         <action
             android:id="@+id/action_handymanJobBoardFragment_to_handymanJobListFragment"
@@ -421,6 +429,7 @@
                 app:argType="string"/>
         </action>
     </fragment>
+
     <fragment
         android:id="@+id/handymanJobBoardDetailsFragment"
         android:name="com.example.handyman.HandymanJobBoardDetailsFragment"
@@ -477,7 +486,16 @@
             android:name="jobStatus"
             app:argType="string"
             android:defaultValue=""/>
+        <argument
+            android:name="latitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <argument
+            android:name="longitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
     </fragment>
+
     <fragment
         android:id="@+id/jobEditFragment"
         android:name="com.example.handyman.JobEditFragment"
@@ -534,7 +552,11 @@
             android:name="jobStatus"
             app:argType="string"
             android:defaultValue=""/>
+        <action
+            android:id="@+id/action_jobEditFragment_to_jobPostingFragment"
+            app:destination="@id/jobPostingFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/handymanJobListFragment"
         android:name="com.example.handyman.HandymanJobListFragment"
@@ -597,8 +619,17 @@
                 android:name="jobStatus"
                 app:argType="string"
                 android:defaultValue=""/>
+            <argument
+                android:name="latitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
+            <argument
+                android:name="longitude"
+                app:argType="float"
+                android:defaultValue="0.0" />
         </action>
     </fragment>
+
     <fragment
         android:id="@+id/handymanJobListDetailsFragment"
         android:name="com.example.handyman.HandymanJobListDetailsFragment"
@@ -655,7 +686,16 @@
             android:name="jobStatus"
             app:argType="string"
             android:defaultValue=""/>
+        <argument
+            android:name="latitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <argument
+            android:name="longitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
     </fragment>
+
     <fragment
         android:id="@+id/customerJobPaymentFragment"
         android:name="com.example.handyman.CustomerJobPaymentFragment"
