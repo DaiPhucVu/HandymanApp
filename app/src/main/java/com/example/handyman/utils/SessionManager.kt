@@ -2,6 +2,7 @@ package com.example.handyman.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.auth.FirebaseAuth
 
 object SessionManager {
     var currentUserID: String? = null
@@ -64,10 +65,16 @@ object SessionManager {
     fun clearSession(context: Context) {
         val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit().clear().apply()
-        
-        // Also clear the legacy "UserSession" if it exists to be safe
+
         val legacyPrefs = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
         legacyPrefs.edit().clear().apply()
+
+        currentUserID = null
+        currentUserName = null
+        currentUserType = null
+        currentUserCity = null
+
+        runCatching { FirebaseAuth.getInstance().signOut() }
     }
 
 }

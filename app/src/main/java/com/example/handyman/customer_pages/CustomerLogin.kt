@@ -1,5 +1,6 @@
 package com.example.handyman.customer_pages
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -21,6 +22,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.database.*
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
@@ -107,47 +111,30 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
 
         Button(
             onClick = {
-                val userRef = FirebaseDatabase.getInstance().getReference("User")
-                val query = userRef.orderByChild("email").equalTo(email)
-                query.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            var authenticated = false
-                            var isVerified = ""
-                            for (child in snapshot.children) {
-                                val userPass = child.child("password").getValue(String::class.java)
-                                val verified = child.child("status").getValue(String::class.java)
-                                if (userPass == password) {
-                                    authenticated = true
-                                    isVerified = verified.toString()
-                                    SessionManager.currentUserID = child.key
-                                    SessionManager.currentUserName = child.child("firstName").getValue(String::class.java)
-                                    break
-                                }
-                            }
-                            if (authenticated) {
-                                val userId = SessionManager.currentUserID ?: ""
-                                val firstName = SessionManager.currentUserName ?: "User"
-                                val city = snapshot.children.first().child("city").getValue(String::class.java) ?: ""
-                                SessionManager.saveSession(context, email, userId, firstName, city)
-                                
-                                val intent = Intent(context, MainJobBoard::class.java).apply {
-                                    putExtra("user_type", "customer")
-                                    Log.d("Navigation", "CustomerLogin authenticated")
-                                }
-                                context.startActivity(intent)
-                            } else {
-                                Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
-                            }
-                        } else {
-                            Toast.makeText(context, "User not found", Toast.LENGTH_LONG).show()
+                FirebaseAuth.getInstance().signInWithEmailAndPassword(email.trim(), password)
+                    .addOnSuccessListener { _ ->
+                        loadCustomerProfileAndNavigate(
+                            context = context,
+                            navController = navController,
+                            email = email.trim(),
+                        )
+                    }
+                    .addOnFailureListener { exc ->
+                        val isUserMissing = exc is FirebaseAuthInvalidUserException ||
+                            (exc is FirebaseAuthInvalidCredentialsException) ||
+                            exc.message?.contains("user-not-found") == true ||
+                            exc.message?.contains("invalid-credential") == true
+                        if (!isUserMissing) {
+                            Toast.makeText(context, exc.localizedMessage ?: "Login failed", Toast.LENGTH_LONG).show()
+                            return@addOnFailureListener
                         }
+                        attemptCustomerRtdbMigration(
+                            context = context,
+                            navController = navController,
+                            email = email.trim(),
+                            password = password,
+                        )
                     }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(context, "Login failed: ${error.message}", Toast.LENGTH_LONG).show()
-                    }
-                })
             },
             enabled = isValid,
             colors = ButtonDefaults.buttonColors(containerColor = if (isValid) Color(0xFFFFB703) else Color.LightGray),
@@ -167,4 +154,104 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
             modifier = Modifier.clickable { navController.navigate("customerSignup") }
         )
     }
+}
+
+private fun loadCustomerProfileAndNavigate(
+    context: Context,
+    navController: NavController,
+    email: String,
+) {
+    val userRef = FirebaseDatabase.getInstance().getReference("User")
+    userRef.orderByChild("email").equalTo(email)
+        .addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(context, "Customer profile not found", Toast.LENGTH_LONG).show()
+                    return
+                }
+                val child = snapshot.children.first()
+                val userId = child.key ?: ""
+                val firstName = child.child("firstName").getValue(String::class.java) ?: "User"
+                val city = child.child("city").getValue(String::class.java) ?: ""
+
+                SessionManager.currentUserID = userId
+                SessionManager.currentUserName = firstName
+                SessionManager.saveSession(context, email, userId, firstName, city)
+                navigateAfterCustomerLogin(context, navController)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, "Profile load failed: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+        })
+}
+
+private fun attemptCustomerRtdbMigration(
+    context: Context,
+    navController: NavController,
+    email: String,
+    password: String,
+) {
+    val userRef = FirebaseDatabase.getInstance().getReference("User")
+    userRef.orderByChild("email").equalTo(email)
+        .addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(context, "User not found", Toast.LENGTH_LONG).show()
+                    return
+                }
+                var matchedKey: String? = null
+                var matchedFirstName: String? = null
+                var matchedCity: String? = null
+                for (child in snapshot.children) {
+                    val rtdbPass = child.child("password").getValue(String::class.java)
+                    if (rtdbPass == password) {
+                        matchedKey = child.key
+                        matchedFirstName = child.child("firstName").getValue(String::class.java)
+                        matchedCity = child.child("city").getValue(String::class.java)
+                        break
+                    }
+                }
+                if (matchedKey == null) {
+                    Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
+                    return
+                }
+                FirebaseAuth.getInstance()
+                    .createUserWithEmailAndPassword(email, password)
+                    .addOnSuccessListener {
+                        SessionManager.currentUserID = matchedKey
+                        SessionManager.currentUserName = matchedFirstName
+                        SessionManager.saveSession(
+                            context = context,
+                            email = email,
+                            userId = matchedKey ?: "",
+                            firstName = matchedFirstName ?: "User",
+                            city = matchedCity ?: "",
+                        )
+                        navigateAfterCustomerLogin(context, navController)
+                    }
+                    .addOnFailureListener { createExc ->
+                        Toast.makeText(
+                            context,
+                            "Login migration failed: ${createExc.localizedMessage ?: createExc.message}",
+                            Toast.LENGTH_LONG,
+                        ).show()
+                    }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, "Login failed: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+        })
+}
+
+private fun navigateAfterCustomerLogin(
+    context: Context,
+    navController: NavController,
+) {
+    val intent = Intent(context, MainJobBoard::class.java).apply {
+        putExtra("user_type", "customer")
+        Log.d("Navigation", "CustomerLogin authenticated")
+    }
+    context.startActivity(intent)
 }
