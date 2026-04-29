@@ -187,18 +187,39 @@ fun CustomerProfilePictureUpload(navController: NavController) {
                     storageRef.putFile(imageUri!!)
                         .addOnSuccessListener {
                             storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                                val email = SessionManager.getLoggedInEmail(context)
-                                val dbRef = FirebaseDatabase.getInstance().getReference("User")
-                                dbRef.orderByChild("email").equalTo(email).get()
-                                    .addOnSuccessListener { snapshot ->
-                                        for (child in snapshot.children) {
-                                            child.ref.child("profileImageUrl").setValue(downloadUri.toString())
+                                val userId = SessionManager.getLoggedInUserId(context)
+                                if (userId.isNotEmpty()) {
+                                    val dbRef = FirebaseDatabase.getInstance().getReference("User").child(userId)
+                                    dbRef.child("profileImageUrl").setValue(downloadUri.toString())
+                                        .addOnSuccessListener {
+                                            Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("customerKycSuccess") {
+                                                popUpTo("landingPage") { inclusive = true }
+                                            }
                                         }
-                                        Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("customerProfile") {
-                                            popUpTo(0)
+                                        .addOnFailureListener {
+                                            isUploading = false
+                                            Toast.makeText(context, "Database update failed", Toast.LENGTH_SHORT).show()
                                         }
-                                    }
+                                } else {
+                                    // Fallback to email search if userId is missing
+                                    val email = SessionManager.getLoggedInEmail(context)
+                                    val dbRef = FirebaseDatabase.getInstance().getReference("User")
+                                    dbRef.orderByChild("email").equalTo(email).get()
+                                        .addOnSuccessListener { snapshot ->
+                                            for (child in snapshot.children) {
+                                                child.ref.child("profileImageUrl").setValue(downloadUri.toString())
+                                            }
+                                            Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("customerKycSuccess") {
+                                                popUpTo("landingPage") { inclusive = true }
+                                            }
+                                        }
+                                        .addOnFailureListener {
+                                            isUploading = false
+                                            Toast.makeText(context, "User search failed", Toast.LENGTH_SHORT).show()
+                                        }
+                                }
                             }
                         }
                         .addOnFailureListener {

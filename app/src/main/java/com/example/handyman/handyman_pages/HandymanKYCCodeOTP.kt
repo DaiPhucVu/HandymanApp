@@ -22,9 +22,18 @@ import com.example.handyman.components.StepCircle
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.PhoneAuthProvider
+
 @Composable
-fun HandymanKYCCodeOTP(modifier: Modifier = Modifier,navController: NavController) {
+fun HandymanKYCCodeOTP(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    verificationId: String
+) {
     var otpCode by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val isValidOTP = otpCode.matches(Regex("^\\d{6}$"))
 
     val context = LocalContext.current
@@ -48,9 +57,9 @@ fun HandymanKYCCodeOTP(modifier: Modifier = Modifier,navController: NavControlle
                 contentDescription = "Back",
                 modifier = Modifier
                     .size(24.dp)
-                    .padding(end = 16.dp)
-                    .clickable { navController.navigate("handymanKycPhoneNumber") }
+                    .clickable { navController.popBackStack() }
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Medium)
         }
 
@@ -85,33 +94,105 @@ fun HandymanKYCCodeOTP(modifier: Modifier = Modifier,navController: NavControlle
 
         OutlinedTextField(
             value = otpCode,
-            onValueChange = { otpCode = it },
+            onValueChange = { 
+                otpCode = it
+                errorMessage = null
+            },
             label = { Text("OTP Code") },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            isError = otpCode.isNotBlank() && !isValidOTP,
+            isError = (otpCode.isNotBlank() && !isValidOTP) || errorMessage != null,
             placeholder = { Text("6-digit code") }
         )
+
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
-                val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
-                val query = handymanRef.orderByChild("email").equalTo(currentEmail)
+                isLoading = true
+                errorMessage = null
+                val auth = FirebaseAuth.getInstance()
+                val currentUser = auth.currentUser
 
-                query.get().addOnSuccessListener { snapshot ->
-                    for (child in snapshot.children) {
-                        child.ref.child("isPhoneVerified").setValue(true)
-                        child.ref.child("verificationStatus").setValue("")
-                    }
-                    navController.navigate("handymanKycSubmitted")
-                }.addOnFailureListener { error ->
-                    Log.e("KYC", "Failed to update KYC status: ${error.message}")
+                val credential = PhoneAuthProvider.getCredential(verificationId, otpCode)
+
+                if (currentUser != null) {
+                    // Link phone to existing email account
+                    currentUser.linkWithCredential(credential)
+                        .addOnCompleteListener { task ->
+                            val exception = task.exception
+                            if (task.isSuccessful || (exception is com.google.firebase.auth.FirebaseAuthUserCollisionException || 
+                                       exception?.message?.contains("already", ignoreCase = true) == true)) {
+                                
+                                if (exception != null) {
+                                    Log.i("KYC", "Phone already linked, but OTP was valid. Proceeding.")
+                                }
+
+                                val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
+                                val query = handymanRef.orderByChild("email").equalTo(currentEmail)
+
+                                query.get().addOnSuccessListener { snapshot ->
+                                    if (snapshot.exists()) {
+                                        for (child in snapshot.children) {
+                                            child.ref.child("isPhoneVerified").setValue(true)
+                                            child.ref.child("verificationStatus").setValue("Verified")
+                                        }
+                                        isLoading = false
+                                        navController.navigate("handymanKycSubmitted")
+                                    } else {
+                                        isLoading = false
+                                        errorMessage = "Handyman record not found."
+                                    }
+                                }.addOnFailureListener { e ->
+                                    isLoading = false
+                                    errorMessage = "Database update failed"
+                                }
+                            } else {
+                                isLoading = false
+                                errorMessage = exception?.message ?: "Verification failed. Please try again."
+                            }
+                        }
+                } else {
+                    auth.signInWithCredential(credential)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
+                                val query = handymanRef.orderByChild("email").equalTo(currentEmail)
+
+                                query.get().addOnSuccessListener { snapshot ->
+                                    if (snapshot.exists()) {
+                                        for (child in snapshot.children) {
+                                            child.ref.child("isPhoneVerified").setValue(true)
+                                            child.ref.child("verificationStatus").setValue("Verified")
+                                        }
+                                        isLoading = false
+                                        navController.navigate("handymanKycSubmitted")
+                                    } else {
+                                        isLoading = false
+                                        errorMessage = "Handyman record not found."
+                                    }
+                                }.addOnFailureListener { e ->
+                                    isLoading = false
+                                    errorMessage = "Database update failed"
+                                }
+                            } else {
+                                isLoading = false
+                                errorMessage = task.exception?.message ?: "Verification failed."
+                            }
+                        }
                 }
             },
-            enabled = isValidOTP,
+            enabled = isValidOTP && !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -120,7 +201,11 @@ fun HandymanKYCCodeOTP(modifier: Modifier = Modifier,navController: NavControlle
                 containerColor = if (isValidOTP) Color(0xFF2F3367) else Color(0xFFCCCCCC)
             )
         ) {
-            Text("Verify", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Verify", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
         }
     }
 }

@@ -36,7 +36,7 @@
         <activity android:name=".chatbox.ChatListingActivity" android:theme="@style/AppTheme" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".chatbox.ChatClientActivity" android:theme="@style/AppTheme" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".SupportForm" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".ChooseAccountTypeActivity" android:exported="true" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize"/>
+
 
         <provider
                 android:name="androidx.core.content.FileProvider"

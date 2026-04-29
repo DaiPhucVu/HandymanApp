@@ -2,6 +2,7 @@ package com.example.handyman.customer_pages
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -56,8 +57,9 @@ fun CustomerKYCCodeOTP(
                 contentDescription = "Back",
                 modifier = Modifier
                     .size(24.dp)
-                    .padding(end = 16.dp)
+                    .clickable { navController.popBackStack() }
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Medium)
         }
 
@@ -116,48 +118,48 @@ fun CustomerKYCCodeOTP(
             onClick = {
                 isLoading = true
                 errorMessage = null
-                val credential = PhoneAuthProvider.getCredential(verificationId, otpCode)
                 val auth = FirebaseAuth.getInstance()
                 val currentUser = auth.currentUser
 
-                val onComplete: (Boolean, String?) -> Unit = { success, error ->
-                    if (success) {
-                        val userRef = FirebaseDatabase.getInstance().getReference("User")
-                        val query = userRef.orderByChild("email").equalTo(currentEmail)
-
-                        query.get().addOnSuccessListener { snapshot ->
-                            if (snapshot.exists()) {
-                                for (child in snapshot.children) {
-                                    child.ref.child("isPhoneVerified").setValue(true)
-                                    child.ref.child("status").setValue("Verified")
-                                }
-                                isLoading = false
-                                navController.navigate("customerProfilePictureUpload")
-                            } else {
-                                isLoading = false
-                                errorMessage = "User record not found in database."
-                                Log.e("KYC", "No database record for email: $currentEmail")
-                            }
-                        }.addOnFailureListener { e ->
-                            isLoading = false
-                            errorMessage = "Database update failed"
-                            Log.e("KYC", "Failed to update KYC status: ${e.message}")
-                        }
-                    } else {
-                        isLoading = false
-                        errorMessage = error ?: "Verification failed. Please try again."
-                        Log.e("KYC", "OTP Verification failed: $error")
-                    }
-                }
+                val credential = PhoneAuthProvider.getCredential(verificationId, otpCode)
 
                 if (currentUser != null) {
                     // Link phone to existing email account
                     currentUser.linkWithCredential(credential)
                         .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                onComplete(true, null)
+                            val exception = task.exception
+                            if (task.isSuccessful || (exception is com.google.firebase.auth.FirebaseAuthUserCollisionException || 
+                                       exception?.message?.contains("already", ignoreCase = true) == true)) {
+                                
+                                if (exception != null) {
+                                    Log.i("KYC", "Phone already linked, but OTP was valid. Proceeding.")
+                                }
+
+                                val userRef = FirebaseDatabase.getInstance().getReference("User")
+                                val query = userRef.orderByChild("email").equalTo(currentEmail)
+
+                                query.get().addOnSuccessListener { snapshot ->
+                                    if (snapshot.exists()) {
+                                        for (child in snapshot.children) {
+                                            child.ref.child("isPhoneVerified").setValue(true)
+                                            child.ref.child("status").setValue("Verified")
+                                        }
+                                        isLoading = false
+                                        navController.navigate("customerProfilePictureUpload")
+                                    } else {
+                                        isLoading = false
+                                        errorMessage = "User record not found in database."
+                                        Log.e("KYC", "No database record for email: $currentEmail")
+                                    }
+                                }.addOnFailureListener { e ->
+                                    isLoading = false
+                                    errorMessage = "Database update failed"
+                                    Log.e("KYC", "Failed to update KYC status: ${e.message}")
+                                }
                             } else {
-                                onComplete(false, task.exception?.message)
+                                isLoading = false
+                                errorMessage = exception?.message ?: "Verification failed. Please try again."
+                                Log.e("KYC", "OTP Verification failed: $errorMessage")
                             }
                         }
                 } else {
@@ -165,9 +167,28 @@ fun CustomerKYCCodeOTP(
                     auth.signInWithCredential(credential)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                onComplete(true, null)
+                                val userRef = FirebaseDatabase.getInstance().getReference("User")
+                                val query = userRef.orderByChild("email").equalTo(currentEmail)
+
+                                query.get().addOnSuccessListener { snapshot ->
+                                    if (snapshot.exists()) {
+                                        for (child in snapshot.children) {
+                                            child.ref.child("isPhoneVerified").setValue(true)
+                                            child.ref.child("status").setValue("Verified")
+                                        }
+                                        isLoading = false
+                                        navController.navigate("customerProfilePictureUpload")
+                                    } else {
+                                        isLoading = false
+                                        errorMessage = "User record not found in database."
+                                    }
+                                }.addOnFailureListener { e ->
+                                    isLoading = false
+                                    errorMessage = "Database update failed"
+                                }
                             } else {
-                                onComplete(false, task.exception?.message)
+                                isLoading = false
+                                errorMessage = task.exception?.message ?: "Verification failed."
                             }
                         }
                 }

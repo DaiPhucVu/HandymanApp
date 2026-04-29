@@ -104,7 +104,9 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
         Text("Describe your problem", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
             value = viewModel.problemDesc,
-            onValueChange = { viewModel.problemDesc = it },
+            onValueChange = { 
+                viewModel.problemDesc = it
+            },
             placeholder = { Text("ex. I have water leaks in the bathroom") },
             modifier = Modifier.fillMaxWidth().height(150.dp),
             shape = RoundedCornerShape(12.dp)

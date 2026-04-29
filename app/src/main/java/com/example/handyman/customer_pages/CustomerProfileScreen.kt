@@ -56,36 +56,44 @@ fun CustomerProfileScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(userId) {
-        if (userId != null) {
+        if (!userId.isNullOrEmpty()) {
             database.child(userId).addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    userData = snapshot.value as? Map<String, Any>
-                    
-                    // Fetch reviews for this customer
-                    val reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews")
-                    reviewsRef.orderByChild("customerId").equalTo(userId)
-                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(reviewSnapshot: DataSnapshot) {
-                                val reviewList = mutableListOf<Review>()
-                                for (child in reviewSnapshot.children) {
-                                    val review = child.getValue(Review::class.java)
-                                    if (review != null && review.reviewerType == "handyman") {
-                                        reviewList.add(review)
+                    if (snapshot.exists()) {
+                        userData = snapshot.value as? Map<String, Any>
+                        
+                        // Fetch reviews for this customer
+                        val reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews")
+                        reviewsRef.orderByChild("customerId").equalTo(userId)
+                            .addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(reviewSnapshot: DataSnapshot) {
+                                    val reviewList = mutableListOf<Review>()
+                                    for (child in reviewSnapshot.children) {
+                                        val review = child.getValue(Review::class.java)
+                                        if (review != null && review.reviewerType == "handyman") {
+                                            reviewList.add(review)
+                                        }
                                     }
+                                    reviews = reviewList.sortedByDescending { it.timestamp }
+                                    isLoading = false
                                 }
-                                reviews = reviewList.sortedByDescending { it.timestamp }
-                                isLoading = false
-                            }
-                            override fun onCancelled(error: DatabaseError) {
-                                isLoading = false
-                            }
-                        })
+                                override fun onCancelled(error: DatabaseError) {
+                                    isLoading = false
+                                }
+                            })
+                    } else {
+                        isLoading = false
+                        Toast.makeText(context, "User profile not found", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
                     isLoading = false
                 }
             })
+        } else {
+            isLoading = false
+            Toast.makeText(context, "Invalid User ID", Toast.LENGTH_SHORT).show()
         }
     }
 

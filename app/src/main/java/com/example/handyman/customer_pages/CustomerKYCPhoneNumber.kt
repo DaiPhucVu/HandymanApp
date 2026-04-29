@@ -1,6 +1,10 @@
 package com.example.handyman.customer_pages
 
+import android.content.Context
+import android.content.ContextWrapper
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,19 +34,29 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import java.util.concurrent.TimeUnit
 
+fun findActivity(context: Context): android.app.Activity? {
+    var currentContext = context
+    while (currentContext is ContextWrapper) {
+        if (currentContext is android.app.Activity) return currentContext
+        currentContext = currentContext.baseContext
+    }
+    return null
+}
+
 @Composable
 fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
-    val activity = context as? android.app.Activity
     var phoneNumber by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val auth = FirebaseAuth.getInstance()
     val textFieldModifier = Modifier
         .fillMaxWidth()
         .height(56.dp)
 
-    val isValidPhone = phoneNumber.matches(Regex("^\\+\\d{1,3}\\s?\\d{4,14}\$"))
+    // Allow +880... or 01... formats
+    val isValidPhone = phoneNumber.matches(Regex("^(\\+8801|01)[3-9][0-9]{8}$"))
 
     Column(
         modifier = modifier
@@ -57,7 +71,9 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
                 contentDescription = "Back",
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text("Account verification", fontSize = 20.sp)
@@ -94,27 +110,54 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
         Text("Mobile", fontWeight = FontWeight.Bold, fontSize = 14.sp)
         OutlinedTextField(
             value = phoneNumber,
-            onValueChange = { phoneNumber = it },
+            onValueChange = { 
+                phoneNumber = it
+                errorMessage = null
+            },
             placeholder = { Text("+880 1300-000000") },
             modifier = textFieldModifier,
-            isError = phoneNumber.isNotBlank() && !isValidPhone
+            isError = (phoneNumber.isNotBlank() && !isValidPhone) || errorMessage != null
         )
+
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(48.dp))
 
         Button(
             onClick = {
-                if (activity == null) return@Button
+                val currentActivity = findActivity(context)
+                if (currentActivity == null) {
+                    Toast.makeText(context, "Error: Activity not found", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
                 isLoading = true
+                errorMessage = null
+
+                // Format number for Firebase (ensure it starts with +880)
+                val formattedNumber = if (phoneNumber.startsWith("0")) {
+                    "+88" + phoneNumber
+                } else {
+                    phoneNumber
+                }
 
                 val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                         isLoading = false
+                        Log.d("KYC", "Verification completed automatically")
                     }
 
                     override fun onVerificationFailed(e: FirebaseException) {
                         isLoading = false
-                        Log.e("KYC", "Verification failed", e)
+                        errorMessage = e.message
+                        Log.e("KYC", "Verification failed: ${e.message}", e)
+                        Toast.makeText(context, "Verification failed: ${e.message}", Toast.LENGTH_LONG).show()
                     }
 
                     override fun onCodeSent(
@@ -122,14 +165,24 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
                         token: PhoneAuthProvider.ForceResendingToken
                     ) {
                         isLoading = false
-                        navController.navigate("customerKycCodeOTP/$verificationId")
+                        val currentEmail = SessionManager.getLoggedInEmail(context)
+                        FirebaseDatabase.getInstance().getReference("User")
+                            .orderByChild("email").equalTo(currentEmail)
+                            .get().addOnSuccessListener { snapshot ->
+                                for (child in snapshot.children) {
+                                    child.ref.child("phoneNumber").setValue(phoneNumber)
+                                }
+                                navController.navigate("customerKycCodeOTP/$verificationId")
+                            }.addOnFailureListener {
+                                navController.navigate("customerKycCodeOTP/$verificationId")
+                            }
                     }
                 }
 
                 val options = PhoneAuthOptions.newBuilder(auth)
-                    .setPhoneNumber(phoneNumber)
+                    .setPhoneNumber(formattedNumber)
                     .setTimeout(60L, TimeUnit.SECONDS)
-                    .setActivity(activity)
+                    .setActivity(currentActivity)
                     .setCallbacks(callbacks)
                     .build()
                 PhoneAuthProvider.verifyPhoneNumber(options)

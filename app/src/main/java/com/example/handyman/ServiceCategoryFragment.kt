@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.navigation.Navigation
 import com.example.handyman.utils.SessionManager
 import com.example.handyman.MainJobBoard
-import com.example.handyman.ChooseAccountType
 import android.content.Intent
 
 
@@ -108,8 +107,9 @@ class ServiceCategoryFragment : Fragment() {
             Log.d("Navigation:", "User clicks Logout")
 
 
-            // Redirect to ChooseAccountType activity
-            val intent = Intent(requireContext(), ChooseAccountTypeActivity::class.java)
+            // Redirect to MainActivity with startDestination=chooseAccountType
+            val intent = Intent(requireContext(), com.example.handyman.chatbox.MainActivity::class.java)
+            intent.putExtra("startDestination", "chooseAccountType")
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
 

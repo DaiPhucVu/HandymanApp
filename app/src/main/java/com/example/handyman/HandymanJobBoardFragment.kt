@@ -21,7 +21,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.example.handyman.MainJobBoard
-import com.example.handyman.ChooseAccountType
 import android.content.Intent
 import android.widget.Button
 import android.widget.TextView
@@ -67,8 +66,9 @@ class HandymanJobBoardFragment : Fragment() {
             // Clear session
             SessionManager.clearSession(requireContext())
 
-            // Redirect to ChooseAccountTypeActivity
-            val intent = Intent(requireContext(), ChooseAccountTypeActivity::class.java)
+            // Redirect to MainActivity
+            val intent = Intent(requireContext(), com.example.handyman.chatbox.MainActivity::class.java)
+            intent.putExtra("startDestination", "chooseAccountType")
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }

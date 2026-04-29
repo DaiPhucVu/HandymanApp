@@ -46,11 +46,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        val startDestination = intent.getStringExtra("startDestination") ?: "landingPage"
+
         setContent {
             HandymanTheme {
                 Navigation(
                     modifier = Modifier.fillMaxSize(),
-                    startDestination = "landingPage"
+                    startDestination = startDestination
                 )
             }
         }

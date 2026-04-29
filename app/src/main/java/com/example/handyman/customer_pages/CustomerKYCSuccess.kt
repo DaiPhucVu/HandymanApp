@@ -2,6 +2,7 @@ package com.example.handyman.customer_pages
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -20,7 +21,7 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 
 @Composable
-fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavController) {
+fun CustomerKYCSuccess(navController: NavController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     Column(
         modifier = Modifier
@@ -38,7 +39,16 @@ fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavControll
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
                 contentDescription = "Back",
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        val intent = android.content.Intent(context, com.example.handyman.MainJobBoard::class.java).apply {
+                            putExtra("user_type", "customer")
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        }
+                        context.startActivity(intent)
+                        (context as? android.app.Activity)?.finish()
+                    },
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(8.dp))
