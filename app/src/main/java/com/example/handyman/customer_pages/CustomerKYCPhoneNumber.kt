@@ -23,15 +23,26 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthOptions
+import com.google.firebase.auth.PhoneAuthProvider
+import java.util.concurrent.TimeUnit
+
 @Composable
 fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
+    val activity = context as? android.app.Activity
     var phoneNumber by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+
+    val auth = FirebaseAuth.getInstance()
     val textFieldModifier = Modifier
         .fillMaxWidth()
         .height(56.dp)
 
-    val isValidPhone = phoneNumber.matches(Regex("^\\+880\\s?1[3-9][0-9]{2}-?[0-9]{6}$"))
+    val isValidPhone = phoneNumber.matches(Regex("^\\+\\d{1,3}\\s?\\d{4,14}\$"))
 
     Column(
         modifier = modifier
@@ -93,24 +104,37 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
 
         Button(
             onClick = {
-                val userId = SessionManager.currentUserID
-                if (userId == null) {
-                    Log.e("KYC", "No logged-in user ID found")
-                    return@Button
+                if (activity == null) return@Button
+                isLoading = true
+
+                val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                        isLoading = false
+                    }
+
+                    override fun onVerificationFailed(e: FirebaseException) {
+                        isLoading = false
+                        Log.e("KYC", "Verification failed", e)
+                    }
+
+                    override fun onCodeSent(
+                        verificationId: String,
+                        token: PhoneAuthProvider.ForceResendingToken
+                    ) {
+                        isLoading = false
+                        navController.navigate("customerKycCodeOTP/$verificationId")
+                    }
                 }
 
-                FirebaseDatabase.getInstance().getReference("User")
-                    .child(userId)
-                    .child("phoneNumber")
-                    .setValue(phoneNumber)
-                    .addOnSuccessListener {
-                        navController.navigate("customerKycCodeOTP")
-                    }
-                    .addOnFailureListener { error ->
-                        Log.e("KYC", "Failed to save phone number: ${error.message}")
-                    }
+                val options = PhoneAuthOptions.newBuilder(auth)
+                    .setPhoneNumber(phoneNumber)
+                    .setTimeout(60L, TimeUnit.SECONDS)
+                    .setActivity(activity)
+                    .setCallbacks(callbacks)
+                    .build()
+                PhoneAuthProvider.verifyPhoneNumber(options)
             },
-            enabled = isValidPhone,
+            enabled = isValidPhone && !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -119,7 +143,11 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
                 containerColor = if (isValidPhone) Color(0xFFFFB703) else Color(0xFFB0B0B0)
             )
         ) {
-            Text("Get OTP", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.DarkGray, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Get OTP", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+            }
         }
     }
 }

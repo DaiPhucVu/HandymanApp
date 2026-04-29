@@ -123,9 +123,13 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         composable("customerKycPhoneNumber") {
             CustomerKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
-        composable ("customerKycCodeOTP" ){
-            CustomerKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController)
+
+        //OTP 
+        composable("customerKycCodeOTP/{verificationId}") { backStackEntry ->
+            val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
+            CustomerKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId)
         }
+
         composable("customerKycSubmitted") {
             CustomerKYCSubmitted(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
