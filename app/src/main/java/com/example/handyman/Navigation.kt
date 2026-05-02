@@ -74,9 +74,10 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         composable("handymanKycPhoneNumber") {
             HandymanKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
-        composable("handymanKycCodeOTP/{verificationId}") { backStackEntry ->
+        composable("handymanKycCodeOTP/{verificationId}/{phoneNumber}") { backStackEntry ->
             val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
-            HandymanKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId)
+            val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+            HandymanKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId, phoneNumber)
         }
         composable("handymanKycSubmitted") {
             HandymanKYCSubmitted(Modifier.fillMaxSize().systemBarsPadding(), navController)
@@ -126,9 +127,10 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         }
 
         //OTP 
-        composable("customerKycCodeOTP/{verificationId}") { backStackEntry ->
+        composable("customerKycCodeOTP/{verificationId}/{phoneNumber}") { backStackEntry ->
             val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
-            CustomerKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId)
+            val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+            CustomerKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId, phoneNumber)
         }
 
         composable("customerKycSubmitted") {

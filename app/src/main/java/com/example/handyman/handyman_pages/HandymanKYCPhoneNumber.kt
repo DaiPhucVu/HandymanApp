@@ -50,8 +50,8 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
         .fillMaxWidth()
         .height(56.dp)
 
-    // Allow +880... or 01... formats
-    val isValidPhone = phoneNumber.matches(Regex("^(\\+8801|01)[3-9][0-9]{8}$"))
+    // Universal regex for phone numbers: ^\+?[1-9]\d{1,14}$
+    val isValidPhone = phoneNumber.matches(Regex("^\\+?[1-9]\\d{1,14}$"))
 
     Column(
         modifier = modifier
@@ -111,7 +111,9 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
                 phoneNumber = it 
                 errorMessage = null
             },
-            placeholder = { Text("+880 1300-000000") },
+            //follows the E.164 international phone format
+            //Max 15 digits, No spaces or symbols, + is optional
+            placeholder = { Text("+8801234567890") },
             modifier = textFieldModifier,
             isError = (phoneNumber.isNotBlank() && !isValidPhone) || errorMessage != null
         )
@@ -137,11 +139,12 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
                 isLoading = true
                 errorMessage = null
 
-                // Format number for Firebase (ensure it starts with +880)
-                val formattedNumber = if (phoneNumber.startsWith("0")) {
-                    "+88" + phoneNumber
-                } else {
+                // Format number for Firebase
+                val formattedNumber = if (phoneNumber.startsWith("+")) {
                     phoneNumber
+                } else {
+                    // Default to +880 if no country code provided
+                    "+880$phoneNumber"
                 }
 
                 val callbacks = object : com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -169,9 +172,9 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
                                 for (child in snapshot.children) {
                                     child.ref.child("phoneNumber").setValue(phoneNumber)
                                 }
-                                navController.navigate("handymanKycCodeOTP/$verificationId")
+                                navController.navigate("handymanKycCodeOTP/$verificationId/$phoneNumber")
                             }.addOnFailureListener {
-                                navController.navigate("handymanKycCodeOTP/$verificationId")
+                                navController.navigate("handymanKycCodeOTP/$verificationId/$phoneNumber")
                             }
                     }
                 }

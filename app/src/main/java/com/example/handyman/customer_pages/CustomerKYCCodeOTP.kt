@@ -29,7 +29,8 @@ import com.google.firebase.auth.PhoneAuthProvider
 fun CustomerKYCCodeOTP(
     modifier: Modifier = Modifier,
     navController: NavController,
-    verificationId: String
+    verificationId: String,
+    phoneNumber: String
 ) {
     var otpCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
