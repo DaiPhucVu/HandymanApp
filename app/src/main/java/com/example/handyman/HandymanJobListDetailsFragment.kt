@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -33,13 +34,20 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import android.location.Geocoder
 import java.util.UUID
 import java.util.Locale
 
 class HandymanJobListDetailsFragment : Fragment() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -88,7 +96,10 @@ class HandymanJobListDetailsFragment : Fragment() {
         val timeDisplay = view.findViewById<TextView>(R.id.tvTime)
         timeDisplay.text = "$timeFrom — $timeTo"
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
-        locationDisplay.text = "$location, Melbourne, VIC"
+        val isAssigned = assignedTo == SessionManager.getLoggedInUserId(requireContext())
+        
+        // Removed initial redundant jobRef.get() here as it's handled in the main map update block
+        locationDisplay.text = "Loading location..."
 
         val customerNameDisplay = view.findViewById<TextView>(R.id.tvTitle)
         val customerRatingDisplay = view.findViewById<TextView>(R.id.tvRating)
@@ -140,7 +151,7 @@ class HandymanJobListDetailsFragment : Fragment() {
         jobRef.get().addOnSuccessListener { snapshot ->
             if (!isAdded) return@addOnSuccessListener
             
-            // Handle Map Coordinates
+            // Handle Map Coordinates first to use in fallback geocoding
             var lat = snapshot.child("latitude").getValue(Double::class.java)
             var lng = snapshot.child("longitude").getValue(Double::class.java)
 
@@ -148,17 +159,59 @@ class HandymanJobListDetailsFragment : Fragment() {
             if (lat == null || lat == 0.0) lat = argLat.toDouble()
             if (lng == null || lng == 0.0) lng = argLng.toDouble()
 
+            val citySuburb = snapshot.child("citySuburb").getValue(String::class.java)
+            if (isAssigned) {
+                locationDisplay.text = "$location, Melbourne, VIC"
+            } else {
+                if (!citySuburb.isNullOrBlank()) {
+                    locationDisplay.text = "$citySuburb (Approximate)"
+                } else if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
+                    // Fallback Geocoding
+                    try {
+                        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                        val addresses = geocoder.getFromLocation(lat, lng, 1)
+                        if (!addresses.isNullOrEmpty()) {
+                            val address = addresses[0]
+                            val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea ?: "Approximate Location"
+                            locationDisplay.text = if (city != "Approximate Location") "$city (Approximate)" else city
+                        } else {
+                            locationDisplay.text = "Approximate Location"
+                        }
+                    } catch (e: Exception) {
+                        locationDisplay.text = "Approximate Location"
+                    }
+                } else {
+                    locationDisplay.text = "Approximate Location"
+                }
+            }
+
             if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
                 mapView.visibility = View.VISIBLE
                 val jobLocation = GeoPoint(lat, lng)
-                mapView.controller.setZoom(16.0)
-                mapView.controller.setCenter(jobLocation)
+                
+                val currentHandymanId = SessionManager.getLoggedInUserId(requireContext())
+                val isAssigned = snapshot.child("assignedTo").getValue(String::class.java) == currentHandymanId
 
-                val marker = Marker(mapView)
-                marker.position = jobLocation
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                marker.title = "Job Location"
-                mapView.overlays.add(marker)
+                if (isAssigned) {
+                    mapView.controller.setZoom(16.0)
+                    mapView.controller.setCenter(jobLocation)
+
+                    val marker = Marker(mapView)
+                    marker.position = jobLocation
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    marker.title = "Job Location"
+                    mapView.overlays.add(marker)
+                } else {
+                    mapView.controller.setZoom(10.0) // Zoom out further for 5km radius
+                    mapView.controller.setCenter(jobLocation)
+
+                    val circle = org.osmdroid.views.overlay.Polygon()
+                    circle.points = org.osmdroid.views.overlay.Polygon.pointsAsCircle(jobLocation, 5000.0) // 5km radius
+                    circle.fillPaint.color = Color.argb(50, 0, 0, 255)
+                    circle.outlinePaint.color = Color.BLUE
+                    circle.outlinePaint.strokeWidth = 2f
+                    mapView.overlays.add(circle)
+                }
                 mapView.invalidate()
             } else {
                 mapView.visibility = View.GONE

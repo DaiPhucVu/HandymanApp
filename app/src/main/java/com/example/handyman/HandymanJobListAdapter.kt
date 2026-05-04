@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.location.Geocoder
+import java.util.Locale
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
@@ -68,11 +70,45 @@ class HandymanJobListAdapter(
                 tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
             }
             tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            tvLocation.text = item.location ?: item.jobLocation
+            
+            val isAssigned = item.assignedTo == handymanId
+            if (isAssigned) {
+                tvLocation.text = item.location ?: item.jobLocation
+            } else {
+                if (!item.citySuburb.isNullOrBlank()) {
+                    tvLocation.text = "${item.citySuburb} (Approximate)"
+                } else {
+                    tvLocation.text = "Approximate Location"
+                    
+                    // Fallback geocoding for the list view
+                    if (item.latitude != null && item.longitude != null && item.latitude != 0.0 && item.longitude != 0.0) {
+                        val context = itemView.context
+                        Thread {
+                            try {
+                                val geocoder = Geocoder(context, Locale.getDefault())
+                                val addresses = geocoder.getFromLocation(item.latitude, item.longitude, 1)
+                                if (!addresses.isNullOrEmpty()) {
+                                    val address = addresses[0]
+                                    val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea
+                                    if (city != null) {
+                                        itemView.post {
+                                            // Re-check if this ViewHolder is still showing the same job
+                                            if (tvJobTitle.text == (item.title ?: item.jobCat)) {
+                                                tvLocation.text = "$city (Approximate)"
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                // Ignore errors
+                            }
+                        }.start()
+                    }
+                }
+            }
 
             val hasQuoted = (item.quotedHandymen as? Map<*, *>)
                 ?.containsValue(handymanId) == true
-            val isAssigned = item.assignedTo == handymanId
             val hasOverall = item.jobStatus == "In-progress" || item.jobStatus == "Done"
 
             if (!hasQuoted && !isAssigned && !hasOverall) {

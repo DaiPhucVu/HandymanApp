@@ -22,6 +22,7 @@ data class Job(
     val jobTimeFrom: String = "",
     val jobTimeTo: String = "",
     val jobLocation: String = "",
+    val citySuburb: String = "",
     val jobSalaryFrom: String = "",
     val jobSalaryTo: String = "",
     val jobPaymentOption: String = "",

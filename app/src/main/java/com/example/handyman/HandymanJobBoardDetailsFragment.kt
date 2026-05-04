@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -33,12 +34,20 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import android.location.Geocoder
+import java.util.Locale
 import java.util.UUID
 
 class HandymanJobBoardDetailsFragment : Fragment() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -94,8 +103,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val timeDisplay = view.findViewById<TextView>(R.id.tvTime)
         timeDisplay.text = "$timeFrom — $timeTo"
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
-        locationDisplay.text = location
-
+        
         val customerNameDisplay = view.findViewById<TextView>(R.id.tvTitle)
         val customerRatingDisplay = view.findViewById<TextView>(R.id.tvRating)
         val btnViewProfile = view.findViewById<Button>(R.id.btnViewProfile)
@@ -104,6 +112,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         // Fetch customer name and rating from Firebase
         val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
         userRef.get().addOnSuccessListener { snapshot ->
+            if (!isAdded) return@addOnSuccessListener
             val firstName = snapshot.child("firstName").getValue(String::class.java)
             val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
             val rating = snapshot.child("averageRating").getValue(Double::class.java) ?: 0.0
@@ -136,9 +145,41 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val mapView = view.findViewById<MapView>(R.id.mapView)
         mapView.setMultiTouchControls(true)
         
-        // Show Quote button if not assigned or not quoted by this handyman
+        // Fetch Job to get City/Suburb and Map Coordinates
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
         jobRef.get().addOnSuccessListener { snapshot ->
+            if (!isAdded) return@addOnSuccessListener
+            
+            // Handle Map Coordinates first to use in fallback geocoding
+            var lat = snapshot.child("latitude").getValue(Double::class.java)
+            var lng = snapshot.child("longitude").getValue(Double::class.java)
+            
+            // If not in snapshot, fallback to arguments
+            if (lat == null || lat == 0.0) lat = argLat.toDouble()
+            if (lng == null || lng == 0.0) lng = argLng.toDouble()
+
+            val citySuburb = snapshot.child("citySuburb").getValue(String::class.java)
+            if (!citySuburb.isNullOrBlank()) {
+                locationDisplay.text = "$citySuburb (Approximate)"
+            } else if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
+                // Fallback Geocoding for older jobs or missing data
+                try {
+                    val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                    val addresses = geocoder.getFromLocation(lat, lng, 1)
+                    if (!addresses.isNullOrEmpty()) {
+                        val address = addresses[0]
+                        val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea ?: "Approximate Location"
+                        locationDisplay.text = if (city != "Approximate Location") "$city (Approximate)" else city
+                    } else {
+                        locationDisplay.text = "Approximate Location"
+                    }
+                } catch (e: Exception) {
+                    locationDisplay.text = "Approximate Location"
+                }
+            } else {
+                locationDisplay.text = "Approximate Location"
+            }
+
             val assigned = snapshot.child("assignedTo").getValue(String::class.java) ?: ""
             val quotes = snapshot.child("quotedHandymen").value as? Map<*, *>
             val hasQuoted = quotes?.containsValue(currentHandymanId) == true
@@ -149,25 +190,20 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                 btnQuote.visibility = View.GONE
             }
 
-            // Handle Map Coordinates
-            var lat = snapshot.child("latitude").getValue(Double::class.java)
-            var lng = snapshot.child("longitude").getValue(Double::class.java)
-            
-            // If not in snapshot, fallback to arguments
-            if (lat == null || lat == 0.0) lat = argLat.toDouble()
-            if (lng == null || lng == 0.0) lng = argLng.toDouble()
-
             if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
                 mapView.visibility = View.VISIBLE
                 val jobLocation = GeoPoint(lat, lng)
-                mapView.controller.setZoom(16.0)
+                mapView.controller.setZoom(12.0) // Set a reasonable zoom level for the circle
                 mapView.controller.setCenter(jobLocation)
 
-                val marker = Marker(mapView)
-                marker.position = jobLocation
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                marker.title = "Job Location"
-                mapView.overlays.add(marker)
+                // Add a Circle to show approximate area instead of a pinpoint Marker
+                val circle = org.osmdroid.views.overlay.Polygon()
+                circle.points = org.osmdroid.views.overlay.Polygon.pointsAsCircle(jobLocation, 5000.0) // 5km radius
+                circle.fillPaint.color = Color.argb(50, 0, 0, 255)
+                circle.outlinePaint.color = Color.BLUE
+                circle.outlinePaint.strokeWidth = 2f
+                
+                mapView.overlays.add(circle)
                 mapView.invalidate()
             } else {
                 mapView.visibility = View.GONE

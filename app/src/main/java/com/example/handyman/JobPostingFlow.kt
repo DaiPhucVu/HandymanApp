@@ -220,9 +220,11 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
                 val results = geocoder.getFromLocationName(address, 1)
                 if (results != null && results.isNotEmpty()) {
                     val location = results[0]
+                    val city = location.locality ?: location.subLocality ?: location.subAdminArea ?: location.adminArea ?: ""
                     withContext(Dispatchers.Main) {
                         viewModel.latitude = location.latitude
                         viewModel.longitude = location.longitude
+                        viewModel.citySuburb = city
                         val p = GeoPoint(location.latitude, location.longitude)
                         mapView.controller.animateTo(p)
                         mapView.controller.setZoom(16.0)
@@ -246,8 +248,11 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
                 val results = geocoder.getFromLocation(lat, lng, 1)
                 if (results != null && results.isNotEmpty()) {
                     val address = results[0].getAddressLine(0)
+                    val loc = results[0]
+                    val city = loc.locality ?: loc.subLocality ?: loc.subAdminArea ?: loc.adminArea ?: ""
                     withContext(Dispatchers.Main) {
                         viewModel.locationAddress = address
+                        viewModel.citySuburb = city
                     }
                 }
             } catch (e: Exception) {
@@ -627,6 +632,7 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             jobTimeFrom = viewModel.timeFrom,
             jobTimeTo = viewModel.timeTo,
             jobLocation = viewModel.locationAddress,
+            citySuburb = viewModel.citySuburb,
             latitude = viewModel.latitude,
             longitude = viewModel.longitude,
             jobSalaryFrom = viewModel.salaryMin,

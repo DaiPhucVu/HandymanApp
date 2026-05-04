@@ -23,6 +23,7 @@ class JobPostingViewModel : ViewModel() {
 
     // Step 2: Location
     var locationAddress by mutableStateOf("")
+    var citySuburb by mutableStateOf("")
     var latitude by mutableStateOf(0.0)
     var longitude by mutableStateOf(0.0)
 
@@ -46,6 +47,7 @@ class JobPostingViewModel : ViewModel() {
         timeFrom = ""
         timeTo = ""
         locationAddress = ""
+        citySuburb = ""
         latitude = 0.0
         longitude = 0.0
         isHappyToNegotiate = false
