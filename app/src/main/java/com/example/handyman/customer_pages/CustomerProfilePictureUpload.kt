@@ -57,7 +57,8 @@ fun CustomerProfilePictureUpload(navController: NavController) {
     }
 
     fun createImageUri(context: Context): Uri {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val timeStamp: String =
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir: File? = context.cacheDir
         val file = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
         return FileProvider.getUriForFile(
@@ -177,58 +178,104 @@ fun CustomerProfilePictureUpload(navController: NavController) {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Button(
+        TextButton(
             onClick = {
-                if (imageUri != null) {
-                    isUploading = true
-                    val storageRef = FirebaseStorage.getInstance().reference
-                        .child("profile_pictures/${UUID.randomUUID()}.jpg")
-                    
-                    storageRef.putFile(imageUri!!)
-                        .addOnSuccessListener {
-                            storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                                val userId = SessionManager.getLoggedInUserId(context)
-                                if (userId.isNotEmpty()) {
-                                    val dbRef = FirebaseDatabase.getInstance().getReference("User").child(userId)
-                                    dbRef.child("profileImageUrl").setValue(downloadUri.toString())
-                                        .addOnSuccessListener {
-                                            Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
-                                            navController.navigate("customerKycSuccess") {
-                                                popUpTo("landingPage") { inclusive = true }
-                                            }
-                                        }
-                                        .addOnFailureListener {
-                                            isUploading = false
-                                            Toast.makeText(context, "Database update failed", Toast.LENGTH_SHORT).show()
-                                        }
-                                } else {
-                                    // Fallback to email search if userId is missing
-                                    val email = SessionManager.getLoggedInEmail(context)
-                                    val dbRef = FirebaseDatabase.getInstance().getReference("User")
-                                    dbRef.orderByChild("email").equalTo(email).get()
-                                        .addOnSuccessListener { snapshot ->
-                                            for (child in snapshot.children) {
-                                                child.ref.child("profileImageUrl").setValue(downloadUri.toString())
-                                            }
-                                            Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
-                                            navController.navigate("customerKycSuccess") {
-                                                popUpTo("landingPage") { inclusive = true }
-                                            }
-                                        }
-                                        .addOnFailureListener {
-                                            isUploading = false
-                                            Toast.makeText(context, "User search failed", Toast.LENGTH_SHORT).show()
-                                        }
-                                }
-                            }
-                        }
-                        .addOnFailureListener {
-                            isUploading = false
-                            Toast.makeText(context, "Upload failed: ${it.message}", Toast.LENGTH_SHORT).show()
-                        }
+                navController.navigate("customerKycSuccess") {
+                    popUpTo("landingPage") { inclusive = true }
                 }
             },
-            enabled = imageUri != null && !isUploading,
+            enabled = !isUploading
+        ) {
+            Text(
+                text = "Skip for now",
+                color = Color.Gray,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                if (imageUri == null) {
+                    navController.navigate("customerKycSuccess") {
+                        popUpTo("landingPage") { inclusive = true }
+                    }
+                    return@Button
+                }
+
+                isUploading = true
+                val storageRef = FirebaseStorage.getInstance().reference
+                    .child("profile_pictures/${UUID.randomUUID()}.jpg")
+
+                storageRef.putFile(imageUri!!)
+                    .addOnSuccessListener {
+                        storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                            val userId = SessionManager.getLoggedInUserId(context)
+
+                            if (userId.isNotEmpty()) {
+                                val dbRef = FirebaseDatabase.getInstance()
+                                    .getReference("User")
+                                    .child(userId)
+
+                                dbRef.child("profileImageUrl").setValue(downloadUri.toString())
+                                    .addOnSuccessListener {
+                                        Toast.makeText(
+                                            context,
+                                            "Profile updated!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        navController.navigate("customerKycSuccess") {
+                                            popUpTo("landingPage") { inclusive = true }
+                                        }
+                                    }
+                                    .addOnFailureListener {
+                                        isUploading = false
+                                        Toast.makeText(
+                                            context,
+                                            "Database update failed",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                            } else {
+                                val email = SessionManager.getLoggedInEmail(context)
+                                val dbRef = FirebaseDatabase.getInstance().getReference("User")
+
+                                dbRef.orderByChild("email").equalTo(email).get()
+                                    .addOnSuccessListener { snapshot ->
+                                        for (child in snapshot.children) {
+                                            child.ref.child("profileImageUrl")
+                                                .setValue(downloadUri.toString())
+                                        }
+
+                                        Toast.makeText(
+                                            context,
+                                            "Profile updated!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        navController.navigate("customerKycSuccess") {
+                                            popUpTo("landingPage") { inclusive = true }
+                                        }
+                                    }
+                                    .addOnFailureListener {
+                                        isUploading = false
+                                        Toast.makeText(
+                                            context,
+                                            "User search failed",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                            }
+                        }
+                    }
+                    .addOnFailureListener {
+                        isUploading = false
+                        Toast.makeText(context, "Upload failed: ${it.message}", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+            },
+            enabled = !isUploading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -239,9 +286,17 @@ fun CustomerProfilePictureUpload(navController: NavController) {
             )
         ) {
             if (isUploading) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
             } else {
-                Text("Finish and Start", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.DarkGray)
+                Text(
+                    "Finish and Start",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.DarkGray
+                )
             }
         }
     }
