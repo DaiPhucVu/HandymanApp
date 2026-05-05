@@ -35,7 +35,7 @@ fun LandingPage(modifier: Modifier = Modifier, navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.profix_logo_1),
             contentDescription = "ProFix Logo",
-            modifier = Modifier.height(48.dp)
+            modifier = Modifier.height(120.dp)
         )
 
 
