@@ -180,6 +180,8 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
                     "city" to "",
                     "country" to "",
                     "postcode" to "",
+                    "latitude" to 0.0,
+                    "longitude" to 0.0,
                     "notes" to "",
                     "status" to "Pending",
                     "approvedBy" to "",

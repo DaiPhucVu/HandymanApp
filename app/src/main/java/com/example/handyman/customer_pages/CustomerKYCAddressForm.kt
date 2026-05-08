@@ -1,6 +1,7 @@
 package com.example.handyman.customer_pages
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,20 +11,31 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
+import android.location.Geocoder
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 import android.widget.Toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 
 
 @Composable
@@ -45,6 +57,62 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
     var city by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("Bangladesh") }
     var note by remember { mutableStateOf("") }
+    var latitude by remember { mutableStateOf(0.0) }
+    var longitude by remember { mutableStateOf(0.0) }
+    var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+    val geocoder = remember { Geocoder(context) }
+
+    fun reverseGeocode(lat: Double, lng: Double) {
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                val results = geocoder.getFromLocation(lat, lng, 1)
+                if (!results.isNullOrEmpty()) {
+                    val a = results[0]
+                    withContext(Dispatchers.Main) {
+                        a.subThoroughfare?.let { houseNumber = it }
+                        a.thoroughfare?.let { street = it }
+                        a.subLocality?.let { area = it }
+                        a.postalCode?.let { postCode = it }
+                        a.adminArea?.let { division = it }
+                        a.subAdminArea?.let { district = it }
+                        a.locality?.let { city = it; thana = it }
+                        a.countryName?.let { country = it }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("KYC", "Reverse geocode failed: ${e.message}")
+            }
+        }
+    }
+
+    fun forwardGeocode(map: MapView) {
+        val query = listOf(houseNumber, street, area, city, country)
+            .filter { it.trim().isNotBlank() }.joinToString(", ")
+        if (query.isBlank()) return
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                val results = geocoder.getFromLocationName(query, 1)
+                if (!results.isNullOrEmpty()) {
+                    val r = results[0]
+                    withContext(Dispatchers.Main) {
+                        latitude = r.latitude
+                        longitude = r.longitude
+                        val p = GeoPoint(latitude, longitude)
+                        map.controller.animateTo(p)
+                        map.controller.setZoom(16.0)
+                        val marker = map.overlays.filterIsInstance<Marker>().firstOrNull()
+                            ?: Marker(map).also { map.overlays.add(it) }
+                        marker.position = p
+                        marker.title = "Selected Location"
+                        map.invalidate()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("KYC", "Forward geocode failed: ${e.message}")
+            }
+        }
+    }
 
     // Validation rules (Relaxed to allow numbers, dots, commas, and hyphens)
     val isValidHouseNumber = houseNumber.trim().isNotBlank() && houseNumber.trim().length <= 20
@@ -211,6 +279,80 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 modifier = textFieldModifier
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Pin your location on the map", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                TextButton(onClick = { mapViewRef?.let { forwardGeocode(it) } }) {
+                    Text("Find on map", color = Color(0xFFFFB703))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            AndroidView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp)),
+                factory = { ctx ->
+                    // Required for OSMDroid tile downloads — without these
+                    // the MapView shows only an empty grid (no tiles).
+                    org.osmdroid.config.Configuration.getInstance().load(
+                        ctx,
+                        androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
+                    )
+                    org.osmdroid.config.Configuration.getInstance().userAgentValue =
+                        ctx.packageName
+                    MapView(ctx).apply {
+                        setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK)
+                        mapViewRef = this
+                        setMultiTouchControls(true)
+                        controller.setZoom(14.0)
+                        val startPoint = if (latitude != 0.0)
+                            GeoPoint(latitude, longitude)
+                        else GeoPoint(23.6850, 90.3563) // Dhaka
+                        controller.setCenter(startPoint)
+
+                        val marker = Marker(this)
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        if (latitude != 0.0) {
+                            marker.position = startPoint
+                            overlays.add(marker)
+                        }
+
+                        val mapEventsReceiver = object : MapEventsReceiver {
+                            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                                latitude = p.latitude
+                                longitude = p.longitude
+                                reverseGeocode(p.latitude, p.longitude)
+                                marker.position = p
+                                marker.title = "Selected Location"
+                                if (!overlays.contains(marker)) overlays.add(marker)
+                                invalidate()
+                                return true
+                            }
+                            override fun longPressHelper(p: GeoPoint): Boolean = false
+                        }
+                        overlays.add(MapEventsOverlay(mapEventsReceiver))
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = if (latitude != 0.0)
+                    "Pinned: ${String.format("%.4f", latitude)}, ${String.format("%.4f", longitude)}"
+                else "Tap on the map to pin your location",
+                fontSize = 12.sp,
+                color = if (latitude != 0.0) Color(0xFF2F3367) else Color.Gray
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
         }
 
@@ -234,6 +376,8 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     "city" to city.trim(),
                     "country" to country.trim(),
                     "notes" to note.trim(),
+                    "latitude" to latitude,
+                    "longitude" to longitude,
                     "kycStatus" to "AddressSubmitted"
                 )
 
