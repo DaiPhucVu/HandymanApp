@@ -1,5 +1,6 @@
 package com.example.handyman
 
+import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,6 +18,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.core.content.FileProvider
 import androidx.preference.PreferenceManager
 import com.example.handyman.utils.SessionManager
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
 import java.io.File
 import java.util.UUID
@@ -51,6 +56,48 @@ class JobPostingFragment : Fragment() {
                         }
                     } else {
                         viewModel.serviceCategory = serviceName
+                    }
+                }
+
+                // P69-17: pre-fill the job location with the user's saved home address.
+                // Only runs for a fresh job (no edits yet); user changes are preserved
+                // and written to the job's jobLocation, never back to the profile.
+                LaunchedEffect(Unit) {
+                    if (!viewModel.isEditing && viewModel.locationAddress.isBlank() &&
+                        viewModel.latitude == 0.0 && viewModel.longitude == 0.0) {
+                        val ctx = requireContext()
+                        val userId = SessionManager.currentUserID
+                            ?: SessionManager.getLoggedInUserId(ctx)
+                        if (userId.isNotBlank()) {
+                            try {
+                                val snapshot = withContext(Dispatchers.IO) {
+                                    Tasks.await(
+                                        FirebaseDatabase.getInstance()
+                                            .getReference("User").child(userId).get()
+                                    )
+                                }
+                                val parts = listOf("houseNumber", "street", "area", "city", "country")
+                                    .map { snapshot.child(it).getValue(String::class.java).orEmpty() }
+                                    .filter { it.isNotBlank() }
+                                if (parts.isNotEmpty() && viewModel.locationAddress.isBlank()) {
+                                    val homeAddress = parts.joinToString(", ")
+                                    viewModel.locationAddress = homeAddress
+                                    val results = withContext(Dispatchers.IO) {
+                                        runCatching {
+                                            Geocoder(ctx).getFromLocationName(homeAddress, 1)
+                                        }.getOrNull()
+                                    }
+                                    if (!results.isNullOrEmpty() &&
+                                        viewModel.latitude == 0.0 && viewModel.longitude == 0.0) {
+                                        viewModel.latitude = results[0].latitude
+                                        viewModel.longitude = results[0].longitude
+                                    }
+                                }
+                            } catch (_: Exception) {
+                                // No saved home address, fetch failed, or geocoder unavailable.
+                                // Fall through — user can still set the location manually.
+                            }
+                        }
                     }
                 }
 
