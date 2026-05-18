@@ -145,4 +145,17 @@ dependencies {
     implementation 'org.osmdroid:osmdroid-android:6.1.18'
     implementation 'androidx.preference:preference-ktx:1.2.1'
 
+    // Retrofit + Gson for the Firebase Function API call
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // Chrome Custom Tabs for the SSLCommerz checkout page
+    implementation 'androidx.browser:browser:1.8.0'
+
+    // Coroutines (you may already have these via your existing libs)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+
 }
