@@ -46,9 +46,85 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:91812569770:android:9997a59b96780d432566d3",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWSqfoUXggzipG09tHP0C1z7WmTDSqDXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:91812569770:android:bd76f886b2a3bd392566d3",
         "android_client_info": {
           "package_name": "com.example.test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWSqfoUXggzipG09tHP0C1z7WmTDSqDXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91812569770:android:7d8b0e3ae1f860062566d3",
+        "android_client_info": {
+          "package_name": "com.example.test2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWSqfoUXggzipG09tHP0C1z7WmTDSqDXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91812569770:android:c618ae49e57f4b4b2566d3",
+        "android_client_info": {
+          "package_name": "dev.duck.accounts"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWSqfoUXggzipG09tHP0C1z7WmTDSqDXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91812569770:android:aef348ab203ff9c62566d3",
+        "android_client_info": {
+          "package_name": "dev.duck.kycfeatures"
         }
       },
       "oauth_client": [],

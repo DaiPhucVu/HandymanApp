@@ -149,11 +149,7 @@ class CustomerJobPaymentFragment : Fragment() {
 
         AlertDialog.Builder(requireContext())
             .setTitle("Pay with bKash")
-            .setMessage(
-                "You'll be taken to the secure bKash checkout for BDT $requestedAmount.\n\n" +
-                        "Sandbox test credentials:\n" +
-                        "Number: 01770618575\nOTP: 123456\nPIN: 12345",
-            )
+            .setMessage("You'll be taken to the secure bKash checkout for BDT $requestedAmount.\n\nTap Continue to proceed.")
             .setPositiveButton("Continue") { _, _ -> startSslCommerzCheckout() }
             .setNegativeButton("Cancel", null)
             .show()

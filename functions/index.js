@@ -61,7 +61,7 @@ exports.initPayment = onRequest(
         fail_url: `${base}/sslRedirect?status=fail&tran_id=${tranId}`,
         cancel_url: `${base}/sslRedirect?status=cancel&tran_id=${tranId}`,
         ipn_url: `${base}/sslIpn`,
-        // multi_card_name: "bkash",
+        multi_card_name: "bkash",
         cus_name: req.body.customerName || "Handyman Customer",
         cus_email: req.body.customerEmail || "customer@handyman.app",
         cus_phone: req.body.customerPhone || "01700000000",
