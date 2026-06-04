@@ -24,12 +24,6 @@ android {
     }
 
     signingConfigs {
-        debug {
-            storeFile file("handyman-keystore.jks")
-            storePassword "handyman123"
-            keyAlias "handyman-key"
-            keyPassword "handyman123"
-        }
         release {
             storeFile file("handyman-keystore.jks")
             storePassword "handyman123"
@@ -39,9 +33,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
         release {
             signingConfig signingConfigs.release
             minifyEnabled false
