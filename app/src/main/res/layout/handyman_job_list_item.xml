@@ -50,7 +50,7 @@
                 android:id="@+id/tvJobTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Wall repair"
+                android:text=""
                 android:textColor="#2F3367"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -97,7 +97,7 @@
             android:layout_below="@id/layoutStatusRow"
             android:layout_alignParentStart="true"
             android:layout_marginTop="4dp"
-            android:text="Leaks in the bathroom wall"
+            android:text=""
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp"
             android:maxLines="2"
@@ -215,6 +215,43 @@
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:backgroundTint="@android:color/holo_blue_light"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="8dp"
+                    android:textSize="13sp"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutAssignmentActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnAcceptJob"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Accept"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/holo_green_dark"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="8dp"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="4dp"/>
+
+                <Button
+                    android:id="@+id/btnDeclineJob"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Decline"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/holo_red_dark"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="8dp"
                     android:textSize="13sp"

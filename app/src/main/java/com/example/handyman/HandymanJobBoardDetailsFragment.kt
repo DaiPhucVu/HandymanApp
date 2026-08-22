@@ -43,11 +43,6 @@ import java.util.Locale
 import java.util.UUID
 
 class HandymanJobBoardDetailsFragment : Fragment() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -81,7 +76,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val argLng = args.longitude
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
-        jobTitle.text = serviceName
+        jobTitle.text = if (serviceName.isNotBlank()) serviceName else "Untitled Job"
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         if (salaryFrom != "" && salaryTo != "") {
             if (paymentOption == "Per Day") {
@@ -93,7 +88,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
             salaryDisplay.text = "To be negotiated"
         }
         val jobDescDisplay = view.findViewById<TextView>(R.id.tvJobSubtitle)
-        jobDescDisplay.text = jobDescription
+        jobDescDisplay.text = if (jobDescription.isNotBlank()) jobDescription else ""
         val dateDisplay = view.findViewById<TextView>(R.id.tvDate)
         if (dateFrom == dateTo) {
             dateDisplay.text = "$dateFrom"
@@ -137,7 +132,6 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val btnMessage: Button = view.findViewById(R.id.btnMessage)
 
         val btnReturn: Button = view.findViewById(R.id.btnReturn)
-        val btnQuote: Button = view.findViewById(R.id.btnQuote)
 
         val currentHandymanId = SessionManager.getLoggedInUserId(requireContext())
         
@@ -180,16 +174,6 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                 locationDisplay.text = "Approximate Location"
             }
 
-            val assigned = snapshot.child("assignedTo").getValue(String::class.java) ?: ""
-            val quotes = snapshot.child("quotedHandymen").value as? Map<*, *>
-            val hasQuoted = quotes?.containsValue(currentHandymanId) == true
-
-            if (assigned.isEmpty() && !hasQuoted) {
-                btnQuote.visibility = View.VISIBLE
-            } else {
-                btnQuote.visibility = View.GONE
-            }
-
             if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
                 mapView.visibility = View.VISIBLE
                 val jobLocation = GeoPoint(lat, lng)
@@ -207,33 +191,6 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                 mapView.invalidate()
             } else {
                 mapView.visibility = View.GONE
-            }
-        }
-
-        btnQuote.setOnClickListener {
-            // Logic to quote the job
-            if (currentHandymanId != null) {
-                val jobQuoteRef = jobRef.child("quotedHandymen").push()
-                val handymanQuoteRef = FirebaseDatabase.getInstance()
-                    .getReference("Handyman")
-                    .child(currentHandymanId)
-                    .child("quotedJobs")
-                    .push()
-
-                val updates = hashMapOf<String, Any>(
-                    "/Job/$jobId/quotedHandymen/${jobQuoteRef.key}" to currentHandymanId,
-                    "/Handyman/$currentHandymanId/quotedJobs/${handymanQuoteRef.key}" to jobId,
-                    "/Handyman/$currentHandymanId/allJobs/${FirebaseDatabase.getInstance().getReference("Handyman").child(currentHandymanId).child("allJobs").push().key}" to jobId
-                )
-
-                FirebaseDatabase.getInstance().reference.updateChildren(updates)
-                    .addOnSuccessListener {
-                        Toast.makeText(context, "Job Quoted Successfully", Toast.LENGTH_SHORT).show()
-                        btnQuote.visibility = View.GONE
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(context, "Failed to quote job: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
             }
         }
 
@@ -385,7 +342,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
-                    target: Target<Drawable>?,
+                    target: Target<Drawable>,
                     isFirstResource: Boolean
                 ): Boolean {
                     progressBar.visibility = View.GONE
@@ -394,10 +351,10 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                 }
 
                 override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
+                    resource: Drawable,
+                    model: Any,
                     target: Target<Drawable>?,
-                    dataSource: DataSource?,
+                    dataSource: DataSource,
                     isFirstResource: Boolean
                 ): Boolean {
                     progressBar.visibility = View.GONE

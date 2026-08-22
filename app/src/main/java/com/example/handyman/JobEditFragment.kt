@@ -492,6 +492,6 @@ class JobEditFragment : Fragment() {
         // Create a file in the cache directory
         val file = File(requireContext().cacheDir, fileName)
         // Get the content URI using FileProvider
-        return FileProvider.getUriForFile(requireContext(), "com.example.handyman.fileprovider", file)
+        return FileProvider.getUriForFile(requireContext(), requireContext().packageName + ".fileprovider", file)
     }
 }

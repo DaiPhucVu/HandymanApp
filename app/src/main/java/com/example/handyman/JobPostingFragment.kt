@@ -28,12 +28,6 @@ import java.util.UUID
 
 class JobPostingFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // Initialize OSMDroid configuration
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -135,6 +129,6 @@ class JobPostingFragment : Fragment() {
     fun createImageFileUri(): Uri {
         val fileName = "${UUID.randomUUID()}.jpg"
         val file = File(requireContext().cacheDir, fileName)
-        return FileProvider.getUriForFile(requireContext(), "com.example.handyman.fileprovider", file)
+        return FileProvider.getUriForFile(requireContext(), requireContext().packageName + ".fileprovider", file)
     }
 }

@@ -99,63 +99,6 @@ class HandymanJobBoardFragment : Fragment() {
                         longitude = job.longitude?.toFloat() ?: 0f
                     )
                 findNavController().navigate(action)
-            },
-            onQuoteJob = { job, quoteJobBttn ->
-                val jobQuotesRef = FirebaseDatabase.getInstance()
-                    .getReference("Job")
-                    .child(job.jobId)
-                    .child("quotedHandymen")
-
-                jobQuotesRef.push()
-                    .setValue(handymanID)
-                    .addOnSuccessListener {
-                        val handymanRef = FirebaseDatabase.getInstance()
-                            .getReference("Handyman")
-                            .child(handymanID)
-
-                        handymanRef.child("quotedJobs")
-                            .push()
-                            .setValue(job.jobId)
-                            .addOnSuccessListener {
-                                handymanRef.child("allJobs")
-                                    .push()
-                                    .setValue(job.jobId)
-                                    .addOnSuccessListener {
-                                        quoteJobBttn.isEnabled = false
-                                        quoteJobBttn.text = "Quoted"
-                                        ViewCompat.setBackgroundTintList(
-                                            quoteJobBttn,
-                                            ColorStateList.valueOf(Color.parseColor("#FFCCCCCC"))
-                                        )
-                                        Toast.makeText(
-                                            context,
-                                            "Job quoted successfully",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                    .addOnFailureListener { e3 ->
-                                        Toast.makeText(
-                                            context,
-                                            "Quoted, but failed to add to allJobs: ${e3.message}",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                            }
-                            .addOnFailureListener { e2 ->
-                                Toast.makeText(
-                                    context,
-                                    "Quoted handyman, but failed to record in quotedJobs: ${e2.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                    }
-                    .addOnFailureListener { e1 ->
-                        Toast.makeText(
-                            context,
-                            "Failed to quote job: ${e1.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
             }
         )
         recyclerView.adapter = adapter
@@ -215,24 +158,7 @@ class HandymanJobBoardFragment : Fragment() {
                                     // 4) Skip if cancelled
                                     if (jobId in cancelledJobs) return@mapNotNull null
 
-                                    // 5) Check quotedHandymen
-                                    val quotedSnapshot = child.child("quotedHandymen")
-                                    val quoted = if (quotedSnapshot.exists()) {
-                                        if (quotedSnapshot.value is Map<*, *>) {
-                                            (quotedSnapshot.value as Map<*, *>).values.mapNotNull { it?.toString() }
-                                        } else if (quotedSnapshot.value is List<*>) {
-                                            (quotedSnapshot.value as List<*>).mapNotNull { it?.toString() }
-                                        } else {
-                                            emptyList<String>()
-                                        }
-                                    } else {
-                                        emptyList<String>()
-                                    }
-
-                                    // 6) Skip if already quoted
-                                    if (handymanID in quoted) return@mapNotNull null
-
-                                    // 7) Return the job
+                                    // 5) Return the job
                                     job.copy(jobId = jobId)
                                 }
 

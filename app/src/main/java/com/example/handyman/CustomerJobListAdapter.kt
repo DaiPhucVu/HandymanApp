@@ -48,9 +48,8 @@ class CustomerJobListAdapter(
 
 
         fun bind(item: Job) {
-            // ... (rest of the bind method)
-            tvJobTitle.text = item.jobCat
-            tvJobDesc.text = item.jobDesc
+            tvJobTitle.text = if (!item.jobCat.isNullOrBlank()) item.jobCat else (item.title ?: "Untitled Job")
+            tvJobDesc.text = if (!item.jobDesc.isNullOrBlank()) item.jobDesc else (item.description ?: "")
             if (item.paymentStatus == "done" && !item.custpay.isNullOrBlank()) {
                 tvSalary.text = "Paid: BDT ${item.custpay}"
             } else if (item.jobSalaryFrom.isNotBlank() && item.jobSalaryTo.isNotBlank()) {
@@ -68,7 +67,7 @@ class CustomerJobListAdapter(
                 "${item.jobDateFrom} — ${item.jobDateTo}"
 
             tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            tvLocation.text = item.jobLocation
+            tvLocation.text = if (!item.jobLocation.isNullOrBlank()) item.jobLocation else (item.location ?: "")
 
             if (hideStatus) {
                 status.visibility = View.GONE

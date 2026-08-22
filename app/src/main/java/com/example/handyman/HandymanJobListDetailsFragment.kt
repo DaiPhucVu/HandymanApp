@@ -43,11 +43,6 @@ import java.util.UUID
 import java.util.Locale
 
 class HandymanJobListDetailsFragment : Fragment() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -81,12 +76,12 @@ class HandymanJobListDetailsFragment : Fragment() {
         val argLng = args.longitude
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
-        jobTitle.text = serviceName
+        jobTitle.text = if (!serviceName.isNullOrEmpty()) serviceName else "Untitled Job"
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
 
         val jobDescDisplay = view.findViewById<TextView>(R.id.tvJobSubtitle)
-        jobDescDisplay.text = jobDescription
+        jobDescDisplay.text = if (!jobDescription.isNullOrEmpty()) jobDescription else ""
         val dateDisplay = view.findViewById<TextView>(R.id.tvDate)
         if (dateFrom == dateTo) {
             dateDisplay.text = "$dateFrom"
@@ -380,7 +375,7 @@ class HandymanJobListDetailsFragment : Fragment() {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
-                    target: Target<Drawable>?,
+                    target: Target<Drawable>,
                     isFirstResource: Boolean
                 ): Boolean {
                     if (!isAdded) return false
@@ -390,10 +385,10 @@ class HandymanJobListDetailsFragment : Fragment() {
                 }
 
                 override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
+                    resource: Drawable,
+                    model: Any,
+                    target: Target<Drawable>,
+                    dataSource: DataSource,
                     isFirstResource: Boolean
                 ): Boolean {
                     if (!isAdded) return false

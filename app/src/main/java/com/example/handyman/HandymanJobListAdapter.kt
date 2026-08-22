@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import android.location.Geocoder
@@ -17,6 +18,8 @@ class HandymanJobListAdapter(
     private val handymanId: String,
     private val onViewDetails: (Job) -> Unit,
     private val onDelete: (Job) -> Unit,
+    private val onAccept: (Job) -> Unit,
+    private val onDecline: (Job) -> Unit,
     private val onUpdate: (Job) -> Unit,
     private val onLeaveReview: (Job) -> Unit,
     val onPaymentProceed: (Job) -> Unit
@@ -44,14 +47,17 @@ class HandymanJobListAdapter(
         private val delete: ImageView = itemView.findViewById(R.id.ivDelete)
         private val updateBttn   = itemView.findViewById<Button>(R.id.btnUpdate)
         private val status: TextView = itemView.findViewById(R.id.tvStatus)
+        private val assignmentActions: LinearLayout = itemView.findViewById(R.id.layoutAssignmentActions)
+        private val acceptBttn: Button = itemView.findViewById(R.id.btnAcceptJob)
+        private val declineBttn: Button = itemView.findViewById(R.id.btnDeclineJob)
         val btnLeaveReview: Button = itemView.findViewById(R.id.btnLeaveReview)
         val btnProceedPayment: Button = itemView.findViewById(R.id.btnProceedPayment)
 
 
         fun bind(item: Job) {
             // Bind your Job data to the views with fallback logic
-            tvJobTitle.text = item.title ?: item.jobCat
-            tvJobDesc.text = item.description ?: item.jobDesc
+            tvJobTitle.text = if (!item.jobCat.isNullOrBlank()) item.jobCat else (item.title ?: "Untitled Job")
+            tvJobDesc.text = if (!item.jobDesc.isNullOrBlank()) item.jobDesc else (item.description ?: "")
 
             if (item.paymentStatus == "done" && item.custpay != null && item.custpay.isNotEmpty()) {
                 tvSalary.text = "Paid: BDT ${item.custpay}"
@@ -73,7 +79,7 @@ class HandymanJobListAdapter(
             
             val isAssigned = item.assignedTo == handymanId
             if (isAssigned) {
-                tvLocation.text = item.location ?: item.jobLocation
+                tvLocation.text = if (!item.jobLocation.isNullOrBlank()) item.jobLocation else (item.location ?: "Location not specified")
             } else {
                 if (!item.citySuburb.isNullOrBlank()) {
                     tvLocation.text = "${item.citySuburb} (Approximate)"
@@ -93,7 +99,7 @@ class HandymanJobListAdapter(
                                     if (city != null) {
                                         itemView.post {
                                             // Re-check if this ViewHolder is still showing the same job
-                                            if (tvJobTitle.text == (item.title ?: item.jobCat)) {
+                                            if (tvJobTitle.text == (if (!item.jobCat.isNullOrBlank()) item.jobCat else (item.title ?: "Untitled Job"))) {
                                                 tvLocation.text = "$city (Approximate)"
                                             }
                                         }
@@ -107,35 +113,44 @@ class HandymanJobListAdapter(
                 }
             }
 
-            val hasQuoted = (item.quotedHandymen as? Map<*, *>)
-                ?.containsValue(handymanId) == true
-            val hasOverall = item.jobStatus == "In-progress" || item.jobStatus == "Done"
+            val normalizedStatus = normalizeJobStatus(item.jobStatus)
+            val handymanStatus = normalizeJobStatus(item.jobStatusHandyman.orEmpty())
+            val isPendingAssignment = isAssigned &&
+                    normalizedStatus != "Done" &&
+                    normalizedStatus != "Cancelled" &&
+                    (handymanStatus.isBlank() || handymanStatus == "Pending" || handymanStatus == "Assigned")
+            val hasOverall = normalizedStatus == "In-progress" ||
+                    normalizedStatus == "Done" ||
+                    normalizedStatus == "Cancelled" ||
+                    isPendingAssignment
 
-            if (!hasQuoted && !isAssigned && !hasOverall) {
+            if (!isAssigned && !hasOverall) {
                 // truly nothing to show
                 status.visibility = View.GONE
             } else {
                 status.visibility = View.VISIBLE
 
-                // pick one of four status labels
                 val displayStatus = when {
-                    hasQuoted && !isAssigned -> "Quoted"
+                    isPendingAssignment -> "Pending"
                     isAssigned && !hasOverall -> "Accepted"
-                    item.jobStatus == "In-progress" -> "In-progress"
+                    normalizedStatus == "In-progress" -> "In-progress"
+                    normalizedStatus == "Cancelled" -> "Cancelled"
                     else -> "Done"
                 }
                 status.text = displayStatus
 
                 // apply matching background
                 when (displayStatus) {
-                    "Quoted" -> status.setBackgroundResource(R.drawable.status_not_assigned)
+                    "Pending" -> status.setBackgroundResource(R.drawable.status_assigned)
                     "Accepted" -> status.setBackgroundResource(R.drawable.status_assigned)
                     "In-progress" -> status.setBackgroundResource(R.drawable.status_in_progress)
                     "Done" -> status.setBackgroundResource(R.drawable.status_done)
+                    "Cancelled" -> status.setBackgroundResource(R.drawable.status_cancelled)
                 }
             }
             if (item.paymentStatus == "done") {
                 updateBttn.visibility = View.GONE
+                assignmentActions.visibility = View.GONE
                 btnProceedPayment.visibility = View.GONE
                 btnLeaveReview.visibility = if (item.isReviewedByHandyman) View.GONE else View.VISIBLE
                 status.text = "Payment: Done"
@@ -143,7 +158,9 @@ class HandymanJobListAdapter(
             } else {
                 updateBttn.visibility = View.VISIBLE
                 btnLeaveReview.visibility = View.GONE
-                if (item.jobStatus == "Done") {
+                assignmentActions.visibility = if (isPendingAssignment) View.VISIBLE else View.GONE
+                updateBttn.visibility = if (isPendingAssignment) View.GONE else View.VISIBLE
+                if (normalizedStatus == "Done") {
                     btnProceedPayment.visibility = if (item.handypay.isNotBlank()) View.GONE else View.VISIBLE
                 } else {
                     btnProceedPayment.visibility = View.GONE
@@ -182,7 +199,12 @@ class HandymanJobListAdapter(
                 }
             } else {
                 // Assigned to this handyman
-                if (item.jobStatus != "Done") {
+                if (isPendingAssignment) {
+                    updateBttn.isEnabled = false
+                    updateBttn.alpha = 0.5f
+                    acceptBttn.setOnClickListener { onAccept(item) }
+                    declineBttn.setOnClickListener { onDecline(item) }
+                } else if (normalizedStatus != "Done") {
                     updateBttn.isEnabled = true
                     updateBttn.alpha = 1.0f
                     updateBttn.setOnClickListener {
@@ -206,6 +228,16 @@ class HandymanJobListAdapter(
             btnLeaveReview.setOnClickListener {
                 onLeaveReview(item)
             }
+        }
+
+        private fun normalizeJobStatus(status: String): String = when (status.trim().lowercase()) {
+            "in progress", "in-progress", "in_progress" -> "In-progress"
+            "done", "completed", "complete" -> "Done"
+            "cancelled", "canceled" -> "Cancelled"
+            "inactive" -> "Inactive"
+            "accepted" -> "Accepted"
+            "assigned" -> "Assigned"
+            else -> status.trim()
         }
     }
 }

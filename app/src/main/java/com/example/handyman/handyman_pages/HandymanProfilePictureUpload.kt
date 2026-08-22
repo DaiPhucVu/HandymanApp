@@ -64,7 +64,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
         val file = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
         return FileProvider.getUriForFile(
             context,
-            "com.example.handyman.fileprovider",
+            context.packageName + ".fileprovider",
             file
         )
     }

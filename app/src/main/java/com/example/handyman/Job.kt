@@ -37,8 +37,6 @@ data class Job(
     val lastUpdate: String = "",
     val latitude: Double? = null,
     val longitude: Double? = null,
-    // Change problematic Map types to Any? to prevent crash if [] is found
-    val quotedHandymen: Any? = null,
     val finishedBy: String? = null,
     val assignedAt: Any? = null,
     val assignedBy: Any? = null,

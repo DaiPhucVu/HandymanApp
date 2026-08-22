@@ -36,7 +36,7 @@
     </string-array>
     <string-array name="job_statuses_handyman">
         <item>All</item>
-        <item>Quoted</item>
+        <item>Pending</item>
         <item>Accepted</item>
         <item>In-progress</item>
         <item>Done</item>

@@ -32,13 +32,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
 class CustomerJobDetailsFragment : Fragment() {
-    private val handymanList = mutableListOf<String>()
-    private lateinit var adapter: QuotedHandymenAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -52,9 +51,6 @@ class CustomerJobDetailsFragment : Fragment() {
         view.findViewById<ImageView>(R.id.ivBack).setOnClickListener {
             findNavController().navigateUp()
         }
-
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerQuotedHandymen)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val args = CustomerJobDetailsFragmentArgs.fromBundle(requireArguments())
 
@@ -74,7 +70,7 @@ class CustomerJobDetailsFragment : Fragment() {
         val jobStatus = args.jobStatus
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
-        jobTitle.text = serviceName
+        jobTitle.text = if (serviceName.isNotBlank()) serviceName else "Untitled Job"
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
 
@@ -117,7 +113,7 @@ class CustomerJobDetailsFragment : Fragment() {
         }
 
         val jobDescDisplay = view.findViewById<TextView>(R.id.tvJobSubtitle)
-        jobDescDisplay.text = jobDescription
+        jobDescDisplay.text = if (jobDescription.isNotBlank()) jobDescription else ""
         val dateDisplay = view.findViewById<TextView>(R.id.tvDate)
         if (dateFrom == dateTo) {
             dateDisplay.text = "$dateFrom"
@@ -171,33 +167,6 @@ class CustomerJobDetailsFragment : Fragment() {
             layoutHandyman.visibility = View.GONE
         }
 
-        adapter = QuotedHandymenAdapter(handymanList, jobId, assignedTo, customerId, requireContext())
-        recyclerView.adapter = adapter
-
-        val quotedHandymenRef = FirebaseDatabase.getInstance()
-            .getReference("Job")
-            .child(jobId)
-            .child("quotedHandymen")
-
-        quotedHandymenRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onDataChange(snapshot: DataSnapshot) {
-                handymanList.clear()
-                for (childSnapshot in snapshot.children) {
-                    val handymanId = childSnapshot.getValue(String::class.java)
-                    if (handymanId != null) {
-                        handymanList.add(handymanId)
-                    }
-                }
-                if (assignedTo.isNotBlank()) {
-                    handymanList.remove(assignedTo)
-                    handymanList.add(0, assignedTo)
-                }
-                adapter.notifyDataSetChanged()
-            }
-            override fun onCancelled(error: DatabaseError) {}
-        })
-
         displayJobImages(view, jobId)
     }
 
@@ -247,14 +216,27 @@ class CustomerJobDetailsFragment : Fragment() {
         progressBar.visibility = View.VISIBLE
 
         Glide.with(this)
+            .asDrawable()
             .load(imageUrl)
             .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>,
+                    isFirstResource: Boolean
+                ): Boolean {
                     if (!isAdded) return false
                     progressBar.visibility = View.GONE
                     return false
                 }
-                override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+
+                override fun onResourceReady(
+                    resource: Drawable,
+                    model: Any,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource,
+                    isFirstResource: Boolean
+                ): Boolean {
                     if (!isAdded) return false
                     progressBar.visibility = View.GONE
                     return false

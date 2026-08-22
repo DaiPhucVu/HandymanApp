@@ -13,8 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 
 class HandymanJobBoardAdapter(
-    private val onViewDetails: (Job) -> Unit,
-    private val onQuoteJob: (Job, Button) -> Unit
+    private val onViewDetails: (Job) -> Unit
 ) : ListAdapter<Job, HandymanJobBoardAdapter.ViewHolder>(HandymanJobBoardDiff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,31 +34,21 @@ class HandymanJobBoardAdapter(
         private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
         private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
         private val tvLocation: TextView = itemView.findViewById(R.id.tvAddress)
-        private val quoteJobBttn: Button = itemView.findViewById(R.id.btnQuote)
         private val detailsBttn: Button = itemView.findViewById(R.id.btnViewDetails)
 
         fun bind(item: Job) {
-            // Bind your Job data to the views with fallbacks
-            tvJobTitle.text = item.title ?: item.jobCat
-            tvJobDesc.text = item.description ?: item.jobDesc
-
-            // Handle Salary display with fallbacks
-            if (!item.jobSalaryFrom.isNullOrBlank() && !item.jobSalaryTo.isNullOrBlank()) {
-                if (item.jobPaymentOption == "Per Day") {
-                    tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
-                } else {
-                    tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}"
-                }
+            // Bind real data to views
+            tvJobTitle.text = if (item.jobCat.isNotEmpty()) item.jobCat else (item.title ?: "Untitled Job")
+            tvJobDesc.text = item.jobDesc.ifEmpty { item.description ?: "" }
+            
+            // Salary display logic
+            tvSalary.text = if (item.jobSalaryFrom.isEmpty() && item.jobSalaryTo.isEmpty()) {
+                "Negotiable"
             } else {
-                tvSalary.text = "To be negotiated"
+                "BDT ${item.jobSalaryFrom} - ${item.jobSalaryTo} (${item.jobPaymentOption})"
             }
 
-            // Dates and Time
-            if (item.jobDateFrom == item.jobDateTo) {
-                tvDate.text = "${item.jobDateFrom}"
-            } else {
-                tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
-            }
+            tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
             tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
 
             // Location with fallback - Show approximate location for privacy
@@ -92,10 +81,6 @@ class HandymanJobBoardAdapter(
                         }
                     }.start()
                 }
-            }
-
-            quoteJobBttn.setOnClickListener {
-                onQuoteJob(item, quoteJobBttn)
             }
 
             detailsBttn.setOnClickListener {

@@ -194,67 +194,21 @@ class CustomerJobListFragment : Fragment() {
                                             override fun onCancelled(error: DatabaseError) {}
                                         })
 
-                                    // Step 4: Remove all quoted handymen from quotedHandymen list
-                                    val quotesRef = jobRef.child("quotedHandymen")
-                                    quotesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-                                            val handymenList = mutableListOf<String>()
-                                            snapshot.children.forEach { child ->
-                                                val handymanId = child.value.toString()
-                                                handymenList.add(handymanId)
-                                                // Properly remove each quoted handyman
-                                                child.ref.removeValue()
-                                            }
+                                    // Step 4: Add the job ID to the cancelledJobs list
+                                    FirebaseDatabase.getInstance()
+                                        .getReference("User")
+                                        .child(customerId)
+                                        .child("cancelledJobs")
+                                        .push()
+                                        .setValue(job.jobId)
 
-                                            // Step 5: Remove the job ID from each handyman's quotedJobs and allJobs list
-                                            handymenList.forEach { handymanId ->
-                                                val handymanRef = FirebaseDatabase.getInstance()
-                                                    .getReference("Handyman")
-                                                    .child(handymanId)
-
-                                                // Iterate through both quotedJobs and allJobs lists
-                                                listOf("quotedJobs", "allJobs").forEach { listType ->
-                                                    handymanRef.child(listType)
-                                                        .orderByValue().equalTo(job.jobId)
-                                                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                                                            override fun onDataChange(handymanSnapshot: DataSnapshot) {
-                                                                if (handymanSnapshot.exists()) {
-                                                                    handymanSnapshot.children.forEach { it.ref.removeValue() }
-                                                                }
-                                                            }
-
-                                                            override fun onCancelled(error: DatabaseError) {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "Error removing job from $listType: ${error.message}",
-                                                                    Toast.LENGTH_LONG
-                                                                ).show()
-                                                            }
-                                                        })
-                                                }
-                                            }
-
-                                            // Step 6: Update the UI
-                                            Toast.makeText(
-                                                context,
-                                                "Job has been cancelled.",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-
-                                            // Update the list after deletion
-//                                            val newList = adapter.currentList.filter { it.jobId != job.jobId }
-//                                            adapter.submitList(newList)
-                                            fetchJobsForCategory(currentCategoryKey)
-                                        }
-
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Toast.makeText(
-                                                context,
-                                                "Failed to remove quoted handymen: ${error.message}",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-                                    })
+                                    // Step 5: Update the UI
+                                    Toast.makeText(
+                                        context,
+                                        "Job has been cancelled.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    fetchJobsForCategory(currentCategoryKey)
                                 }
                                 .setNegativeButton("No", null)
                                 .show()

@@ -301,14 +301,6 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     .clip(RoundedCornerShape(12.dp))
                     .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp)),
                 factory = { ctx ->
-                    // Required for OSMDroid tile downloads — without these
-                    // the MapView shows only an empty grid (no tiles).
-                    org.osmdroid.config.Configuration.getInstance().load(
-                        ctx,
-                        androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
-                    )
-                    org.osmdroid.config.Configuration.getInstance().userAgentValue =
-                        ctx.packageName
                     MapView(ctx).apply {
                         setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK)
                         mapViewRef = this

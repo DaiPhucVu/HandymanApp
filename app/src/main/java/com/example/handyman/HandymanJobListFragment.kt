@@ -70,79 +70,17 @@ class HandymanJobListFragment : Fragment() {
                 findNavController().navigate(action)
             },
             onDelete = { job ->
-                val handymanRef = FirebaseDatabase.getInstance()
-                    .getReference("Handyman")
-                    .child(handymanID)
-                    .child("quotedJobs")
-
-                handymanRef.orderByValue().equalTo(job.jobId)
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(handymanSnapshot: DataSnapshot) {
-                            if (!handymanSnapshot.exists()) {
-                                context?.let {
-                                    Toast.makeText(it, "Cannot cancel.", Toast.LENGTH_SHORT).show()
-                                }
-                                return
-                            }
-
-                            AlertDialog.Builder(requireContext())
-                                .setTitle("Withdraw quote?")
-                                .setMessage("Remove your quote for this job?")
-                                .setPositiveButton("Yes") { _, _ ->
-                                    val quotesRef = FirebaseDatabase.getInstance()
-                                        .getReference("Job")
-                                        .child(job.jobId)
-                                        .child("quotedHandymen")
-
-                                    quotesRef.orderByValue().equalTo(handymanID)
-                                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                                            override fun onDataChange(snapshot: DataSnapshot) {
-                                                if (!snapshot.exists()) {
-                                                    context?.let {
-                                                        Toast.makeText(it, "You haven’t quoted this job.", Toast.LENGTH_SHORT).show()
-                                                    }
-                                                    return
-                                                }
-
-                                                snapshot.children.forEach { it.ref.removeValue() }
-                                                handymanSnapshot.children.forEach { it.ref.removeValue() }
-
-                                                val cancelledJobsRef = FirebaseDatabase.getInstance()
-                                                    .getReference("Handyman")
-                                                    .child(handymanID)
-                                                    .child("cancelledJobs")
-
-                                                cancelledJobsRef.push().setValue(job.jobId)
-                                                    .addOnSuccessListener {
-                                                        val allJobsRef = FirebaseDatabase.getInstance()
-                                                            .getReference("Handyman")
-                                                            .child(handymanID)
-                                                            .child("allJobs")
-
-                                                        allJobsRef.orderByValue().equalTo(job.jobId)
-                                                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                                                override fun onDataChange(snapshot: DataSnapshot) {
-                                                                    snapshot.children.forEach { it.ref.removeValue() }
-                                                                    context?.let {
-                                                                        Toast.makeText(it, "Your quote was removed.", Toast.LENGTH_SHORT).show()
-                                                                    }
-                                                                    fetchJobsForCategory(currentCategoryKey)
-                                                                }
-                                                                override fun onCancelled(error: DatabaseError) {}
-                                                            })
-                                                    }
-                                            }
-                                            override fun onCancelled(error: DatabaseError) {}
-                                        })
-                                }
-                                .setNegativeButton("No", null)
-                                .show()
-                        }
-                        override fun onCancelled(error: DatabaseError) {}
-                    })
+                // No-op or remove if we don't want any job removal from list by handyman
+                Toast.makeText(requireContext(), "Removal of assigned jobs not permitted.", Toast.LENGTH_SHORT).show()
+            },
+            onAccept = { job ->
+                acceptAssignedJob(job)
+            },
+            onDecline = { job ->
+                confirmDeclineAssignedJob(job)
             },
             onUpdate = { job ->
-                val currentStatus = job.jobStatus
+                val currentStatus = normalizeJobStatus(job.jobStatus)
                 val nextStatuses = when (currentStatus) {
                     "In-progress" -> arrayOf("Done")
                     "Done" -> arrayOf()
@@ -207,7 +145,7 @@ class HandymanJobListFragment : Fragment() {
                 showCustomerReviewDialog(job)
             },
             onPaymentProceed = { job ->
-                if (job.jobStatus != "Done") {
+                if (normalizeJobStatus(job.jobStatus) != "Done") {
                     context?.let {
                         Toast.makeText(it, "Job is not marked as Done yet.", Toast.LENGTH_SHORT).show()
                     }
@@ -223,7 +161,7 @@ class HandymanJobListFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>, v: View?, pos: Int, id: Long) {
                 val display = parent.getItemAtPosition(pos) as String
                 currentCategoryKey = when (display) {
-                    "Quoted"      -> "quotedJobs"
+                    "Pending" -> "pendingJobs"
                     "Accepted"  -> "acceptedJobs"
                     "In-progress" -> "inProgressJobs"
                     "Done"        -> "completedJobs"
@@ -366,56 +304,173 @@ class HandymanJobListFragment : Fragment() {
             })
     }
 
-    private fun fetchJobsForCategory(category: String) {
-        val rootRef = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanID)
+    private fun acceptAssignedJob(job: Job) {
+        val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(job.jobId)
+        val updates = mapOf<String, Any>(
+            "jobStatus" to "Accepted",
+            "jobStatusHandyman" to "Accepted",
+            "lastUpdated" to java.time.LocalDateTime.now().toString()
+        )
 
-        if (category == "allJobs") {
-            val categoriesToFetch = listOf("quotedJobs", "acceptedJobs", "inProgressJobs", "completedJobs", "allJobs")
-            val allJobIds = mutableSetOf<String>()
-            var completedFetches = 0
+        jobRef.updateChildren(updates)
+            .addOnSuccessListener {
+                val customerRef = FirebaseDatabase.getInstance().getReference("User").child(job.customerId)
+                val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanID)
 
-            categoriesToFetch.forEach { cat ->
-                rootRef.child(cat).addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        snapshot.children.mapNotNull { it.getValue(String::class.java) }.let { allJobIds.addAll(it) }
-                        completedFetches++
-                        if (completedFetches == categoriesToFetch.size) fetchJobsByIds(allJobIds.toList())
-                    }
-                    override fun onCancelled(error: DatabaseError) {
-                        completedFetches++
-                        if (completedFetches == categoriesToFetch.size) fetchJobsByIds(allJobIds.toList())
-                    }
-                })
+                removeJobId(customerRef, "notAssignedJobs", job.jobId)
+                addJobIdIfMissing(customerRef, "assignedJobs", job.jobId)
+                addJobIdIfMissing(customerRef, "allJobs", job.jobId)
+
+                removeJobId(handymanRef, "cancelledJobs", job.jobId)
+                addJobIdIfMissing(handymanRef, "acceptedJobs", job.jobId)
+                addJobIdIfMissing(handymanRef, "allJobs", job.jobId)
+
+                Toast.makeText(requireContext(), "Job accepted.", Toast.LENGTH_SHORT).show()
+                fetchJobsForCategory(currentCategoryKey)
             }
-            return
-        }
-
-        rootRef.child(category).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(listSnap: DataSnapshot) {
-                val jobIds = listSnap.children.mapNotNull { it.getValue(String::class.java) }
-                fetchJobsByIds(jobIds)
+            .addOnFailureListener { error ->
+                Toast.makeText(requireContext(), "Failed to accept job: ${error.message}", Toast.LENGTH_LONG).show()
             }
-            override fun onCancelled(error: DatabaseError) {}
-        })
     }
 
-    private fun fetchJobsByIds(jobIds: List<String>) {
-        if (jobIds.isEmpty()) {
-            adapter.submitList(emptyList())
-            return
+    private fun confirmDeclineAssignedJob(job: Job) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Decline job?")
+            .setMessage("This will unassign the job and return it to the open job list.")
+            .setPositiveButton("Decline") { _, _ -> declineAssignedJob(job) }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun declineAssignedJob(job: Job) {
+        val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(job.jobId)
+        val updates = mapOf<String, Any>(
+            "assignedTo" to "",
+            "jobStatus" to "",
+            "lastUpdated" to java.time.LocalDateTime.now().toString()
+        )
+
+        jobRef.updateChildren(updates)
+            .addOnSuccessListener {
+                jobRef.child("jobStatusHandyman").removeValue()
+
+                val customerRef = FirebaseDatabase.getInstance().getReference("User").child(job.customerId)
+                val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanID)
+
+                removeJobId(customerRef, "assignedJobs", job.jobId)
+                addJobIdIfMissing(customerRef, "notAssignedJobs", job.jobId)
+                addJobIdIfMissing(customerRef, "allJobs", job.jobId)
+
+                listOf("acceptedJobs", "inProgressJobs", "completedJobs", "allJobs").forEach { listName ->
+                    removeJobId(handymanRef, listName, job.jobId)
+                }
+                addJobIdIfMissing(handymanRef, "cancelledJobs", job.jobId)
+
+                Toast.makeText(requireContext(), "Job declined.", Toast.LENGTH_SHORT).show()
+                fetchJobsForCategory(currentCategoryKey)
+            }
+            .addOnFailureListener { error ->
+                Toast.makeText(requireContext(), "Failed to decline job: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun addJobIdIfMissing(ref: DatabaseReference, listName: String, jobId: String) {
+        ref.child(listName).orderByValue().equalTo(jobId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (!snapshot.exists()) {
+                        ref.child(listName).push().setValue(jobId)
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    private fun removeJobId(ref: DatabaseReference, listName: String, jobId: String) {
+        ref.child(listName).orderByValue().equalTo(jobId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.children.forEach { it.ref.removeValue() }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    private fun fetchJobsForCategory(category: String) {
+        val rootRef = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanID)
+        val categoriesToFetch = if (category == "allJobs") {
+            listOf("acceptedJobs", "inProgressJobs", "completedJobs", "allJobs")
+        } else {
+            listOf(category)
         }
 
+        val listedJobIds = mutableSetOf<String>()
+        var completedFetches = 0
+
+        categoriesToFetch.forEach { cat ->
+            rootRef.child(cat).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.children.mapNotNull { it.getValue(String::class.java) }.let { listedJobIds.addAll(it) }
+                    completedFetches++
+                    if (completedFetches == categoriesToFetch.size) fetchJobsForCategory(category, listedJobIds)
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    completedFetches++
+                    if (completedFetches == categoriesToFetch.size) fetchJobsForCategory(category, listedJobIds)
+                }
+            })
+        }
+    }
+
+    private fun fetchJobsForCategory(category: String, listedJobIds: Set<String>) {
         FirebaseDatabase.getInstance().getReference("Job")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val jobs = snapshot.children.mapNotNull { jobSnap ->
                         val key = jobSnap.key ?: return@mapNotNull null
-                        if (key !in jobIds) return@mapNotNull null
-                        jobSnap.getValue(Job::class.java)?.copy(jobId = key)
+                        val job = jobSnap.getValue(Job::class.java)?.copy(jobId = key)
+                            ?: return@mapNotNull null
+
+                        if (key in listedJobIds || isAssignedJobInCategory(job, category)) job else null
                     }
                     adapter.submitList(jobs)
                 }
                 override fun onCancelled(error: DatabaseError) {}
             })
+    }
+
+    private fun isAssignedJobInCategory(job: Job, category: String): Boolean {
+        if (job.assignedTo != handymanID) return false
+
+        return when (category) {
+            "allJobs" -> normalizeJobStatus(job.jobStatus) != "Inactive"
+            "acceptedJobs" -> !isPendingAssignment(job) &&
+                    normalizeJobStatus(job.jobStatus) == "Accepted"
+            "pendingJobs" -> isPendingAssignment(job)
+            "inProgressJobs" -> !isPendingAssignment(job) &&
+                    normalizeJobStatus(job.jobStatus) == "In-progress"
+            "completedJobs" -> normalizeJobStatus(job.jobStatus) == "Done"
+            "cancelledJobs" -> normalizeJobStatus(job.jobStatus) == "Cancelled"
+            else -> false
+        }
+    }
+
+    private fun isPendingAssignment(job: Job): Boolean {
+        val status = normalizeJobStatus(job.jobStatus)
+        val handymanStatus = normalizeJobStatus(job.jobStatusHandyman.orEmpty())
+        return job.assignedTo == handymanID &&
+                status != "Done" &&
+                status != "Cancelled" &&
+                (handymanStatus.isBlank() || handymanStatus == "Pending" || handymanStatus == "Assigned")
+    }
+
+    private fun normalizeJobStatus(status: String): String = when (status.trim().lowercase()) {
+        "in progress", "in-progress", "in_progress" -> "In-progress"
+        "done", "completed", "complete" -> "Done"
+        "cancelled", "canceled" -> "Cancelled"
+        "inactive" -> "Inactive"
+        "accepted" -> "Accepted"
+        "assigned" -> "Assigned"
+        else -> status.trim()
     }
 }
