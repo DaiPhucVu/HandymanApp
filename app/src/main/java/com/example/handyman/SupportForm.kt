@@ -1,5 +1,8 @@
 package com.example.handyman
 
+import android.content.Context
+import com.example.handyman.utils.LocaleHelper
+
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +11,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class SupportForm : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
 
     private lateinit var editName: EditText
     private lateinit var editEmail: EditText

@@ -1,5 +1,8 @@
 package com.example.handyman.chatbox
 
+import android.content.Context
+import com.example.handyman.utils.LocaleHelper
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,6 +18,10 @@ import com.example.handyman.chatbox.ui.composables.ChatListingScreen
 import com.example.handyman.ui.theme.HandymanTheme
 
 class ChatListingActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

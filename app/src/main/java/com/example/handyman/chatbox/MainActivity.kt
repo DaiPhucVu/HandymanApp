@@ -2,6 +2,7 @@ package com.example.handyman.chatbox
 
 
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +20,8 @@ import com.example.handyman.MainJobBoard
 import com.google.firebase.database.*
 import com.example.handyman.Navigation
 import com.example.handyman.ui.theme.HandymanTheme
+import com.example.handyman.LanguageSelectionScreen
+import com.example.handyman.utils.LocaleHelper
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -42,6 +45,12 @@ class MainActivity : ComponentActivity() {
     private lateinit var database: FirebaseDatabase
     private var sessionStartTime: Long = 0
 
+    // Applies the saved language to this screen. Must be present on every
+    // Activity for the choice to take effect there.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -50,10 +59,23 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             HandymanTheme {
-                Navigation(
-                    modifier = Modifier.fillMaxSize(),
-                    startDestination = startDestination
-                )
+                // On the very first launch, ask for a language before anything
+                // else. Once chosen it is remembered and this never shows again.
+                if (!LocaleHelper.hasChosenLanguage(this)) {
+                    LanguageSelectionScreen(
+                        onLanguageSelected = { language ->
+                            LocaleHelper.setLanguage(this, language)
+                            // Recreate so attachBaseContext re-runs with the new
+                            // locale and the app redraws in that language.
+                            recreate()
+                        }
+                    )
+                } else {
+                    Navigation(
+                        modifier = Modifier.fillMaxSize(),
+                        startDestination = startDestination
+                    )
+                }
             }
         }
     }
