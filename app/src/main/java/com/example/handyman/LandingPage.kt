@@ -10,10 +10,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,20 +21,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.handyman.R
 import com.example.handyman.utils.LocaleHelper
 
 @Composable
 fun LandingPage(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
-    var showLanguagePicker by remember { mutableStateOf(false) }
+    val showLanguagePicker = remember { mutableStateOf(false) }
 
     // Reopening the picker from here is what lets the user change language on
     // any launch after the first, not just on install.
-    if (showLanguagePicker) {
+    if (showLanguagePicker.value) {
         LanguageSelectionScreen(
             currentLanguage = LocaleHelper.currentLanguage(context),
-            onDismiss = { showLanguagePicker = false },
+            onDismiss = { showLanguagePicker.value = false },
             onLanguageSelected = { language ->
                 LocaleHelper.setLanguage(context, language)
                 // Recreate so attachBaseContext re-runs and the app redraws in
@@ -70,7 +67,7 @@ fun LandingPage(modifier: Modifier = Modifier, navController: NavController) {
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .border(1.dp, Color.White, RoundedCornerShape(20.dp))
-                    .clickable { showLanguagePicker = true }
+                    .clickable { showLanguagePicker.value = true }
                     .padding(horizontal = 14.dp, vertical = 7.dp),
             )
         }

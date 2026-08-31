@@ -10,7 +10,6 @@ import androidx.activity.compose.setContent
 import com.example.handyman.chatbox.ui.composables.ChatClientScreen
 import com.example.handyman.ui.theme.HandymanTheme
 import com.example.handyman.utils.SessionManager
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
