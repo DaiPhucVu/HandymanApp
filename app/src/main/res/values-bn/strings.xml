@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Bangla (bn) translations — PLACEHOLDER, INTENTIONALLY EMPTY.
+
+        Add translated <string> entries here using the same name= keys as
+        res/values/strings.xml. Any key not listed here automatically falls back
+        to the English value, so a partial file is safe to ship.
+
+        ============================ IMPORTANT ============================
+        Do NOT translate these two arrays:
+
+            job_statuses_customer
+            job_statuses_handyman
+
+        They are not display-only labels. The selected spinner text is compared
+        against English string literals in code, for example:
+
+            HandymanJobListFragment.kt
+                "In-progress" -> Triple("assignedJobs", "acceptedJobs", "inProgressJobs")
+            CustomerJobListFragment.kt
+                "In-progress" -> "inProgressJobs"
+
+        Translating them makes every one of those comparisons fail and silently
+        breaks job filtering for both customers and handymen. Supporting Bangla
+        here requires separating the stored value from the displayed label,
+        which is a code change rather than a translation.
+
+        Also not usually translated:
+          - app_name (brand name)
+          - location_array (CBD, Camberwell, Richmond, Hawthorn, Docklands are
+            proper place names)
+        ==================================================================
+    -->
+</resources>
