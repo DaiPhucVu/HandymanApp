@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Payment"
+            android:text="@string/payment_title"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -63,7 +63,7 @@
                         android:id="@+id/tvJobTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Job Title"
+                        android:text="@string/job_title_label"
                         android:textColor="@android:color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -74,7 +74,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:alpha="0.7"
-                        android:text="Job Description"
+                        android:text="@string/job_description_label"
                         android:textSize="14sp" />
 
                     <View
@@ -86,7 +86,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Amount"
+                        android:text="@string/total_amount_label"
                         android:textSize="14sp" />
 
                     <TextView
@@ -105,7 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="Select Payment Method"
+                android:text="@string/select_payment_method"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -125,7 +125,7 @@
                     android:drawableStart="@drawable/credit_card"
                     android:drawablePadding="12dp"
                     android:paddingStart="20dp"
-                    android:text="Pay with bKash"
+                    android:text="@string/pay_with_bkash"
                     android:textAllCaps="false"
                     android:textSize="16sp"
                     app:cornerRadius="12dp" />
@@ -138,7 +138,7 @@
                     android:drawableStart="@drawable/credit_card"
                     android:drawablePadding="12dp"
                     android:paddingStart="20dp"
-                    android:text="Pay with Cash"
+                    android:text="@string/pay_with_cash"
                     android:textAllCaps="false"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"

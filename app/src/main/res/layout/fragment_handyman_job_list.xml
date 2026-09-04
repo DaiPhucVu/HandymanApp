@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="My Assigned Jobs"
+        android:text="@string/my_assigned_jobs"
         android:textColor="#2F3367"
         android:textSize="20sp"
         android:fontFamily="sans-serif-medium"

@@ -149,7 +149,7 @@
                 android:id="@+id/btnViewDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="View Details"
+                android:text="@string/view_details"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@android:color/holo_blue_light"
