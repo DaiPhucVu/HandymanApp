@@ -34,7 +34,7 @@
                 android:layout_height="28dp"
                 android:layout_marginEnd="16dp"
                 android:src="@drawable/edit"
-                android:contentDescription="Edit"
+                android:contentDescription="@string/cd_edit"
                 android:padding="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
 
@@ -43,7 +43,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/cancel"
-                android:contentDescription="Delete"
+                android:contentDescription="@string/cd_delete"
                 android:padding="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
         </LinearLayout>
@@ -208,7 +208,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Update Status"
+                    android:text="@string/update_status"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:backgroundTint="@android:color/holo_blue_light"
@@ -222,7 +222,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="View Details"
+                    android:text="@string/view_details"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:backgroundTint="@android:color/holo_blue_light"
@@ -237,7 +237,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Leave Review"
+                android:text="@string/leave_review"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@android:color/holo_orange_dark"
@@ -251,7 +251,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Proceed to Payment"
+                android:text="@string/proceed_to_payment"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@android:color/holo_orange_dark"

@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="Job booking Complete!"
+        android:text="@string/job_booking_complete"
         android:textColor="@android:color/black"
         android:textSize="24sp"
         android:textStyle="bold" />
@@ -44,7 +44,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="24dp"
         android:backgroundTint="@android:color/holo_orange_light"
-        android:text="Return Home"
+        android:text="@string/return_home"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textStyle="bold"

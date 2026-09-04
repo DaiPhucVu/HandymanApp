@@ -48,7 +48,7 @@
                         android:id="@+id/btnAllJobs"
                         android:layout_width="wrap_content"
                         android:layout_height="32dp"
-                        android:text="All Jobs"
+                        android:text="@string/all_jobs"
                         android:textSize="11sp"
                         android:paddingLeft="12dp"
                         android:paddingRight="12dp"
@@ -80,7 +80,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Welcome back!"
+                        android:text="@string/welcome_back"
                         android:textColor="@color/darker_gray"
                         android:textSize="14sp"
                         android:layout_marginBottom="8dp"/>
@@ -103,7 +103,7 @@
                             android:id="@+id/tvVerified"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Verified"
+                            android:text="@string/verified_badge"
                             android:textSize="13sp"
                             android:textColor="#2E7D32"
                             android:textStyle="bold"
@@ -130,7 +130,7 @@
                             android:id="@+id/tvLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Location..."
+                            android:text="@string/location_loading"
                             android:textSize="13sp"
                             android:textColor="@color/darker_gray" />
                     </LinearLayout>
@@ -141,7 +141,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_logout"
-                    android:contentDescription="Logout"
+                    android:contentDescription="@string/cd_logout"
                     android:layout_gravity="top|end"
                     android:padding="4dp"
                     app:tint="#30386D"/>
@@ -167,7 +167,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="Support"
+        android:contentDescription="@string/cd_support"
         android:src="@drawable/help" />
 
 </FrameLayout>

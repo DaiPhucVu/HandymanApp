@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitCenter"
-        android:contentDescription="Enlarged job photo" />
+        android:contentDescription="@string/cd_enlarged_job_photo" />
 
     <ProgressBar
         android:id="@+id/pbLoading"
@@ -28,7 +28,7 @@
         android:src="@drawable/ic_logout"
         android:padding="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Close"
+        android:contentDescription="@string/cd_close"
         app:tint="@android:color/white" />
 
 </FrameLayout>

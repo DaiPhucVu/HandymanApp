@@ -8,7 +8,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.handyman" />
+                  <option name="appId" value="com.ictproject.handymanapp" />
                   <option name="mobileSdkAppId" value="1:91812569770:android:e1a20b07657f93562566d3" />
                   <option name="projectId" value="handymanapplicationcos40006" />
                   <option name="projectNumber" value="91812569770" />

@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:91812569770:android:e1a20b07657f93562566d3",
         "android_client_info": {
-          "package_name": "com.ictproject.handymanapp"
+          "package_name": "com.example.handyman"
         }
       },
       "oauth_client": [],
@@ -87,6 +87,25 @@
         "mobilesdk_app_id": "1:91812569770:android:7d8b0e3ae1f860062566d3",
         "android_client_info": {
           "package_name": "com.example.test2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWSqfoUXggzipG09tHP0C1z7WmTDSqDXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91812569770:android:b35d28104086d9e82566d3",
+        "android_client_info": {
+          "package_name": "com.ictproject.handymanapp"
         }
       },
       "oauth_client": [],
