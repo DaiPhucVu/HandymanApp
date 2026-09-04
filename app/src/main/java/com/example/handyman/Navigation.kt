@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 //Customer pages
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.handyman.*
 import com.example.handyman.customer_pages.*
 import com.example.handyman.handyman_pages.*
 
@@ -26,6 +25,9 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         builder = {
         composable("landingPage") {
             LandingPage(Modifier.fillMaxSize(), navController)
+        }
+        composable("languageSelection") {
+            LanguageSelectionRoute(navController)
         }
         composable("chooseAccountType") {
             ChooseAccountType(Modifier.fillMaxSize(), navController)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.example.handyman.Navigation
 import com.example.handyman.ui.theme.HandymanTheme
-import com.example.handyman.LanguageSelectionScreen
 import com.example.handyman.utils.LocaleHelper
 import com.google.firebase.auth.FirebaseAuth
 import com.example.handyman.utils.updateSessionMetrics
@@ -36,23 +35,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             HandymanTheme {
-                // On the very first launch, ask for a language before anything
-                // else. Once chosen it is remembered and this never shows again.
-                if (!LocaleHelper.hasChosenLanguage(this)) {
-                    LanguageSelectionScreen(
-                        onLanguageSelected = { language ->
-                            LocaleHelper.setLanguage(this, language)
-                            // Recreate so attachBaseContext re-runs with the new
-                            // locale and the app redraws in that language.
-                            recreate()
-                        }
-                    )
-                } else {
-                    Navigation(
-                        modifier = Modifier.fillMaxSize(),
-                        startDestination = startDestination
-                    )
-                }
+                // Language is chosen as part of "Get started" on the landing
+                // page, so there is no separate first-launch prompt here.
+                Navigation(
+                    modifier = Modifier.fillMaxSize(),
+                    startDestination = startDestination
+                )
             }
         }
     }

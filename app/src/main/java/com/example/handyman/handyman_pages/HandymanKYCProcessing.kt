@@ -21,8 +21,6 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.*
-import android.content.Intent
-import com.example.handyman.MainJobBoard
 
 @Composable
 fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavController) {
@@ -60,16 +58,20 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                     certificateApprovedStatus = child.child("certificateApprovedStatus").getValue(String::class.java) ?: ""
 
                     val photoIdCard = child.child("photoIdCard").getValue(String::class.java)
-                    val certificates = child.child("certificates").getValue(String::class.java)
+                    // This step now collects an NID number instead of certificate
+                    // uploads. `certificates` is still read so handymen who
+                    // completed the old photo-upload flow are not sent back through it.
+                    val nid = child.child("nid").getValue(String::class.java)
+                    val legacyCertificates = child.child("certificates").getValue(String::class.java)
                     val professionalCertificate = child.child("professionalCertificate").getValue(String::class.java)
 
-                    Log.d("KYC_CHECK", "REFRESHED STATUS: [$status], ID: $photoIdCard, Certs: $certificates, OldCert: $professionalCertificate")
+                    Log.d("KYC_CHECK", "REFRESHED STATUS: [$status], ID: $photoIdCard, NID: $nid, OldCert: $professionalCertificate")
 
                     if (photoIdCard.isNullOrBlank()) {
                         navController.navigate("handymanKYCLanding") {
                             popUpTo("handymanHomeKYCProcessing") { inclusive = true }
                         }
-                    } else if (certificates.isNullOrBlank() && professionalCertificate != "skipped") {
+                    } else if (nid.isNullOrBlank() && legacyCertificates.isNullOrBlank() && professionalCertificate != "skipped") {
                         // Only redirect if NOT skipped and NOT uploaded
                         navController.navigate("handymanKYCCertificates") {
                             popUpTo("handymanHomeKYCProcessing") { inclusive = true }

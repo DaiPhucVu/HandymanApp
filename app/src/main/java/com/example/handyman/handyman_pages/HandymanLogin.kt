@@ -48,28 +48,37 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .imePadding()
             .verticalScroll(scrollState)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Row(
+        // Box, not a Row with SpaceEvenly: SpaceEvenly distributes the back
+        // arrow and the title across the width, which pushes the title off
+        // centre and leaves the arrow floating. Aligning them independently
+        // pins the arrow left and centres the title on the screen.
+        Box(
             modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically) {
-
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
                 contentDescription = "Back",
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .size(32.dp)
                     .clickable { navController.popBackStack() }
             )
 
-            Text("Log In", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(
+                "Log In",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -253,7 +262,7 @@ private fun attemptHandymanRtdbMigration(
                         SessionManager.saveSession(
                             context = context,
                             email = email,
-                            userId = matchedKey ?: "",
+                            userId = matchedKey,
                             firstName = matchedFirstName ?: "Handyman",
                             city = matchedCity ?: "",
                         )

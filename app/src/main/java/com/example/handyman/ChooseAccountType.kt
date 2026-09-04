@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,18 +16,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.handyman.R
-
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun ChooseAccountType(modifier: Modifier = Modifier, navController: NavController) {
     val scrollState = rememberScrollState()
+    Box(modifier = modifier.fillMaxSize().background(Color(0xFF7D56F3))) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF7D56F3))
             .systemBarsPadding()
             .verticalScroll(scrollState)
             .padding(24.dp),
@@ -106,5 +104,20 @@ fun ChooseAccountType(modifier: Modifier = Modifier, navController: NavControlle
             }
         }
         Spacer(modifier = Modifier.weight(1f))
+    }
+
+        // Back to the language picker. Overlaid rather than placed in the
+        // scrolling column so it stays put when the content scrolls.
+        Icon(
+            painter = painterResource(id = R.drawable.arrow_back),
+            contentDescription = "Back to language selection",
+            tint = Color.White,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .systemBarsPadding()
+                .padding(16.dp)
+                .size(28.dp)
+                .clickable { navController.navigate("languageSelection") }
+        )
     }
 }

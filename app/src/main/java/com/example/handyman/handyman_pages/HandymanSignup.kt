@@ -50,30 +50,36 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .verticalScroll(scrollState)
             .imePadding()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row (
+        // Box, not a Row with SpaceEvenly: SpaceEvenly distributes the back
+        // arrow and the title across the width, which pushes the title off
+        // centre and leaves the arrow floating. Aligning them independently
+        // pins the arrow left and centres the title on the screen.
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+                .height(56.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
                 contentDescription = "Back",
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .size(32.dp)
                     .clickable { navController.popBackStack() }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text("Join our crew", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                "Join our crew",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
         Image(
@@ -168,7 +174,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
                     "password" to password,
                     "isPhoneVerified" to false,
                     "photoIdCard" to "",
-                    "certificates" to "",
+                    "nid" to "",
                     "houseNumber" to "",
                     "street" to "",
                     "area" to "",
@@ -216,7 +222,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text("Already have account? ?", fontSize = 14.sp)
+        Text("Already have an account?", fontSize = 14.sp)
         Text(
             "Log in",
             color = Color(0xFF2D2E5E),
