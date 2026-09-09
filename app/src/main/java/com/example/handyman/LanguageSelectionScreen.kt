@@ -5,6 +5,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,7 +16,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import android.content.Intent
-import com.example.handyman.chatbox.MainActivity
 import com.example.handyman.utils.LocaleHelper
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private val PurpleDeep = Color(0xFF4A2FB8)
 private val Purple = Color(0xFF7D56F3)
@@ -47,33 +52,45 @@ private val Amber = Color(0xFFFFB703)
 @Composable
 fun LanguageSelectionRoute(navController: NavController) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var isLeaving by remember { mutableStateOf(false) }
+    val slideDurationMillis = 350
 
-    LanguageSelectionScreen(
-        currentLanguage = LocaleHelper.currentLanguage(context),
-        onDismiss = { navController.popBackStack() },
-        onLanguageSelected = { language ->
-            val changed = language != LocaleHelper.currentLanguage(context)
-            LocaleHelper.setLanguage(context, language)
+    fun leaveScreen(afterSlide: () -> Unit) {
+        if (isLeaving) return
+        isLeaving = true
+        coroutineScope.launch {
+            delay(slideDurationMillis.toLong())
+            afterSlide()
+        }
+    }
 
-            if (changed) {
-                // The locale is applied in attachBaseContext, which only runs
-                // when the Activity is created — so relaunch it, carrying the
-                // next destination so the user still lands where they were going.
-                LocaleHelper.findActivity(context)?.let { activity ->
-                    activity.startActivity(
-                        Intent(activity, MainActivity::class.java).apply {
-                            putExtra("startDestination", "chooseAccountType")
-                        }
-                    )
-                    activity.finish()
+    AnimatedVisibility(
+        visible = !isLeaving,
+        exit = slideOutVertically(
+            animationSpec = tween(slideDurationMillis),
+            targetOffsetY = { it }
+        )
+    ) {
+        LanguageSelectionScreen(
+            currentLanguage = LocaleHelper.currentLanguage(context),
+            onDismiss = {
+                leaveScreen {
+                    navController.popBackStack()
                 }
-            } else {
-                // Same language as before — no need to restart and flash the
-                // screen, just carry on.
-                navController.navigate("chooseAccountType")
-            }
-        },
-    )
+            },
+            onLanguageSelected = { language ->
+                LocaleHelper.setLanguage(context, language)
+
+                leaveScreen {
+                    navController.navigate("chooseAccountType") {
+                        popUpTo("landingPage") { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            },
+        )
+    }
 }
 
 /**

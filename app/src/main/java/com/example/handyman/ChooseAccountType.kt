@@ -20,7 +20,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 
 @Composable
-fun ChooseAccountType(modifier: Modifier = Modifier, navController: NavController) {
+fun ChooseAccountType(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    onBackToLanguageSelection: (() -> Unit)? = null
+) {
     val scrollState = rememberScrollState()
     Box(modifier = modifier.fillMaxSize().background(Color(0xFF7D56F3))) {
     Column(
@@ -117,7 +121,7 @@ fun ChooseAccountType(modifier: Modifier = Modifier, navController: NavControlle
                 .systemBarsPadding()
                 .padding(16.dp)
                 .size(28.dp)
-                .clickable { navController.navigate("languageSelection") }
+                .clickable { onBackToLanguageSelection?.invoke() ?: navController.navigate("languageSelection") }
         )
     }
 }

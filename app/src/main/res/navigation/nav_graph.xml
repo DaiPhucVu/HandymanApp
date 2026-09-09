@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_service_category">
         <action
             android:id="@+id/action_serviceCategoryFragment_to_jobPostingFragment"
-            app:destination="@id/jobPostingFragment">
+            app:destination="@id/jobPostingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="serviceCategory"
                 app:argType="string"/>
@@ -262,7 +266,11 @@
         </action>
         <action
             android:id="@+id/action_customerJobListFragment_to_jobPostingFragment"
-            app:destination="@id/jobPostingFragment">
+            app:destination="@id/jobPostingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="serviceCategory"
                 app:argType="string" />

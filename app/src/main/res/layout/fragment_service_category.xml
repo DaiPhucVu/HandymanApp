@@ -3,19 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/dashboard_background"
     android:fitsSystemWindows="true">
 
-    <!-- Main content: vertical layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp">
 
-        <!-- Top Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="0dp"
+            app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             app:strokeWidth="0dp">
@@ -28,37 +31,36 @@
                 android:gravity="center_vertical"
                 android:background="@color/white">
 
-                <!-- Avatar and All Jobs Button Column -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center_horizontal"
-                    android:layout_marginEnd="20dp">
+                    android:layout_marginEnd="20dp"
+                    android:orientation="vertical">
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivAvatar"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
-                        android:src="@drawable/sample_handyman"
                         android:scaleType="centerCrop"
+                        android:src="@drawable/sample_handyman"
                         app:shapeAppearanceOverlay="@style/CircleAppearance" />
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnAllJobs"
                         android:layout_width="wrap_content"
                         android:layout_height="32dp"
-                        android:text="@string/all_jobs"
-                        android:textSize="11sp"
-                        android:paddingLeft="12dp"
-                        android:paddingRight="12dp"
-                        android:minHeight="0dp"
-                        android:minWidth="0dp"
-                        android:background="@drawable/button_background_purple"
-                        android:textColor="@android:color/white"
                         android:layout_marginTop="10dp"
+                        android:background="@drawable/button_background_purple"
+                        android:fontFamily="sans-serif-medium"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="@string/all_jobs"
                         android:textAllCaps="false"
-                        android:fontFamily="sans-serif-medium"/>
+                        android:textColor="@android:color/white"
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -71,26 +73,26 @@
                         android:id="@+id/tvGreeting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
                         android:text="Hello, Minnie J."
                         android:textColor="@color/black"
                         android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-black"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
                         android:text="@string/welcome_back"
                         android:textColor="@color/darker_gray"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="8dp"/>
+                        android:textSize="14sp" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginBottom="4dp"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <ImageView
                             android:id="@+id/ivVerifiedIcon"
@@ -103,20 +105,21 @@
                             android:id="@+id/tvVerified"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/verified_badge"
-                            android:textSize="13sp"
-                            android:textColor="#2E7D32"
-                            android:textStyle="bold"
-                            android:background="#DCF3E3"
+                            android:background="@drawable/verified_badge_background"
                             android:paddingHorizontal="6dp"
-                            android:paddingVertical="2dp"/>
+                            android:paddingVertical="2dp"
+                            android:text="@string/verified_badge"
+                            android:textColor="#2E7D32"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <ImageView
                             android:id="@+id/ivLocationIcon"
@@ -131,8 +134,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/location_loading"
-                            android:textSize="13sp"
-                            android:textColor="@color/darker_gray" />
+                            android:textColor="@color/darker_gray"
+                            android:textSize="13sp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -140,34 +143,58 @@
                     android:id="@+id/ivLogout"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_logout"
-                    android:contentDescription="@string/cd_logout"
                     android:layout_gravity="top|end"
+                    android:contentDescription="@string/cd_logout"
                     android:padding="4dp"
-                    app:tint="#30386D"/>
-
+                    android:src="@drawable/ic_logout"
+                    app:tint="#30386D" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- RecyclerView fills remaining space -->
+        <TextView
+            android:id="@+id/tvServiceTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
+            android:text="What do you need help with?"
+            android:textColor="#15182B"
+            android:textSize="21sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvServiceSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Pick a task category to start a request"
+            android:textColor="@color/darker_gray"
+            android:textSize="13sp" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:padding="16dp"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2" />
     </LinearLayout>
 
-    <!-- Floating button always on top -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabSupport"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:contentDescription="@string/cd_support"
-        android:src="@drawable/help" />
+        android:src="@drawable/help"
+        app:backgroundTint="#00B8B8"
+        app:elevation="6dp"
+        app:tint="@android:color/white" />
 
 </FrameLayout>

@@ -27,8 +27,6 @@ import androidx.navigation.NavController
 import com.google.firebase.database.FirebaseDatabase
 import com.example.handyman.utils.SessionManager
 import android.widget.Toast
-import com.example.handyman.components.DividerLine
-import com.example.handyman.components.StepCircle
 import java.util.*
 import coil.compose.AsyncImage
 import com.google.firebase.storage.FirebaseStorage
@@ -47,6 +45,10 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clipToBounds
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
@@ -55,51 +57,127 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 
 @Composable
-fun JobPostingProgressBar(currentStep: Int) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+fun JobPostingProgressBar(currentStep: Int, onStepSelected: (Int) -> Unit = {}) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .padding(vertical = 8.dp)
+            .clipToBounds()
     ) {
-        StepCircle(stepNumber = 1, isActive = currentStep >= 1)
-        DividerLine()
-        StepCircle(stepNumber = 2, isActive = currentStep >= 2)
-        DividerLine()
-        StepCircle(stepNumber = 3, isActive = currentStep >= 3)
-        DividerLine()
-        StepCircle(stepNumber = 4, isActive = currentStep >= 4)
-        DividerLine()
-        StepCircle(stepNumber = 5, isActive = currentStep >= 5)
-    }
-}
-
-@Composable
-fun JobPostingTopBar(navController: NavController, title: String, onBack: () -> Unit = { navController.popBackStack() }) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Icon(
-            painter = painterResource(id = R.drawable.arrow_back),
-            contentDescription = "Back",
-            modifier = Modifier.size(24.dp).clickable { onBack() }
+        val dotSize = 32.dp
+        val slotWidth = maxWidth / 5
+        val activeOffset by animateDpAsState(
+            targetValue = slotWidth * (currentStep - 1) + ((slotWidth - dotSize) / 2),
+            animationSpec = tween(300),
+            label = "jobPostingStepDot"
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+        repeat(4) { index ->
+            Box(
+                modifier = Modifier
+                    .offset(
+                        x = slotWidth * index + (slotWidth / 2) + (dotSize / 2),
+                        y = 23.dp
+                    )
+                    .width(slotWidth - dotSize)
+                    .height(1.dp)
+                    .background(Color(0xFFFFB703))
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .offset(x = activeOffset)
+                .size(dotSize)
+                .background(Color(0xFFFFB703), CircleShape)
+                .align(Alignment.CenterStart)
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dotSize)
+                .align(Alignment.Center),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            (1..5).forEach { step ->
+                val isStepEnabled = step <= currentStep
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clickable(enabled = isStepEnabled) { onStepSelected(step) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = step.toString(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = when {
+                            step == currentStep -> Color.White
+                            isStepEnabled -> Color(0xFFFFB703)
+                            else -> Color(0xFFB8B8B8)
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPostingViewModel) {
+fun JobPostingTopBar(
+    navController: NavController,
+    title: String,
+    navigationIcon: Int = R.drawable.arrow_back,
+    navigationContentDescription: String = "Back",
+    onBack: () -> Unit = { navController.popBackStack() }
+) {
+    Box(modifier = Modifier.fillMaxWidth().height(32.dp)) {
+        Icon(
+            painter = painterResource(id = navigationIcon),
+            contentDescription = navigationContentDescription,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .size(24.dp)
+                .clickable { onBack() }
+        )
+        Text(
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+private fun missingJobPostingFields(viewModel: JobPostingViewModel): List<String> {
+    val missing = mutableListOf<String>()
+    if (viewModel.serviceCategory.isBlank()) missing += "service category"
+    if (viewModel.problemDesc.isBlank()) missing += "problem description"
+    if (viewModel.dateFrom.isBlank()) missing += "start date"
+    if (viewModel.dateTo.isBlank()) missing += "end date"
+    if (viewModel.timeFrom.isBlank()) missing += "start time"
+    if (viewModel.timeTo.isBlank()) missing += "end time"
+    if (viewModel.locationAddress.isBlank()) missing += "location"
+    if (!viewModel.isHappyToNegotiate) {
+        if (viewModel.salaryMin.isBlank()) missing += "minimum salary"
+        if (viewModel.salaryMax.isBlank()) missing += "maximum salary"
+    }
+    if (viewModel.paymentOption.isBlank()) missing += "payment frequency"
+    return missing
+}
+
+@Composable
+fun JobPostingDescriptionScreen(
+    navController: NavController,
+    viewModel: JobPostingViewModel
+) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Describe your problem", onBack = {
-            if (!navController.popBackStack()) {
-                navController.navigate("customerHome")
-            }
-        })
-        JobPostingProgressBar(currentStep = 1)
-
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
         Text("Describe your problem", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
@@ -261,11 +339,7 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp)) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Location")
-        JobPostingProgressBar(currentStep = 2)
-
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(16.dp))
         Text("Where do you need help?", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         
@@ -386,11 +460,7 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
 
 @Composable
 fun JobPostingSalaryScreen(navController: NavController, viewModel: JobPostingViewModel) {
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp)) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Salary Requirements")
-        JobPostingProgressBar(currentStep = 3)
-
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { viewModel.isHappyToNegotiate = !viewModel.isHappyToNegotiate }) {
@@ -469,11 +539,7 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp)) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Add Photos")
-        JobPostingProgressBar(currentStep = 4)
-
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(
@@ -605,6 +671,7 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
 fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingViewModel) {
     var showPopup by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
+    var validationMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
     // Reset editing state when entering review
@@ -680,11 +747,7 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Review & Confirm")
-        JobPostingProgressBar(currentStep = 5)
-
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
 
         ReviewSection(title = "Service", content = viewModel.serviceCategory, onEdit = { 
@@ -711,7 +774,16 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { if (!isSubmitting) submitJobToFirebase() },
+            onClick = {
+                if (!isSubmitting) {
+                    val missingFields = missingJobPostingFields(viewModel)
+                    if (missingFields.isNotEmpty()) {
+                        validationMessage = "Please complete: ${missingFields.joinToString(", ")}."
+                    } else {
+                        submitJobToFirebase()
+                    }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367)),
@@ -738,6 +810,19 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             },
             title = { Text("Confirmed") },
             text = { Text("Your job request has been successfully submitted.") }
+        )
+    }
+
+    validationMessage?.let { message ->
+        AlertDialog(
+            onDismissRequest = { validationMessage = null },
+            confirmButton = {
+                Button(onClick = { validationMessage = null }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("Missing details") },
+            text = { Text(message) }
         )
     }
 }

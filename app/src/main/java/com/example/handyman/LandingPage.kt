@@ -18,7 +18,11 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun LandingPage(modifier: Modifier = Modifier, navController: NavController) {
+fun LandingPage(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    onGetStarted: (() -> Unit)? = null
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -61,7 +65,7 @@ fun LandingPage(modifier: Modifier = Modifier, navController: NavController) {
         Button(
             // Choosing a language is the first step of getting started, rather
             // than a separate control on this screen.
-            onClick = { navController.navigate("languageSelection") },
+            onClick = { onGetStarted?.invoke() ?: navController.navigate("languageSelection") },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB703)),
             modifier = Modifier
                 .fillMaxWidth()

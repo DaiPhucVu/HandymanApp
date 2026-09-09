@@ -1,9 +1,22 @@
 package com.example.handyman
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,26 +24,125 @@ import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.handyman.customer_pages.*
 import com.example.handyman.handyman_pages.*
+import com.example.handyman.utils.LocaleHelper
 
 
 @Composable
 fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landingPage") {
     val navController = rememberNavController()
     val jobPostingViewModel: JobPostingViewModel = viewModel()
+    val context = LocalContext.current
+    var showLanguagePicker by remember { mutableStateOf(false) }
 
+    Box(modifier = modifier) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
+        enterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(350)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(350)
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(350)
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(350)
+            )
+        },
         builder = {
-        composable("landingPage") {
-            LandingPage(Modifier.fillMaxSize(), navController)
+        composable(
+            route = "landingPage",
+            exitTransition = {
+                if (targetState.destination.route == "chooseAccountType") {
+                    ExitTransition.None
+                } else {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(350)
+                    )
+                }
+            },
+            popEnterTransition = {
+                if (initialState.destination.route == "languageSelection") {
+                    EnterTransition.None
+                } else {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(350)
+                    )
+                }
+            }
+        ) {
+            LandingPage(
+                modifier = Modifier.fillMaxSize(),
+                navController = navController,
+                onGetStarted = { showLanguagePicker = true }
+            )
         }
-        composable("languageSelection") {
+        composable(
+            route = "languageSelection",
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(350)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(350)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(350)
+                )
+            }
+        ) {
             LanguageSelectionRoute(navController)
         }
-        composable("chooseAccountType") {
-            ChooseAccountType(Modifier.fillMaxSize(), navController)
+        composable(
+            route = "chooseAccountType",
+            enterTransition = {
+                if (
+                    initialState.destination.route == "languageSelection" ||
+                    initialState.destination.route == "landingPage"
+                ) {
+                    EnterTransition.None
+                } else {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(350)
+                    )
+                }
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(350)
+                )
+            }
+        ) {
+            ChooseAccountType(
+                modifier = Modifier.fillMaxSize(),
+                navController = navController,
+                onBackToLanguageSelection = { showLanguagePicker = true }
+            )
         }
 
         // New Job Posting Flow
@@ -52,7 +164,15 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
 
 //        Handyman pages
 
-        composable("handymanSignup") {
+        composable(
+            route = "handymanSignup",
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(350)
+                )
+            }
+        ) {
             HandymanSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanSkills") {
@@ -106,7 +226,15 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         composable("customerLogin") {
             CustomerLogin(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
-        composable("customerSignup") {
+        composable(
+            route = "customerSignup",
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(350)
+                )
+            }
+        ) {
             CustomerSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("customerHome") {
@@ -158,5 +286,34 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         }
 
     })
+        AnimatedVisibility(
+            visible = showLanguagePicker,
+            enter = slideInVertically(
+                animationSpec = tween(350),
+                initialOffsetY = { it }
+            ),
+            exit = slideOutVertically(
+                animationSpec = tween(350),
+                targetOffsetY = { it }
+            )
+        ) {
+            LanguageSelectionScreen(
+                currentLanguage = LocaleHelper.currentLanguage(context),
+                onDismiss = { showLanguagePicker = false },
+                onLanguageSelected = { language ->
+                    LocaleHelper.setLanguage(context, language)
+
+                    if (navController.currentBackStackEntry?.destination?.route != "chooseAccountType") {
+                        navController.navigate("chooseAccountType") {
+                            popUpTo("landingPage") { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    }
+
+                    showLanguagePicker = false
+                }
+            )
+        }
+    }
     
 }

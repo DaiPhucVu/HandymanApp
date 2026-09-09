@@ -35,9 +35,13 @@ class ServiceCategoryAdapter(private val customerId: String, private val onItemC
 
             itemView.setOnClickListener {
                 Log.d("ServiceCategoryAdapter", "Item clicked: ${item.name}")
+                val navController = itemView.findNavController()
+                if (navController.currentDestination?.id != R.id.serviceCategoryFragment) {
+                    return@setOnClickListener
+                }
                 val action = ServiceCategoryFragmentDirections.actionServiceCategoryFragmentToJobPostingFragment(serviceCategory = item.name, customerId = customerId)
                 Log.d("ServiceCategoryAdapter", "Navigating with action: $action")
-                itemView.findNavController().navigate(action)
+                navController.navigate(action)
             }
         }
     }
