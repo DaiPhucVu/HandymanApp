@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -145,13 +146,13 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
         Column(
@@ -175,10 +176,10 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text("Confirm your address", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.confirm_your_address_title), fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Tell us you live so we can bring our excellent service straight to your home.",
+                stringResource(R.string.confirm_address_subtitle),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -188,7 +189,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = houseNumber,
                 onValueChange = { houseNumber = it },
-                label = { Text("House number") },
+                label = { Text(stringResource(R.string.house_number_label)) },
                 modifier = textFieldModifier,
                 isError = houseNumber.isNotBlank() && !isValidHouseNumber
             )
@@ -198,7 +199,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = street,
                 onValueChange = { street = it },
-                label = { Text("Street") },
+                label = { Text(stringResource(R.string.street_label)) },
                 modifier = textFieldModifier,
                 isError = street.isNotBlank() && !isValidStreet
             )
@@ -209,14 +210,14 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 OutlinedTextField(
                     value = area,
                     onValueChange = { area = it },
-                    label = { Text("Neighborhood") },
+                    label = { Text(stringResource(R.string.neighborhood_label)) },
                     modifier = Modifier.weight(1f),
                     isError = area.isNotBlank() && !isValidArea
                 )
                 OutlinedTextField(
                     value = postCode,
                     onValueChange = { postCode = it },
-                    label = { Text("Post code") },
+                    label = { Text(stringResource(R.string.post_code_label)) },
                     modifier = Modifier.weight(1f),
                     isError = postCode.isNotBlank() && !isValidPostCode
                 )
@@ -228,14 +229,14 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 OutlinedTextField(
                     value = division,
                     onValueChange = { division = it },
-                    label = { Text("Division") },
+                    label = { Text(stringResource(R.string.division_label)) },
                     modifier = Modifier.weight(1f),
                     isError = division.isNotBlank() && !isValidDivision
                 )
                 OutlinedTextField(
                     value = district,
                     onValueChange = { district = it },
-                    label = { Text("District") },
+                    label = { Text(stringResource(R.string.district_label)) },
                     modifier = Modifier.weight(1f),
                     isError = district.isNotBlank() && !isValidDistrict
                 )
@@ -247,14 +248,14 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 OutlinedTextField(
                     value = thana,
                     onValueChange = { thana = it },
-                    label = { Text("Thana") },
+                    label = { Text(stringResource(R.string.thana_label)) },
                     modifier = Modifier.weight(1f),
                     isError = thana.isNotBlank() && !isValidThana
                 )
                 OutlinedTextField(
                     value = city,
                     onValueChange = { city = it },
-                    label = { Text("City") },
+                    label = { Text(stringResource(R.string.city_label)) },
                     modifier = Modifier.weight(1f),
                     isError = city.isNotBlank() && !isValidCity
                 )
@@ -265,7 +266,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = country,
                 onValueChange = { country = it },
-                label = { Text("Country") },
+                label = { Text(stringResource(R.string.country_label)) },
                 modifier = textFieldModifier,
                 isError = country.isNotBlank() && !isValidCountry
             )
@@ -275,7 +276,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = note,
                 onValueChange = { note = it },
-                label = { Text("Additional note (optional)") },
+                label = { Text(stringResource(R.string.additional_note_optional_label)) },
                 modifier = textFieldModifier
             )
 
@@ -286,9 +287,9 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Pin your location on the map", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.pin_location_on_map_label), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 TextButton(onClick = { mapViewRef?.let { forwardGeocode(it) } }) {
-                    Text("Find on map", color = Color(0xFFFFB703))
+                    Text(stringResource(R.string.find_on_map_btn), color = Color(0xFFFFB703))
                 }
             }
 
@@ -339,8 +340,8 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = if (latitude != 0.0)
-                    "Pinned: ${String.format("%.4f", latitude)}, ${String.format("%.4f", longitude)}"
-                else "Tap on the map to pin your location",
+                    stringResource(R.string.pinned_location_format, String.format("%.4f", latitude), String.format("%.4f", longitude))
+                else stringResource(R.string.tap_map_to_pin_location),
                 fontSize = 12.sp,
                 color = if (latitude != 0.0) Color(0xFF2F3367) else Color.Gray
             )
@@ -353,7 +354,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 val userId = SessionManager.currentUserID ?: SessionManager.getLoggedInUserId(context)
                 if (userId.isBlank()) {
                     Log.e("KYC", "No logged-in user ID found")
-                    Toast.makeText(context, "Session error. Please log in again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.session_error_message), Toast.LENGTH_LONG).show()
                     return@Button
                 }
 
@@ -382,7 +383,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     }
                     .addOnFailureListener { error ->
                         Log.e("KYC", "Failed to update address: ${error.message}")
-                        Toast.makeText(context, "Failed to save address. Please try again.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.failed_to_save_address_message), Toast.LENGTH_LONG).show()
                     }
             },
             enabled = isFormComplete,
@@ -394,7 +395,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 containerColor = if (isFormComplete) Color(0xFFFFB703) else Color(0xFFB0B0B0)
             )
         ) {
-            Text("Submit address", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+            Text(stringResource(R.string.submit_address_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,7 +108,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 if (profileImageUrl != null && profileImageUrl!!.isNotEmpty()) {
                     Image(
                         painter = rememberAsyncImagePainter(profileImageUrl),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.cd_profile_picture),
                         modifier = Modifier
                             .size(60.dp)
                             .clip(RoundedCornerShape(30.dp))
@@ -118,7 +119,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.character_customer),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.cd_profile_picture),
                         modifier = Modifier
                             .size(60.dp)
                             .clickable { navController.navigate("customerProfile") }
@@ -128,13 +129,13 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 Column(modifier = Modifier.clickable { navController.navigate("customerProfile") }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "Hello, $firstName $lastName.",
+                            stringResource(R.string.hello_name_format, firstName, lastName),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Verified",
+                            text = stringResource(R.string.verified_badge),
                             color = Color(0xFF2E7D32),
                             fontSize = 12.sp,
                             modifier = Modifier
@@ -145,7 +146,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.bytesize_location),
-                            contentDescription = "Location Icon",
+                            contentDescription = stringResource(R.string.cd_location_icon),
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
@@ -161,7 +162,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
             TextField(
                 value = "",
                 onValueChange = {},
-                placeholder = { Text("What services are you looking for?") },
+                placeholder = { Text(stringResource(R.string.search_services_placeholder)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -170,13 +171,13 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Services", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.services_title), fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
 
             // Grid of services (simplified layout)
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.fixture_replacement, "Fixture replacement") {
+                    ServiceCard(R.drawable.fixture_replacement, stringResource(R.string.service_fixture_replacement)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Fixture replacement"
                             navController.navigate("jobPostingReview")
@@ -186,7 +187,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                             navController.navigate("jobPostingDescription")
                         }
                     }
-                    ServiceCard(R.drawable.plumbing, "Plumbing") {
+                    ServiceCard(R.drawable.plumbing, stringResource(R.string.service_plumbing)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Plumbing"
                             navController.navigate("jobPostingReview")
@@ -199,7 +200,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.smart_home, "Smart home") {
+                    ServiceCard(R.drawable.smart_home, stringResource(R.string.service_smart_home)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Smart home"
                             navController.navigate("jobPostingReview")
@@ -209,7 +210,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                             navController.navigate("jobPostingDescription")
                         }
                     }
-                    ServiceCard(R.drawable.appliance_repair, "Appliance repair") {
+                    ServiceCard(R.drawable.appliance_repair, stringResource(R.string.service_appliance_repair_lower)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Appliance repair"
                             navController.navigate("jobPostingReview")
@@ -222,7 +223,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.painting, "Painting") {
+                    ServiceCard(R.drawable.painting, stringResource(R.string.service_painting)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Painting"
                             navController.navigate("jobPostingReview")
@@ -232,7 +233,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                             navController.navigate("jobPostingDescription")
                         }
                     }
-                    ServiceCard(R.drawable.floor_repair, "Floor repair") {
+                    ServiceCard(R.drawable.floor_repair, stringResource(R.string.service_floor_repair)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Floor repair"
                             navController.navigate("jobPostingReview")
@@ -245,7 +246,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ServiceCard(R.drawable.wall_repair, "Wall repair") {
+                    ServiceCard(R.drawable.wall_repair, stringResource(R.string.service_wall_repair)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Wall repair"
                             navController.navigate("jobPostingReview")
@@ -255,7 +256,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                             navController.navigate("jobPostingDescription")
                         }
                     }
-                    ServiceCard(R.drawable.small_appliance_repair, "Small appliance repair") {
+                    ServiceCard(R.drawable.small_appliance_repair, stringResource(R.string.service_small_appliance_repair)) {
                         if (viewModel.isEditing) {
                             viewModel.serviceCategory = "Small appliance repair"
                             navController.navigate("jobPostingReview")
@@ -278,13 +279,13 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = "Home",
+                    contentDescription = stringResource(R.string.cd_home),
                     tint = Color(0xFF30386D),
                     modifier = Modifier.size(30.dp).clickable { /* Already home */ }
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = "List",
+                    contentDescription = stringResource(R.string.cd_list),
                     tint = Color.Gray,
                     modifier = Modifier.size(30.dp).clickable {
                         val userId = SessionManager.getLoggedInUserId(context)
@@ -297,7 +298,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = "Chat",
+                    contentDescription = stringResource(R.string.cd_chat),
                     tint = Color.Gray,
                     modifier = Modifier.size(30.dp).clickable {
                         val intent = android.content.Intent(context, com.example.handyman.chatbox.ChatListingActivity::class.java)

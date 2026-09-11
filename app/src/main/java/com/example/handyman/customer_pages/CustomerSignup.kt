@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -70,7 +71,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(32.dp)
                     .clickable { navController.popBackStack() }
@@ -78,7 +79,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Text("Create account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.create_account_title), fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.weight(1.2f))
         }
@@ -87,7 +88,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
 
         Image(
             painter = painterResource(id = R.drawable.character_customer),
-            contentDescription = "Customer Graphic",
+            contentDescription = stringResource(R.string.cd_customer_graphic),
             modifier = Modifier
                 .size(160.dp)
         )
@@ -97,7 +98,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         OutlinedTextField(
             value = firstName,
             onValueChange = { firstName = it },
-            label = { Text("First name") },
+            label = { Text(stringResource(R.string.first_name_label)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -105,7 +106,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         OutlinedTextField(
             value = lastName,
             onValueChange = { lastName = it },
-            label = { Text("Last name") },
+            label = { Text(stringResource(R.string.last_name_label)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -113,7 +114,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email_label)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -122,7 +123,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password_label)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -139,7 +140,7 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm password") },
+            label = { Text(stringResource(R.string.confirm_password_label)) },
             visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -200,12 +201,12 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
 
                         Log.d("Signup", "Successfully created user.")
                         SessionManager.saveSession(context, email, userId, firstName)
-                        Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.account_created_success_message), Toast.LENGTH_LONG).show()
                         navController.navigate("customerKycAddressForm")
                     }
                     .addOnFailureListener { e ->
                         Log.e("Signup", "Error creating account", e)
-                        Toast.makeText(context, "Error creating account", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.error_creating_account_message), Toast.LENGTH_LONG).show()
                     }
             },
             enabled = isValid,
@@ -214,14 +215,14 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
                 .fillMaxWidth()
                 .height(54.dp)
         ) {
-            Text("Sign Up", fontSize = 18.sp)
+            Text(stringResource(R.string.sign_up_btn), fontSize = 18.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Already have an account?", fontSize = 14.sp)
+        Text(stringResource(R.string.already_have_account_message), fontSize = 14.sp)
         Text(
-            text = "Log in",
+            text = stringResource(R.string.log_in_link),
             color = Color(0xFF7D56F3),
             modifier = Modifier.clickable { navController.navigate("customerLogin") }
         )

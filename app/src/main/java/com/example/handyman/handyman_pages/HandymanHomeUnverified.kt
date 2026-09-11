@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,7 +67,7 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
 
         // Logout
         Text(
-            "Log out",
+            stringResource(R.string.log_out_link),
             color = Color(0xFF30386D),
             fontSize = 18.sp,
             modifier = Modifier
@@ -92,16 +93,16 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.dp),
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.cd_profile),
                     modifier = Modifier.size(60.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hello, $firstName $lastName.", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.hello_name_format, firstName, lastName), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Unverified",
+                            text = stringResource(R.string.unverified_badge),
                             color = Color(0xFFE8A317),
                             fontSize = 12.sp,
                             modifier = Modifier
@@ -112,12 +113,12 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.bytesize_location),
-                            contentDescription = "Location",
+                            contentDescription = stringResource(R.string.cd_location),
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Unverified address", fontSize = 12.sp, color = Color.Gray)
+                        Text(stringResource(R.string.unverified_address_label), fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
@@ -125,10 +126,10 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             Spacer(modifier = Modifier.height(24.dp))
 
             // Welcome
-            Text("Welcome, $firstName!", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.welcome_name_format, firstName), fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Verify your account and unlock access to our trusted Handymen services.",
+                stringResource(R.string.verify_unlock_hint),
                 fontSize = 16.sp, color = Color.Gray
             )
 
@@ -137,7 +138,7 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             // Illustration
             Image(
                 painter = painterResource(id = R.drawable.group_419),
-                contentDescription = "Illustration",
+                contentDescription = stringResource(R.string.cd_illustration),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
@@ -156,7 +157,7 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                     .height(56.dp),
                 shape = RoundedCornerShape(50)
             ) {
-                Text("Check Status", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(stringResource(R.string.check_status_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -171,19 +172,19 @@ fun HandymanHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = "Home",
+                    contentDescription = stringResource(R.string.cd_home),
                     tint = Color(0xFF8A4DFF),
                     modifier = Modifier.size(30.dp)
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = "List",
+                    contentDescription = stringResource(R.string.cd_list),
                     tint = Color.Gray,
                     modifier = Modifier.size(30.dp)
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = "Chat",
+                    contentDescription = stringResource(R.string.cd_chat),
                     tint = Color.Gray,
                     modifier = Modifier.size(30.dp)
                 )

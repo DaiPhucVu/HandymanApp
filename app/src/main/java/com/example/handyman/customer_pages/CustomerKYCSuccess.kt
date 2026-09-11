@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +39,7 @@ fun CustomerKYCSuccess(navController: NavController) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
@@ -52,7 +53,7 @@ fun CustomerKYCSuccess(navController: NavController) {
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Account verification", fontSize = 20.sp, color = Color.White)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(64.dp))
@@ -60,17 +61,17 @@ fun CustomerKYCSuccess(navController: NavController) {
         // Success Icon
         Image(
             painter = painterResource(id = R.drawable.verified_icon),
-            contentDescription = "Verified",
+            contentDescription = stringResource(R.string.verified_badge),
             modifier = Modifier.size(120.dp)
         )
 
         Spacer(modifier = Modifier.height(48.dp))
 
         // Success Text
-        Text("Account Created!", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(stringResource(R.string.account_created_title), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Congratulations! Your account has been successfully created. You can now start requesting services.",
+            stringResource(R.string.account_created_hint),
             fontSize = 14.sp,
             color = Color.White,
             lineHeight = 20.sp,
@@ -95,7 +96,7 @@ fun CustomerKYCSuccess(navController: NavController) {
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB703))
         ) {
-            Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B1B1B))
+            Text(stringResource(R.string.continue_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B1B1B))
         }
     }
 }

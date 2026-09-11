@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -95,7 +96,7 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
     Box(modifier = modifier.fillMaxSize()) {
         // Top right logout
         Text(
-            "Log out",
+            stringResource(R.string.log_out_link),
             color = Color(0xFF30386D),
             fontSize = 18.sp,
             modifier = Modifier
@@ -119,14 +120,14 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.dp),
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.cd_profile),
                     modifier = Modifier
                         .size(60.dp)
                         .padding(end = 8.dp)
                 )
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hello, $firstName $lastName.", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.hello_name_format, firstName, lastName), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = verificationStatus,
@@ -140,22 +141,22 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.bytesize_location),
-                            contentDescription = "Location",
+                            contentDescription = stringResource(R.string.cd_location),
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Unverified address", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = stringResource(R.string.unverified_address_label), fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            Text("KYC Application\nUnder Review", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.kyc_application_under_review_title), fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Your identity verification is being processed.\nWe will let you know when you are ready to serve.",
+                stringResource(R.string.kyc_processing_hint_handyman),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -164,7 +165,7 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
 
             Image(
                 painter = painterResource(id = R.drawable.document_icon_yellow),
-                contentDescription = "KYC Document Icon",
+                contentDescription = stringResource(R.string.cd_kyc_document_icon),
                 modifier = Modifier
                     .size(100.dp)
                     .align(Alignment.CenterHorizontally)
@@ -179,16 +180,16 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Application Details", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.application_details_title), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Identity Verification", fontSize = 14.sp)
+                        Text(stringResource(R.string.identity_verification_label), fontSize = 14.sp)
                         Text(
-                            text = if (idApprovedStatus.isEmpty()) "Pending" else idApprovedStatus.replaceFirstChar { it.uppercase() },
+                            text = if (idApprovedStatus.isEmpty()) stringResource(R.string.pending_status) else idApprovedStatus.replaceFirstChar { it.uppercase() },
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = when (idApprovedStatus.lowercase()) {
@@ -207,11 +208,11 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Professional Certificate", fontSize = 14.sp)
+                        Text(stringResource(R.string.professional_certificate_label), fontSize = 14.sp)
                         Text(
                             text = when {
-                                certificateApprovedStatus == "not_provided" -> "Not Provided"
-                                certificateApprovedStatus.isEmpty() -> "Pending"
+                                certificateApprovedStatus == "not_provided" -> stringResource(R.string.not_provided_status)
+                                certificateApprovedStatus.isEmpty() -> stringResource(R.string.pending_status)
                                 else -> certificateApprovedStatus.replaceFirstChar { it.uppercase() }
                             },
                             fontSize = 14.sp,
@@ -249,7 +250,7 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                     )
                 } else {
                     Text(
-                        "Refresh Status",
+                        stringResource(R.string.refresh_status_btn),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White

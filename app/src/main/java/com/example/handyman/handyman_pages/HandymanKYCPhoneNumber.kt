@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,13 +66,13 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.navigate("handymanKycAddressForm") }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Account verification", fontSize = 20.sp)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -94,26 +95,26 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
         Spacer(modifier = Modifier.height(32.dp))
 
         // Header
-        Text("Verify your phone number", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.verify_phone_title), fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Get a one-time-passcode (OTP) to verify your mobile number",
+            stringResource(R.string.otp_hint),
             fontSize = 14.sp,
             color = Color.Gray
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text("Mobile", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(stringResource(R.string.mobile_label), fontWeight = FontWeight.Bold, fontSize = 14.sp)
         OutlinedTextField(
             value = phoneNumber,
-            onValueChange = { 
-                phoneNumber = it 
+            onValueChange = {
+                phoneNumber = it
                 errorMessage = null
             },
             //follows the E.164 international phone format
             //Max 15 digits, No spaces or symbols, + is optional
-            placeholder = { Text("+8801234567890") },
+            placeholder = { Text(stringResource(R.string.phone_number_placeholder)) },
             modifier = textFieldModifier,
             isError = (phoneNumber.isNotBlank() && !isValidPhone) || errorMessage != null
         )
@@ -133,7 +134,7 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
             onClick = {
                 val currentActivity = findActivity(context)
                 if (currentActivity == null) {
-                    Toast.makeText(context, "Error: Activity not found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.error_activity_not_found_message), Toast.LENGTH_SHORT).show()
                     return@Button
                 }
                 isLoading = true
@@ -156,7 +157,7 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
                         isLoading = false
                         errorMessage = e.message
                         Log.e("KYC", "Verification failed: ${e.message}", e)
-                        Toast.makeText(context, "Verification failed: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.verification_failed_format, e.message), Toast.LENGTH_LONG).show()
                     }
 
                     override fun onCodeSent(
@@ -199,7 +200,7 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
             } else {
-                Text("Get OTP", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(stringResource(R.string.get_otp_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
     }

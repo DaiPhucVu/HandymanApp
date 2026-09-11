@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +31,20 @@ import com.google.firebase.database.FirebaseDatabase
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+
+@Composable
+private fun tradeDisplayName(trade: String): String = when (trade) {
+    "Electric and Plumbing" -> stringResource(R.string.electric_and_plumbing)
+    "A/C Repair Services" -> stringResource(R.string.ac_repair_services)
+    "Appliance Repair" -> stringResource(R.string.appliance_repair)
+    "Cleaning Solution" -> stringResource(R.string.cleaning_solution)
+    "Painting and Renovation" -> stringResource(R.string.painting_and_renovation)
+    "Pest Control" -> stringResource(R.string.pest_control)
+    "Electronics and Gadget Repair" -> stringResource(R.string.electronics_and_gadget_repair_trade)
+    "Shifting" -> stringResource(R.string.shifting)
+    "Other" -> stringResource(R.string.other_label)
+    else -> trade
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,13 +89,13 @@ fun HandymanSkillsScreen(navController: NavController) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text("Professional Skills", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.professional_skills_title), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
         Column(
@@ -91,9 +106,9 @@ fun HandymanSkillsScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Tell us about your expertise", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.tell_us_about_expertise_title), fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Text(
-                "This information will be shown on your profile to help customers find you.",
+                stringResource(R.string.profile_visibility_hint),
                 fontSize = 14.sp,
                 color = Color.Gray,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -102,7 +117,7 @@ fun HandymanSkillsScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Trade Selection
-            Text("Primary Trade", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 8.dp))
+            Text(stringResource(R.string.primary_trade_label), fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 8.dp))
             var expanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -110,10 +125,10 @@ fun HandymanSkillsScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = selectedTrade,
+                    value = if (selectedTrade.isBlank()) "" else tradeDisplayName(selectedTrade),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Select your main trade") },
+                    label = { Text(stringResource(R.string.select_main_trade_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth(),
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
@@ -124,7 +139,7 @@ fun HandymanSkillsScreen(navController: NavController) {
                 ) {
                     trades.forEach { trade ->
                         DropdownMenuItem(
-                            text = { Text(trade) },
+                            text = { Text(tradeDisplayName(trade)) },
                             onClick = {
                                 selectedTrade = trade
                                 expanded = false
@@ -139,7 +154,7 @@ fun HandymanSkillsScreen(navController: NavController) {
                 OutlinedTextField(
                     value = otherTrade,
                     onValueChange = { otherTrade = it },
-                    label = { Text("Specify your trade") },
+                    label = { Text(stringResource(R.string.specify_your_trade_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -150,7 +165,7 @@ fun HandymanSkillsScreen(navController: NavController) {
             OutlinedTextField(
                 value = experienceYears,
                 onValueChange = { if (it.all { char -> char.isDigit() }) experienceYears = it },
-                label = { Text("Years of Experience") },
+                label = { Text(stringResource(R.string.years_of_experience_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
@@ -162,7 +177,7 @@ fun HandymanSkillsScreen(navController: NavController) {
             OutlinedTextField(
                 value = hourlyRate,
                 onValueChange = { if (it.all { char -> char.isDigit() }) hourlyRate = it },
-                label = { Text("Expected Hourly Rate (৳)") },
+                label = { Text(stringResource(R.string.expected_hourly_rate_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
@@ -174,7 +189,7 @@ fun HandymanSkillsScreen(navController: NavController) {
             OutlinedTextField(
                 value = skillDescription,
                 onValueChange = { skillDescription = it },
-                label = { Text("Short Bio / Description of Skills") },
+                label = { Text(stringResource(R.string.short_bio_label)) },
                 modifier = Modifier.fillMaxWidth().height(120.dp),
                 maxLines = 5
             )
@@ -203,7 +218,7 @@ fun HandymanSkillsScreen(navController: NavController) {
                                 navController.navigate("handymanKYCLanding")
                             }
                             .addOnFailureListener {
-                                Toast.makeText(context, "Failed to save skills", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.failed_to_save_skills_message), Toast.LENGTH_SHORT).show()
                             }
                     }
                 },
@@ -212,7 +227,7 @@ fun HandymanSkillsScreen(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D2E5E)),
                 shape = RoundedCornerShape(28.dp)
             ) {
-                Text("Continue to Verification", color = Color.White, fontSize = 16.sp)
+                Text(stringResource(R.string.continue_to_verification_btn), color = Color.White, fontSize = 16.sp)
             }
         }
     }

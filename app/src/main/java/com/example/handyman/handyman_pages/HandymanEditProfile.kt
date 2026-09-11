@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,12 +76,12 @@ fun HandymanEditProfile(navController: NavController) {
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back),
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.cd_back),
                         modifier = Modifier.size(24.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                Text("Edit Profile", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.edit_profile_title), fontSize = 20.sp, fontWeight = FontWeight.Bold)
             }
 
             Column(
@@ -92,7 +93,7 @@ fun HandymanEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text("First Name") },
+                    label = { Text(stringResource(R.string.first_name_field_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -100,7 +101,7 @@ fun HandymanEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text("Last Name") },
+                    label = { Text(stringResource(R.string.last_name_field_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -108,7 +109,7 @@ fun HandymanEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = hourlyRate,
                     onValueChange = { if (it.all { char -> char.isDigit() }) hourlyRate = it },
-                    label = { Text("Hourly Rate (৳)") },
+                    label = { Text(stringResource(R.string.hourly_rate_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
@@ -119,7 +120,7 @@ fun HandymanEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = experienceYears,
                     onValueChange = { if (it.all { char -> char.isDigit() }) experienceYears = it },
-                    label = { Text("Years of Experience") },
+                    label = { Text(stringResource(R.string.years_of_experience_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
@@ -130,7 +131,7 @@ fun HandymanEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = bio,
                     onValueChange = { bio = it },
-                    label = { Text("Bio") },
+                    label = { Text(stringResource(R.string.bio_label)) },
                     modifier = Modifier.fillMaxWidth().height(150.dp),
                     maxLines = 5
                 )
@@ -151,11 +152,11 @@ fun HandymanEditProfile(navController: NavController) {
                         )
                         database.child(userId).updateChildren(updates)
                             .addOnSuccessListener {
-                                Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.profile_updated_success_message), Toast.LENGTH_SHORT).show()
                                 navController.popBackStack()
                             }
                             .addOnFailureListener {
-                                Toast.makeText(context, "Failed to update profile", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.failed_to_update_profile_message), Toast.LENGTH_SHORT).show()
                             }
                     }
                 },
@@ -166,7 +167,7 @@ fun HandymanEditProfile(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D2E5E)),
                 shape = RoundedCornerShape(28.dp)
             ) {
-                Text("Save Changes", color = Color.White, fontSize = 16.sp)
+                Text(stringResource(R.string.save_changes_btn), color = Color.White, fontSize = 16.sp)
             }
         }
     }

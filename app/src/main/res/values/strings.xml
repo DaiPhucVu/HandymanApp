@@ -148,4 +148,299 @@
     <string name="how_was_the_service">How was the service?</string>
     <string name="share_experience_hint">Share your experience (optional)</string>
     <string name="submit_review">Submit Review</string>
+
+    <!-- Job posting flow (Compose) -->
+    <string name="continue_btn">Continue</string>
+    <string name="where_do_you_need_help">Where do you need help?</string>
+    <string name="enter_your_address_label">Enter your address</string>
+    <string name="cd_search">Search</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="cd_gallery">Gallery</string>
+    <string name="from_gallery">From Gallery</string>
+    <string name="selected_photos">Selected Photos</string>
+    <string name="no_photos_added_yet">No photos added yet</string>
+    <string name="cd_remove">Remove</string>
+    <string name="ok_btn">OK</string>
+    <string name="confirmed_title">Confirmed</string>
+    <string name="job_request_submitted_message">Your job request has been successfully submitted.</string>
+    <string name="missing_details_title">Missing details</string>
+    <string name="min_bdt_label">Min BDT</string>
+    <string name="max_bdt_label">Max BDT</string>
+    <string name="payment_frequency_label">Payment Frequency</string>
+    <string name="selected_location_format">Selected: %1$s, %2$s</string>
+    <string name="tap_map_to_pinpoint">Tap on the map to pin-point your location</string>
+    <string name="photos_label">Photos</string>
+    <string name="negotiable_label">Negotiable</string>
+    <string name="salary_range_format">%1$s - %2$s BDT (%3$s)</string>
+    <string name="photos_attached_format">%1$d photos attached</string>
+    <string name="please_complete_format">Please complete: %1$s.</string>
+    <string name="failed_to_post_job_format">Failed to post job: %1$s</string>
+    <string name="review_service_title">Service</string>
+    <string name="review_description_timing_title">Description &amp; Timing</string>
+    <string name="field_service_category">service category</string>
+    <string name="field_problem_description">problem description</string>
+    <string name="field_start_date">start date</string>
+    <string name="field_end_date">end date</string>
+    <string name="field_start_time">start time</string>
+    <string name="field_end_time">end time</string>
+    <string name="field_location">location</string>
+    <string name="field_minimum_salary">minimum salary</string>
+    <string name="field_maximum_salary">maximum salary</string>
+    <string name="field_payment_frequency">payment frequency</string>
+
+    <!-- KYC address form (customer + handyman, Compose) -->
+    <string name="account_verification_title">Account verification</string>
+    <string name="confirm_your_address_title">Confirm your address</string>
+    <string name="confirm_address_subtitle">Tell us you live so we can bring our excellent service straight to your home.</string>
+    <string name="house_number_label">House number</string>
+    <string name="street_label">Street</string>
+    <string name="neighborhood_label">Neighborhood</string>
+    <string name="post_code_label">Post code</string>
+    <string name="division_label">Division</string>
+    <string name="district_label">District</string>
+    <string name="thana_label">Thana</string>
+    <string name="city_label">City</string>
+    <string name="country_label">Country</string>
+    <string name="additional_note_optional_label">Additional note (optional)</string>
+    <string name="pin_location_on_map_label">Pin your location on the map</string>
+    <string name="find_on_map_btn">Find on map</string>
+    <string name="pinned_location_format">Pinned: %1$s, %2$s</string>
+    <string name="tap_map_to_pin_location">Tap on the map to pin your location</string>
+    <string name="submit_address_btn">Submit address</string>
+    <string name="session_error_message">Session error. Please log in again.</string>
+    <string name="failed_to_save_address_message">Failed to save address. Please try again.</string>
+    <string name="area_neighborhood_label">Area/Neighborhood</string>
+
+    <!-- Handyman skills screen (Compose) -->
+    <string name="professional_skills_title">Professional Skills</string>
+    <string name="tell_us_about_expertise_title">Tell us about your expertise</string>
+    <string name="profile_visibility_hint">This information will be shown on your profile to help customers find you.</string>
+    <string name="primary_trade_label">Primary Trade</string>
+    <string name="select_main_trade_label">Select your main trade</string>
+    <string name="specify_your_trade_label">Specify your trade</string>
+    <string name="years_of_experience_label">Years of Experience</string>
+    <string name="expected_hourly_rate_label">Expected Hourly Rate (৳)</string>
+    <string name="short_bio_label">Short Bio / Description of Skills</string>
+    <string name="failed_to_save_skills_message">Failed to save skills</string>
+    <string name="continue_to_verification_btn">Continue to Verification</string>
+    <string name="electronics_and_gadget_repair_trade">Electronics and Gadget Repair</string>
+    <string name="other_label">Other</string>
+
+    <!-- KYC capture ID (customer + handyman, Compose) -->
+    <string name="select_id_photo_title">Select ID Photo</string>
+    <string name="choose_id_photo_source_message">Choose a photo of your ID from your gallery or take a new one.</string>
+    <string name="camera_btn">Camera</string>
+    <string name="id_card_photo_title">ID Card Photo</string>
+    <string name="photo_id_card_title">Photo ID Card</string>
+    <string name="review_id_card_hint">Please review your ID Card Photo can submit.</string>
+    <string name="cd_selected_id">Selected ID</string>
+    <string name="cd_default_id">Default ID</string>
+    <string name="cd_capture">Capture</string>
+    <string name="submit_id_card_btn">Submit ID Card</string>
+    <string name="try_again_btn">Try again</string>
+    <string name="place_id_card_hint">Please place your national ID card inside the frame.</string>
+    <string name="cd_upload_placeholder">Upload Placeholder</string>
+
+    <!-- Signup (customer + handyman, Compose) -->
+    <string name="create_account_title">Create account</string>
+    <string name="cd_customer_graphic">Customer Graphic</string>
+    <string name="first_name_label">First name</string>
+    <string name="last_name_label">Last name</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password_label">Confirm password</string>
+    <string name="sign_up_btn">Sign Up</string>
+    <string name="already_have_account_message">Already have an account?</string>
+    <string name="log_in_link">Log in</string>
+    <string name="account_created_success_message">Account created successfully</string>
+    <string name="error_creating_account_message">Error creating account</string>
+    <string name="join_our_crew_title">Join our crew</string>
+    <string name="cd_handyman_illustration">Handyman Illustration</string>
+    <string name="repeat_password_label">Repeat password</string>
+    <string name="failed_to_sign_up_format">Failed to sign up: %1$s</string>
+
+    <!-- Edit profile (customer + handyman, Compose) -->
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="first_name_field_label">First Name</string>
+    <string name="last_name_field_label">Last Name</string>
+    <string name="phone_number_label">Phone Number</string>
+    <string name="bio_label">Bio</string>
+    <string name="save_changes_btn">Save Changes</string>
+    <string name="profile_updated_message">Profile updated</string>
+    <string name="update_failed_message">Update failed</string>
+    <string name="hourly_rate_label">Hourly Rate (৳)</string>
+    <string name="profile_updated_success_message">Profile updated successfully</string>
+    <string name="failed_to_update_profile_message">Failed to update profile</string>
+
+    <!-- Login (customer + handyman, Compose) -->
+    <string name="log_in_title">Log in</string>
+    <string name="login_btn">Login</string>
+    <string name="dont_have_account_message">Don’t have an account?</string>
+    <string name="login_failed_default_message">Login failed</string>
+    <string name="customer_profile_not_found_message">Customer profile not found</string>
+    <string name="profile_load_failed_format">Profile load failed: %1$s</string>
+    <string name="user_not_found_message">User not found</string>
+    <string name="incorrect_password_message">Incorrect password</string>
+    <string name="login_migration_failed_format">Login migration failed: %1$s</string>
+    <string name="login_failed_format">Login failed: %1$s</string>
+    <string name="log_in_caps_title">Log In</string>
+    <string name="email_placeholder">email</string>
+    <string name="password_placeholder_min8">at least 8 characters</string>
+    <string name="forgot_password_link">Forgot password?</string>
+    <string name="handyman_profile_not_found_message">Handyman profile not found</string>
+    <string name="handyman_account_not_found_message">Handyman account not found</string>
+
+    <!-- KYC phone number (customer + handyman, Compose) -->
+    <string name="verify_phone_title">Verify your phone number</string>
+    <string name="otp_hint">Get a one-time-passcode (OTP) to verify your mobile number</string>
+    <string name="mobile_label">Mobile</string>
+    <string name="phone_number_placeholder">+8801234567890</string>
+    <string name="error_activity_not_found_message">Error: Activity not found</string>
+    <string name="verification_failed_format">Verification failed: %1$s</string>
+    <string name="get_otp_btn">Get OTP</string>
+
+    <!-- KYC OTP code (customer + handyman, Compose) -->
+    <string name="enter_otp_hint">Enter the 6-digit code sent to your mobile number.</string>
+    <string name="otp_code_label">OTP Code</string>
+    <string name="six_digit_code_placeholder">6-digit code</string>
+    <string name="verify_btn">Verify</string>
+    <string name="user_record_not_found_message">User record not found in database.</string>
+    <string name="database_update_failed_message">Database update failed</string>
+    <string name="verification_failed_retry_message">Verification failed. Please try again.</string>
+    <string name="verification_failed_message">Verification failed.</string>
+    <string name="handyman_record_not_found_message">Handyman record not found.</string>
+
+    <!-- KYC landing (customer + handyman, Compose) -->
+    <string name="logout_link">Logout</string>
+    <string name="verify_identity_title">Let’s verify your identity</string>
+    <string name="verify_identity_hint">You are required to verify your identity before you can use the application. Your information will be encrypted and stored securely</string>
+    <string name="cd_id_card_icon">ID Card Icon</string>
+    <string name="upload_id_btn">Upload ID</string>
+
+    <!-- KYC processing / home status (customer + handyman, Compose) -->
+    <string name="log_out_link">Log out</string>
+    <string name="cd_profile">Profile</string>
+    <string name="hello_name_format">Hello, %1$s %2$s.</string>
+    <string name="unverified_badge">Unverified</string>
+    <string name="cd_location">Location</string>
+    <string name="unverified_address_label">Unverified address</string>
+    <string name="kyc_application_under_review_title">KYC Application\nUnder Review</string>
+    <string name="kyc_processing_hint">Your identity verification is being processed.\nWe will let you know when you are ready to use our service.</string>
+    <string name="cd_kyc_document_icon">KYC Document Icon</string>
+    <string name="application_details_title">Application Details</string>
+    <string name="identity_verification_label">Identity Verification</string>
+    <string name="pending_status">Pending</string>
+    <string name="refresh_status_btn">Refresh Status</string>
+    <string name="cd_home">Home</string>
+    <string name="cd_list">List</string>
+    <string name="cd_chat">Chat</string>
+    <string name="kyc_processing_hint_handyman">Your identity verification is being processed.\nWe will let you know when you are ready to serve.</string>
+    <string name="professional_certificate_label">Professional Certificate</string>
+    <string name="not_provided_status">Not Provided</string>
+
+    <!-- Profile picture upload (customer + handyman, Compose) -->
+    <string name="select_profile_picture_title">Select Profile Picture</string>
+    <string name="choose_profile_photo_source_message">Choose a photo from your gallery or take a new one.</string>
+    <string name="final_step_title">Final Step!</string>
+    <string name="add_profile_picture_hint">Add a profile picture so handymen can recognize you. A friendly face builds trust!</string>
+    <string name="cd_profile_picture">Profile Picture</string>
+    <string name="upload_photo_label">Upload Photo</string>
+    <string name="skip_for_now_btn">Skip for now</string>
+    <string name="profile_updated_exclaim_message">Profile updated!</string>
+    <string name="user_search_failed_message">User search failed</string>
+    <string name="upload_failed_format">Upload failed: %1$s</string>
+    <string name="finish_and_start_btn">Finish and Start</string>
+    <string name="add_profile_picture_hint_handyman">Add a profile picture so customers can recognize you. A friendly face builds trust!</string>
+    <string name="finish_and_start_working_btn">Finish and Start Working</string>
+
+    <!-- Profile screen (customer + handyman, Compose) -->
+    <string name="user_profile_not_found_message">User profile not found</string>
+    <string name="invalid_user_id_message">Invalid User ID</string>
+    <string name="location_not_set_label">Location not set</string>
+    <string name="phone_not_set_label">No phone set</string>
+    <string name="no_bio_available_label">No bio available.</string>
+    <string name="cd_default_profile_picture">Default Profile Picture</string>
+    <string name="rating_count_format">Rating (%1$d)</string>
+    <string name="no_rating_label">No Rating</string>
+    <string name="about_me_title">About Me</string>
+    <string name="handyman_reviews_title">Handyman Reviews</string>
+    <string name="update_information_btn">Update Information</string>
+    <string name="handyman_fallback_name">Handyman</string>
+    <string name="no_trade_set_label">No Trade Set</string>
+    <string name="experience_label">Experience</string>
+    <string name="years_short_format">%1$s Yrs</string>
+    <string name="rate_label">Rate</string>
+    <string name="rate_per_hour_format">৳%1$s/hr</string>
+    <string name="customer_reviews_title">Customer Reviews</string>
+    <string name="edit_profile_btn">Edit Profile</string>
+    <string name="complete_verification_btn">Complete Verification</string>
+    <string name="customer_fallback_name">Customer</string>
+
+    <!-- Choose account type (Compose) -->
+    <string name="get_started_title">Get started</string>
+    <string name="cd_profix_logo">ProFix Logo</string>
+    <string name="select_account_type_hint">Select your account type</string>
+    <string name="im_a_label">I\'m a</string>
+    <string name="customer_role_label">Customer</string>
+    <string name="handyman_role_label">Handyman</string>
+    <string name="cd_back_to_language_selection">Back to language selection</string>
+
+    <!-- Landing page (Compose) -->
+    <string name="welcome_to_label">Welcome to</string>
+    <string name="cd_hands_holding_tools">Hands Holding Tools</string>
+    <string name="get_things_done_hint">Get things done right\nby our expert</string>
+    <string name="technicians_label">Technicians</string>
+
+    <!-- Customer home (Compose) -->
+    <string name="cd_location_icon">Location Icon</string>
+    <string name="search_services_placeholder">What services are you looking for?</string>
+    <string name="services_title">Services</string>
+    <string name="service_fixture_replacement">Fixture replacement</string>
+    <string name="service_plumbing">Plumbing</string>
+    <string name="service_smart_home">Smart home</string>
+    <string name="service_appliance_repair_lower">Appliance repair</string>
+    <string name="service_painting">Painting</string>
+    <string name="service_floor_repair">Floor repair</string>
+    <string name="service_wall_repair">Wall repair</string>
+    <string name="service_small_appliance_repair">Small appliance repair</string>
+
+    <!-- Home unverified (customer + handyman, Compose) -->
+    <string name="welcome_name_format">Welcome, %1$s!</string>
+    <string name="verify_unlock_hint">Verify your account and unlock access to our trusted Handymen services.</string>
+    <string name="cd_illustration">Illustration</string>
+    <string name="start_verification_btn">Start verification</string>
+    <string name="check_status_btn">Check Status</string>
+
+    <!-- KYC submitted (customer + handyman, Compose) -->
+    <string name="cd_document">Document</string>
+    <string name="kyc_application_submitted_title">KYC Application Submitted</string>
+    <string name="kyc_submitted_hint">Your identity verification is being\nprocessed. We will let you know\nwhen you can use our service!</string>
+    <string name="cd_document_icon_kyc">Document Icon</string>
+    <string name="kyc_submitted_hint_handyman">Your identity verification is being\nprocessed. We will let you know\nwhen you’re ready to serve!</string>
+    <string name="account_created_title">Account Created!</string>
+    <string name="account_created_hint">Congratulations! Your account has been successfully created. You can now start requesting services.</string>
+
+    <!-- Handyman KYC certificates / NID (Compose) -->
+    <string name="national_id_title">National ID</string>
+    <string name="national_id_hint">Enter your National ID (NID) number so we can verify who you are. No photo needed — just the number on your card.</string>
+    <string name="nid_number_label">NID Number</string>
+    <string name="nid_placeholder">e.g. 1234567890</string>
+    <string name="nid_length_error_format">An NID number is 10, 13 or 17 digits. You have entered %1$d.</string>
+    <string name="nid_length_hint">10, 13 or 17 digits, as printed on your NID card.</string>
+    <string name="submit_btn">Submit</string>
+    <string name="skip_this_step_link">Skip this step</string>
+
+    <!-- Payment success fragment (legacy View) -->
+    <string name="please_select_rating_message">Please select a rating</string>
+    <string name="error_handyman_id_not_found_message">Error: Handyman ID not found</string>
+    <string name="job_id_not_found_message">Job ID not found</string>
+    <string name="your_invoice_title">Your Invoice</string>
+    <string name="close_btn">Close</string>
+    <string name="copy_to_clipboard_btn">Copy to Clipboard</string>
+    <string name="invoice_clip_label">Invoice</string>
+    <string name="invoice_copied_message">Invoice copied to clipboard</string>
+    <string name="failed_to_fetch_invoice_message">Failed to fetch invoice details</string>
+    <string name="thank_you_for_review_message">Thank you for your review!</string>
+    <string name="failed_to_submit_review_message">Failed to submit review</string>
+    <string name="invoice_content_format">--- INVOICE ---\nJob: %1$s\nDate: %2$s\nLocation: %3$s\nAmount Paid: BDT %4$s\nPayment Method: %5$s\nStatus: Paid\n---------------\nThank you for using Profix!</string>
 </resources>

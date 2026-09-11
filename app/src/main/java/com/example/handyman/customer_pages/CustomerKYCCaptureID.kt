@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,8 +72,8 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Select ID Photo") },
-            text = { Text("Choose a photo of your ID from your gallery or take a new one.") },
+            title = { Text(stringResource(R.string.select_id_photo_title)) },
+            text = { Text(stringResource(R.string.choose_id_photo_source_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     val uri = createImageUri(context)
@@ -80,7 +81,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
                     cameraLauncher.launch(uri)
                     showDialog = false
                 }) {
-                    Text("Camera")
+                    Text(stringResource(R.string.camera_btn))
                 }
             },
             dismissButton = {
@@ -88,7 +89,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
                     galleryLauncher.launch("image/*")
                     showDialog = false
                 }) {
-                    Text("Gallery")
+                    Text(stringResource(R.string.cd_gallery))
                 }
             }
         )
@@ -104,13 +105,13 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("ID Card Photo", fontSize = 20.sp)
+            Text(stringResource(R.string.id_card_photo_title), fontSize = 20.sp)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -131,10 +132,10 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
         Spacer(modifier = Modifier.height(32.dp))
 
         // Header
-        Text("Photo ID Card", fontSize = 28.sp)
+        Text(stringResource(R.string.photo_id_card_title), fontSize = 28.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Please review your ID Card Photo can submit.",
+            stringResource(R.string.review_id_card_hint),
             fontSize = 14.sp,
             color = Color.Gray
         )
@@ -152,7 +153,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
             if (selectedImageUri != null) {
                 Image(
                     painter = rememberAsyncImagePainter(selectedImageUri),
-                    contentDescription = "Selected ID",
+                    contentDescription = stringResource(R.string.cd_selected_id),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
@@ -161,7 +162,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.id_card_icon),
-                    contentDescription = "Default ID",
+                    contentDescription = stringResource(R.string.cd_default_id),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
@@ -182,7 +183,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
                 // Gallery button
                 Icon(
                     painter = painterResource(id = R.drawable.image_icon),
-                    contentDescription = "Gallery",
+                    contentDescription = stringResource(R.string.cd_gallery),
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(48.dp)
@@ -194,7 +195,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
                 // Capture button
                 Icon(
                     painter = painterResource(id = R.drawable.camera_shutter_button),
-                    contentDescription = "Capture",
+                    contentDescription = stringResource(R.string.cd_capture),
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(72.dp)
@@ -207,7 +208,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
                 // Conditional: Remove (Bin) icon
                 Icon(
                     painter = painterResource(id = R.drawable.bin_icon),
-                    contentDescription = "Remove",
+                    contentDescription = stringResource(R.string.cd_remove),
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(42.dp)
@@ -289,7 +290,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Submit ID Card", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+                        Text(stringResource(R.string.submit_id_card_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
                     }
                 }
 
@@ -304,7 +305,7 @@ fun CustomerKYCCaptureID(navController: NavController, modifier: Modifier = Modi
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Try again", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+                    Text(stringResource(R.string.try_again_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
                 }
             }
         }

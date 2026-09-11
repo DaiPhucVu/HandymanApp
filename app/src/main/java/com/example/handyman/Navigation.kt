@@ -302,6 +302,12 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
                 onDismiss = { showLanguagePicker = false },
                 onLanguageSelected = { language ->
                     LocaleHelper.setLanguage(context, language)
+                    // Recreate so the new locale is actually applied — resources are
+                    // resolved from the Activity's base Configuration (set in
+                    // attachBaseContext), which doesn't change on its own just because
+                    // the preference was saved. Without this, the chosen language
+                    // silently doesn't take effect until the app is next restarted.
+                    LocaleHelper.findActivity(context)?.recreate()
 
                     if (navController.currentBackStackEntry?.destination?.route != "chooseAccountType") {
                         navController.navigate("chooseAccountType") {

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
@@ -66,7 +67,7 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .size(32.dp)
@@ -74,7 +75,7 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
             )
 
             Text(
-                "Log In",
+                stringResource(R.string.log_in_caps_title),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Center)
@@ -84,7 +85,7 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
 
         Image(
             painter = painterResource(id = R.drawable.character_handyman),
-            contentDescription = "Handyman Illustration",
+            contentDescription = stringResource(R.string.cd_handyman_illustration),
             modifier = Modifier.size(140.dp)
         )
 
@@ -93,8 +94,8 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
-            placeholder = { Text("email") },
+            label = { Text(stringResource(R.string.email_label)) },
+            placeholder = { Text(stringResource(R.string.email_placeholder)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
@@ -103,8 +104,8 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
-            placeholder = { Text("at least 8 characters") },
+            label = { Text(stringResource(R.string.password_label)) },
+            placeholder = { Text(stringResource(R.string.password_placeholder_min8)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -126,7 +127,7 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Forgot password?",
+            text = stringResource(R.string.forgot_password_link),
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(bottom = 8.dp),
@@ -152,7 +153,7 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
                             exc.message?.contains("user-not-found") == true ||
                             exc.message?.contains("invalid-credential") == true
                         if (!isUserMissing) {
-                            Toast.makeText(context, exc.localizedMessage ?: "Login failed", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, exc.localizedMessage ?: context.getString(R.string.login_failed_default_message), Toast.LENGTH_LONG).show()
                             return@addOnFailureListener
                         }
                         attemptHandymanRtdbMigration(
@@ -172,14 +173,14 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
             ),
             shape = MaterialTheme.shapes.large,
         ) {
-            Text("Login", fontSize = 18.sp, color = Color.White)
+            Text(stringResource(R.string.login_btn), fontSize = 18.sp, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Don’t have an account?", fontSize = 14.sp)
+        Text(stringResource(R.string.dont_have_account_message), fontSize = 14.sp)
         Text(
-            text = "Sign Up",
+            text = stringResource(R.string.sign_up_btn),
             color = Color(0xFF2D2E5E),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.clickable {
@@ -199,7 +200,7 @@ private fun loadHandymanProfileAndNavigate(
         .addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(context, "Handyman profile not found", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.handyman_profile_not_found_message), Toast.LENGTH_LONG).show()
                     return
                 }
                 val child = snapshot.children.first()
@@ -216,7 +217,7 @@ private fun loadHandymanProfileAndNavigate(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Profile load failed: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.profile_load_failed_format, error.message), Toast.LENGTH_LONG).show()
             }
         })
 }
@@ -232,7 +233,7 @@ private fun attemptHandymanRtdbMigration(
         .addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(context, "Handyman account not found", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.handyman_account_not_found_message), Toast.LENGTH_LONG).show()
                     return
                 }
                 var matchedKey: String? = null
@@ -251,7 +252,7 @@ private fun attemptHandymanRtdbMigration(
                     }
                 }
                 if (matchedKey == null) {
-                    Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.incorrect_password_message), Toast.LENGTH_LONG).show()
                     return
                 }
                 FirebaseAuth.getInstance()
@@ -275,14 +276,14 @@ private fun attemptHandymanRtdbMigration(
                     .addOnFailureListener { createExc ->
                         Toast.makeText(
                             context,
-                            "Login migration failed: ${createExc.localizedMessage ?: createExc.message}",
+                            context.getString(R.string.login_migration_failed_format, createExc.localizedMessage ?: createExc.message),
                             Toast.LENGTH_LONG,
                         ).show()
                     }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Login failed: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.login_failed_format, error.message), Toast.LENGTH_LONG).show()
             }
         })
 }

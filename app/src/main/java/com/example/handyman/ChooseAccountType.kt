@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +38,7 @@ fun ChooseAccountType(
     ) {
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "Get started",
+            text = stringResource(R.string.get_started_title),
             fontSize = 24.sp,
             color = Color.White,
             fontWeight = FontWeight.Bold,
@@ -45,11 +46,11 @@ fun ChooseAccountType(
         // ProFix Logo
         Image(
             painter = painterResource(id = R.drawable.profix_logo_1),
-            contentDescription = "ProFix Logo",
+            contentDescription = stringResource(R.string.cd_profix_logo),
             modifier = Modifier.height(120.dp)
         )
         Text(
-            text = "Select your account type",
+            text = stringResource(R.string.select_account_type_hint),
             fontSize = 16.sp,
             color = Color.White,
             modifier = Modifier.padding(bottom = 24.dp, top = 64.dp)
@@ -70,9 +71,9 @@ fun ChooseAccountType(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally)
             {
-                Text("I'm a", fontSize = 24.sp, color = Color(0xFF30386D), fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.im_a_label), fontSize = 24.sp, color = Color(0xFF30386D), fontWeight = FontWeight.Medium)
                 Text(
-                    "Customer",
+                    stringResource(R.string.customer_role_label),
                     fontSize = 48.sp,
                     color = Color(0xFF30386D),
                     fontWeight = FontWeight.Bold
@@ -98,9 +99,9 @@ fun ChooseAccountType(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally)
             {
-                Text("I'm a", fontSize = 24.sp, color = Color.White, fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.im_a_label), fontSize = 24.sp, color = Color.White, fontWeight = FontWeight.Medium)
                 Text(
-                    "Handyman",
+                    stringResource(R.string.handyman_role_label),
                     fontSize = 48.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -114,7 +115,7 @@ fun ChooseAccountType(
         // scrolling column so it stays put when the content scrolls.
         Icon(
             painter = painterResource(id = R.drawable.arrow_back),
-            contentDescription = "Back to language selection",
+            contentDescription = stringResource(R.string.cd_back_to_language_selection),
             tint = Color.White,
             modifier = Modifier
                 .align(Alignment.TopStart)

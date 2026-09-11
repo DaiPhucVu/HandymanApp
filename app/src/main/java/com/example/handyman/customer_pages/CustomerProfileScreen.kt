@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,7 +84,7 @@ fun CustomerProfileScreen(navController: NavController) {
                             })
                     } else {
                         isLoading = false
-                        Toast.makeText(context, "User profile not found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.user_profile_not_found_message), Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -93,7 +94,7 @@ fun CustomerProfileScreen(navController: NavController) {
             })
         } else {
             isLoading = false
-            Toast.makeText(context, "Invalid User ID", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.invalid_user_id_message), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -104,9 +105,9 @@ fun CustomerProfileScreen(navController: NavController) {
     } else {
         val firstName = userData?.get("firstName") as? String ?: ""
         val lastName = userData?.get("lastName") as? String ?: ""
-        val city = userData?.get("city") as? String ?: "Location not set"
-        val phone = userData?.get("phoneNumber") as? String ?: "No phone set"
-        val bio = userData?.get("bio") as? String ?: "No bio available."
+        val city = userData?.get("city") as? String ?: stringResource(R.string.location_not_set_label)
+        val phone = userData?.get("phoneNumber") as? String ?: stringResource(R.string.phone_not_set_label)
+        val bio = userData?.get("bio") as? String ?: stringResource(R.string.no_bio_available_label)
         val photoUrl = userData?.get("profileImageUrl") as? String ?: ""
         
         val averageRating = (userData?.get("averageRating") as? Number)?.toDouble() ?: 0.0
@@ -145,7 +146,7 @@ fun CustomerProfileScreen(navController: NavController) {
                         .statusBarsPadding()
                         .padding(8.dp)
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.DarkGray)
+                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.cd_back), tint = Color.DarkGray)
                 }
 
                 Column(
@@ -158,7 +159,7 @@ fun CustomerProfileScreen(navController: NavController) {
                         if (photoUrl.isNotEmpty()) {
                             Image(
                                 painter = rememberAsyncImagePainter(photoUrl),
-                                contentDescription = "Profile Picture",
+                                contentDescription = stringResource(R.string.cd_profile_picture),
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(CircleShape)
@@ -168,7 +169,7 @@ fun CustomerProfileScreen(navController: NavController) {
                         } else {
                             Image(
                                 painter = painterResource(id = R.drawable.character_customer),
-                                contentDescription = "Default Profile Picture",
+                                contentDescription = stringResource(R.string.cd_default_profile_picture),
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(CircleShape)
@@ -206,7 +207,7 @@ fun CustomerProfileScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     ProfileStat(
-                        label = if (reviewCount > 0) "Rating ($reviewCount)" else "No Rating",
+                        label = if (reviewCount > 0) stringResource(R.string.rating_count_format, reviewCount) else stringResource(R.string.no_rating_label),
                         value = if (reviewCount > 0) String.format("%.1f", averageRating) else "—"
                     )
                 }
@@ -215,7 +216,7 @@ fun CustomerProfileScreen(navController: NavController) {
 
                 // Bio Section
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Text("About Me", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.about_me_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(bio, fontSize = 14.sp, color = Color.DarkGray, lineHeight = 20.sp)
                 }
@@ -225,7 +226,7 @@ fun CustomerProfileScreen(navController: NavController) {
                 // Reviews Section
                 if (reviews.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        Text("Handyman Reviews", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.handyman_reviews_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(16.dp))
                         reviews.forEach { review ->
                             ReviewItem(review)
@@ -247,7 +248,7 @@ fun CustomerProfileScreen(navController: NavController) {
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.DarkGray)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Update Information", color = Color.DarkGray)
+                        Text(stringResource(R.string.update_information_btn), color = Color.DarkGray)
                     }
                 }
                 
@@ -259,7 +260,8 @@ fun CustomerProfileScreen(navController: NavController) {
 
 @Composable
 fun ReviewItem(review: Review) {
-    var handymanName by remember { mutableStateOf("Handyman") }
+    val defaultHandymanName = stringResource(R.string.handyman_fallback_name)
+    var handymanName by remember { mutableStateOf(defaultHandymanName) }
     
     LaunchedEffect(review.handymanId) {
         FirebaseDatabase.getInstance().getReference("Handyman")

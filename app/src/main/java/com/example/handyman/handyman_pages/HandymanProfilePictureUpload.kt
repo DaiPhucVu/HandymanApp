@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -72,8 +73,8 @@ fun HandymanProfilePictureUpload(navController: NavController) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Select Profile Picture") },
-            text = { Text("Choose a photo from your gallery or take a new one.") },
+            title = { Text(stringResource(R.string.select_profile_picture_title)) },
+            text = { Text(stringResource(R.string.choose_profile_photo_source_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     val uri = createImageUri(context)
@@ -81,7 +82,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
                     cameraLauncher.launch(uri)
                     showDialog = false
                 }) {
-                    Text("Camera")
+                    Text(stringResource(R.string.camera_btn))
                 }
             },
             dismissButton = {
@@ -89,7 +90,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
                     galleryLauncher.launch("image/*")
                     showDialog = false
                 }) {
-                    Text("Gallery")
+                    Text(stringResource(R.string.cd_gallery))
                 }
             }
         )
@@ -105,7 +106,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
         Spacer(modifier = Modifier.height(40.dp))
 
         Text(
-            text = "Final Step!",
+            text = stringResource(R.string.final_step_title),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF30386D)
@@ -114,7 +115,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Add a profile picture so customers can recognize you. A friendly face builds trust!",
+            text = stringResource(R.string.add_profile_picture_hint_handyman),
             fontSize = 16.sp,
             color = Color.Gray,
             textAlign = TextAlign.Center,
@@ -136,7 +137,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
             if (imageUri != null) {
                 Image(
                     painter = rememberAsyncImagePainter(imageUri),
-                    contentDescription = "Profile Picture",
+                    contentDescription = stringResource(R.string.cd_profile_picture),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -150,7 +151,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Upload Photo",
+                        stringResource(R.string.upload_photo_label),
                         color = Color(0xFF30386D),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
@@ -196,7 +197,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
                                         for (child in snapshot.children) {
                                             child.ref.child("profileImageUrl").setValue(downloadUri.toString())
                                         }
-                                        Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.profile_updated_exclaim_message), Toast.LENGTH_SHORT).show()
                                         
                                         // Start the MainJobBoard Activity for Handyman
                                         val intent = Intent(context, MainJobBoard::class.java).apply {
@@ -209,7 +210,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
                         }
                         .addOnFailureListener {
                             isUploading = false
-                            Toast.makeText(context, "Upload failed: ${it.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.upload_failed_format, it.message), Toast.LENGTH_SHORT).show()
                         }
                 }
             },
@@ -226,7 +227,7 @@ fun HandymanProfilePictureUpload(navController: NavController) {
             if (isUploading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
             } else {
-                Text("Finish and Start Working", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.finish_and_start_working_btn), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }

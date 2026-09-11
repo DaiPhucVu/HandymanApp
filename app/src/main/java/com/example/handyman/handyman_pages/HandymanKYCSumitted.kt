@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,7 +45,7 @@ fun HandymanKYCSubmitted(modifier: Modifier = Modifier,navController: NavControl
                     .padding(end = 8.dp)
             )
             Text(
-                text = "Account verification",
+                text = stringResource(R.string.account_verification_title),
                 fontSize = 18.sp,
                 color = Color.White
             )
@@ -55,7 +56,7 @@ fun HandymanKYCSubmitted(modifier: Modifier = Modifier,navController: NavControl
         // Document Icon
         Image(
             painter = painterResource(id = R.drawable.document_icon),
-            contentDescription = "Document Icon",
+            contentDescription = stringResource(R.string.cd_document_icon_kyc),
             modifier = Modifier.size(120.dp)
         )
 
@@ -63,7 +64,7 @@ fun HandymanKYCSubmitted(modifier: Modifier = Modifier,navController: NavControl
 
         // Heading
         Text(
-            text = "KYC Application Submitted",
+            text = stringResource(R.string.kyc_application_submitted_title),
             fontSize = 24.sp,
             color = Color.White,
             fontWeight = FontWeight.Bold,
@@ -74,7 +75,7 @@ fun HandymanKYCSubmitted(modifier: Modifier = Modifier,navController: NavControl
 
         // Subtext
         Text(
-            text = "Your identity verification is being\nprocessed. We will let you know\nwhen you’re ready to serve!",
+            text = stringResource(R.string.kyc_submitted_hint_handyman),
             fontSize = 14.sp,
             color = Color.White,
             textAlign = TextAlign.Center
@@ -96,7 +97,7 @@ fun HandymanKYCSubmitted(modifier: Modifier = Modifier,navController: NavControl
                 },
             contentAlignment = Alignment.Center
         ) {
-            Text("Return Home", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.return_home), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(32.dp))

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -61,7 +62,7 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(32.dp)
                     .clickable { navController.popBackStack() }
@@ -71,12 +72,12 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text("Log in", fontSize = 24.sp)
+        Text(stringResource(R.string.log_in_title), fontSize = 24.sp)
         Spacer(modifier = Modifier.height(16.dp))
 
         Image(
             painter = painterResource(id = R.drawable.character_customer),
-            contentDescription = "Customer Graphic",
+            contentDescription = stringResource(R.string.cd_customer_graphic),
             modifier = Modifier
                 .size(120.dp)
         )
@@ -86,7 +87,7 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email_label)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
             singleLine = true
         )
@@ -94,7 +95,7 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password_label)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -125,7 +126,7 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
                             exc.message?.contains("user-not-found") == true ||
                             exc.message?.contains("invalid-credential") == true
                         if (!isUserMissing) {
-                            Toast.makeText(context, exc.localizedMessage ?: "Login failed", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, exc.localizedMessage ?: context.getString(R.string.login_failed_default_message), Toast.LENGTH_LONG).show()
                             return@addOnFailureListener
                         }
                         attemptCustomerRtdbMigration(
@@ -142,14 +143,14 @@ fun CustomerLogin(modifier: Modifier = Modifier, navController: NavController) {
                 .fillMaxWidth()
                 .height(54.dp)
         ) {
-            Text("Login", fontSize = 18.sp)
+            Text(stringResource(R.string.login_btn), fontSize = 18.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Don’t have an account?", fontSize = 14.sp)
+        Text(stringResource(R.string.dont_have_account_message), fontSize = 14.sp)
         Text(
-            text = "Sign Up",
+            text = stringResource(R.string.sign_up_btn),
             color = Color(0xFF7D56F3),
             modifier = Modifier.clickable { navController.navigate("customerSignup") }
         )
@@ -166,7 +167,7 @@ private fun loadCustomerProfileAndNavigate(
         .addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(context, "Customer profile not found", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.customer_profile_not_found_message), Toast.LENGTH_LONG).show()
                     return
                 }
                 val child = snapshot.children.first()
@@ -181,7 +182,7 @@ private fun loadCustomerProfileAndNavigate(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Profile load failed: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.profile_load_failed_format, error.message), Toast.LENGTH_LONG).show()
             }
         })
 }
@@ -197,7 +198,7 @@ private fun attemptCustomerRtdbMigration(
         .addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(context, "User not found", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.user_not_found_message), Toast.LENGTH_LONG).show()
                     return
                 }
                 var matchedKey: String? = null
@@ -213,7 +214,7 @@ private fun attemptCustomerRtdbMigration(
                     }
                 }
                 if (matchedKey == null) {
-                    Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.incorrect_password_message), Toast.LENGTH_LONG).show()
                     return
                 }
                 FirebaseAuth.getInstance()
@@ -233,14 +234,14 @@ private fun attemptCustomerRtdbMigration(
                     .addOnFailureListener { createExc ->
                         Toast.makeText(
                             context,
-                            "Login migration failed: ${createExc.localizedMessage ?: createExc.message}",
+                            context.getString(R.string.login_migration_failed_format, createExc.localizedMessage ?: createExc.message),
                             Toast.LENGTH_LONG,
                         ).show()
                     }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Login failed: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.login_failed_format, error.message), Toast.LENGTH_LONG).show()
             }
         })
 }

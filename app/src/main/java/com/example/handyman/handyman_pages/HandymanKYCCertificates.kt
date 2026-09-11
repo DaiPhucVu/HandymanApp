@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -67,13 +68,13 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
         Column(
@@ -99,18 +100,17 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
             }
 
             Spacer(modifier = Modifier.height(32.dp))
-            Text("National ID", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.national_id_title), fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Enter your National ID (NID) number so we can verify who you are. " +
-                    "No photo needed — just the number on your card.",
+                stringResource(R.string.national_id_hint),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text("NID Number", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(stringResource(R.string.nid_number_label), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
@@ -120,7 +120,7 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
                     // and dashes copied off a card cannot reach the database.
                     nid = input.filter { it.isDigit() }.take(17)
                 },
-                placeholder = { Text("e.g. 1234567890") },
+                placeholder = { Text(stringResource(R.string.nid_placeholder)) },
                 singleLine = true,
                 isError = showError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -131,9 +131,9 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = if (showError) {
-                    "An NID number is 10, 13 or 17 digits. You have entered ${nid.length}."
+                    stringResource(R.string.nid_length_error_format, nid.length)
                 } else {
-                    "10, 13 or 17 digits, as printed on your NID card."
+                    stringResource(R.string.nid_length_hint)
                 },
                 fontSize = 12.sp,
                 color = if (showError) MaterialTheme.colorScheme.error else Color.Gray
@@ -185,7 +185,7 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                 } else {
                     Text(
-                        "Submit",
+                        stringResource(R.string.submit_btn),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -196,7 +196,7 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                "Skip this step",
+                stringResource(R.string.skip_this_step_link),
                 color = Color.Gray,
                 fontSize = 14.sp,
                 modifier = Modifier

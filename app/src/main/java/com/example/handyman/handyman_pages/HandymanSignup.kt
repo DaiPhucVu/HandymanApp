@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
@@ -67,7 +68,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .size(32.dp)
@@ -75,7 +76,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
             )
 
             Text(
-                "Join our crew",
+                stringResource(R.string.join_our_crew_title),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Center)
@@ -84,7 +85,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
 
         Image(
             painter = painterResource(id = R.drawable.character_handyman),
-            contentDescription = "Handyman Illustration",
+            contentDescription = stringResource(R.string.cd_handyman_illustration),
             modifier = Modifier.size(140.dp)
         )
 
@@ -93,7 +94,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = firstName,
             onValueChange = { firstName = it },
-            label = { Text("First name") },
+            label = { Text(stringResource(R.string.first_name_label)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -101,7 +102,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = lastName,
             onValueChange = { lastName = it },
-            label = { Text("Last name") },
+            label = { Text(stringResource(R.string.last_name_label)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -109,7 +110,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email_label)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
@@ -118,7 +119,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password_label)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -140,7 +141,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Repeat password") },
+            label = { Text(stringResource(R.string.repeat_password_label)) },
             visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -201,11 +202,11 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
                         incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
 
                         SessionManager.saveSession(context, email, handymanId, firstName)
-                        Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.account_created_success_message), Toast.LENGTH_LONG).show()
                         navController.navigate("handymanSkills")
                     }
                     .addOnFailureListener { error ->
-                        Toast.makeText(context, "Failed to sign up: ${error.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.failed_to_sign_up_format, error.message), Toast.LENGTH_LONG).show()
                     }
             },
             enabled = isValid,
@@ -217,14 +218,14 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
             ),
             shape = MaterialTheme.shapes.large
         ) {
-            Text("Sign Up", fontSize = 18.sp, color = Color.White)
+            Text(stringResource(R.string.sign_up_btn), fontSize = 18.sp, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text("Already have an account?", fontSize = 14.sp)
+        Text(stringResource(R.string.already_have_account_message), fontSize = 14.sp)
         Text(
-            "Log in",
+            stringResource(R.string.log_in_link),
             color = Color(0xFF2D2E5E),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.clickable { navController.navigate("handymanLogin") }

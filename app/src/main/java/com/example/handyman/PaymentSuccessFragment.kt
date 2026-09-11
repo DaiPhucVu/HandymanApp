@@ -42,14 +42,14 @@ class PaymentSuccessFragment : Fragment() {
             val comment = etComment.text.toString().trim()
             
             if (rating == 0f) {
-                Toast.makeText(context, "Please select a rating", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.please_select_rating_message), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            
+
             if (handymanId != null) {
                 submitReview(handymanId!!, rating, comment)
             } else {
-                Toast.makeText(context, "Error: Handyman ID not found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.error_handyman_id_not_found_message), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -70,7 +70,7 @@ class PaymentSuccessFragment : Fragment() {
 
     private fun downloadInvoice() {
         if (jobId == null) {
-            Toast.makeText(context, "Job ID not found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.job_id_not_found_message), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -82,34 +82,27 @@ class PaymentSuccessFragment : Fragment() {
                 val location = snapshot.child("location").getValue(String::class.java) ?: "N/A"
                 val paymentMethod = snapshot.child("jobPaymentOption").getValue(String::class.java) ?: "N/A"
 
-                val invoiceContent = """
-                    --- INVOICE ---
-                    Job: $jobTitle
-                    Date: $date
-                    Location: $location
-                    Amount Paid: BDT $amount
-                    Payment Method: $paymentMethod
-                    Status: Paid
-                    ---------------
-                    Thank you for using Profix!
-                """.trimIndent()
+                val invoiceContent = getString(
+                    R.string.invoice_content_format,
+                    jobTitle, date, location, amount, paymentMethod
+                )
 
                 // Displaying in a dialog for now, could be saved to a file or shared
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Your Invoice")
+                    .setTitle(getString(R.string.your_invoice_title))
                     .setMessage(invoiceContent)
-                    .setPositiveButton("Close", null)
-                    .setNeutralButton("Copy to Clipboard") { _, _ ->
+                    .setPositiveButton(getString(R.string.close_btn), null)
+                    .setNeutralButton(getString(R.string.copy_to_clipboard_btn)) { _, _ ->
                         val clipboard = requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                        val clip = android.content.ClipData.newPlainText("Invoice", invoiceContent)
+                        val clip = android.content.ClipData.newPlainText(getString(R.string.invoice_clip_label), invoiceContent)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "Invoice copied to clipboard", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.invoice_copied_message), Toast.LENGTH_SHORT).show()
                     }
                     .show()
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Failed to fetch invoice details", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.failed_to_fetch_invoice_message), Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -131,11 +124,11 @@ class PaymentSuccessFragment : Fragment() {
         database.child("Reviews").child(reviewId).setValue(review)
             .addOnSuccessListener {
                 updateHandymanRating(handymanId, rating)
-                Toast.makeText(context, "Thank you for your review!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.thank_you_for_review_message), Toast.LENGTH_SHORT).show()
                 navigateToHome()
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Failed to submit review", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.failed_to_submit_review_message), Toast.LENGTH_SHORT).show()
             }
     }
 

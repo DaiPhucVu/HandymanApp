@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,13 +82,13 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
         Column(
@@ -115,10 +116,10 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             Spacer(modifier = Modifier.height(32.dp))
 
             // Header
-            Text("Confirm your address", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.confirm_your_address_title), fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Tell us you live so we can bring our excellent service straight to your home.",
+                stringResource(R.string.confirm_address_subtitle),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -129,7 +130,7 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = houseNumber,
                 onValueChange = { houseNumber = it },
-                label = { Text("House number") },
+                label = { Text(stringResource(R.string.house_number_label)) },
                 modifier = textFieldModifier,
                 isError = houseNumber.isNotBlank() && !isValidHouseNumber
             )
@@ -139,7 +140,7 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = street,
                 onValueChange = { street = it },
-                label = { Text("Street") },
+                label = { Text(stringResource(R.string.street_label)) },
                 modifier = textFieldModifier,
                 isError = street.isNotBlank() && !isValidStreet
             )
@@ -150,14 +151,14 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 OutlinedTextField(
                     value = area,
                     onValueChange = { area = it },
-                    label = { Text("Area/Neighborhood") },
+                    label = { Text(stringResource(R.string.area_neighborhood_label)) },
                     modifier = Modifier.weight(1f),
                     isError = area.isNotBlank() && !isValidArea
                 )
                 OutlinedTextField(
                     value = postCode,
                     onValueChange = { postCode = it },
-                    label = { Text("Post code") },
+                    label = { Text(stringResource(R.string.post_code_label)) },
                     modifier = Modifier.weight(1f),
                     isError = postCode.isNotBlank() && !isValidPostCode
                 )
@@ -169,14 +170,14 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 OutlinedTextField(
                     value = division,
                     onValueChange = { division = it },
-                    label = { Text("Division") },
+                    label = { Text(stringResource(R.string.division_label)) },
                     modifier = Modifier.weight(1f),
                     isError = division.isNotBlank() && !isValidDivision
                 )
                 OutlinedTextField(
                     value = district,
                     onValueChange = { district = it },
-                    label = { Text("District") },
+                    label = { Text(stringResource(R.string.district_label)) },
                     modifier = Modifier.weight(1f),
                     isError = district.isNotBlank() && !isValidDistrict
                 )
@@ -188,14 +189,14 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 OutlinedTextField(
                     value = thana,
                     onValueChange = { thana = it },
-                    label = { Text("Thana") },
+                    label = { Text(stringResource(R.string.thana_label)) },
                     modifier = Modifier.weight(1f),
                     isError = thana.isNotBlank() && !isValidThana
                 )
                 OutlinedTextField(
                     value = city,
                     onValueChange = { city = it },
-                    label = { Text("City") },
+                    label = { Text(stringResource(R.string.city_label)) },
                     modifier = Modifier.weight(1f),
                     isError = city.isNotBlank() && !isValidCity
                 )
@@ -206,7 +207,7 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = country,
                 onValueChange = { country = it },
-                label = { Text("Country") },
+                label = { Text(stringResource(R.string.country_label)) },
                 modifier = textFieldModifier,
                 isError = country.isNotBlank() && !isValidCountry
             )
@@ -216,7 +217,7 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
             OutlinedTextField(
                 value = note,
                 onValueChange = { note = it },
-                label = { Text("Additional note (optional)") },
+                label = { Text(stringResource(R.string.additional_note_optional_label)) },
                 modifier = textFieldModifier
             )
 
@@ -269,7 +270,7 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 containerColor = if (isFormComplete) Color(0xFF2F3367) else Color(0xFFCCCCCC)
             )
         ) {
-            Text("Submit address", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.submit_address_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }

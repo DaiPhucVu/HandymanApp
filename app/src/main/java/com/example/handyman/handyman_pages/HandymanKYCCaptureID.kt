@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,8 +72,8 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Select ID Photo") },
-            text = { Text("Choose a photo of your ID from your gallery or take a new one.") },
+            title = { Text(stringResource(R.string.select_id_photo_title)) },
+            text = { Text(stringResource(R.string.choose_id_photo_source_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     val uri = createImageUri(context)
@@ -80,7 +81,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     cameraLauncher.launch(uri)
                     showDialog = false
                 }) {
-                    Text("Camera")
+                    Text(stringResource(R.string.camera_btn))
                 }
             },
             dismissButton = {
@@ -88,7 +89,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     galleryLauncher.launch("image/*")
                     showDialog = false
                 }) {
-                    Text("Gallery")
+                    Text(stringResource(R.string.cd_gallery))
                 }
             }
         )
@@ -104,13 +105,13 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.navigate("handymanKycLanding") }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("ID Card Photo", fontSize = 20.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.id_card_photo_title), fontSize = 20.sp, fontWeight = FontWeight.Medium)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -133,10 +134,10 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
         Spacer(modifier = Modifier.height(32.dp))
 
         // Header
-        Text("Photo ID Card", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.photo_id_card_title), fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Please place your national ID card inside the frame.",
+            stringResource(R.string.place_id_card_hint),
             fontSize = 14.sp,
             color = Color.Gray
         )
@@ -154,7 +155,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
             if (selectedImageUri != null) {
                 Image(
                     painter = rememberAsyncImagePainter(selectedImageUri),
-                    contentDescription = "Selected ID",
+                    contentDescription = stringResource(R.string.cd_selected_id),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
@@ -163,7 +164,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.id_card_icon_handyman),
-                    contentDescription = "Default ID",
+                    contentDescription = stringResource(R.string.cd_default_id),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
@@ -182,7 +183,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.image_icon),
-                    contentDescription = "Gallery",
+                    contentDescription = stringResource(R.string.cd_gallery),
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(48.dp)
@@ -193,7 +194,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
 
                 Icon(
                     painter = painterResource(id = R.drawable.camera_shutter_button),
-                    contentDescription = "Capture",
+                    contentDescription = stringResource(R.string.cd_capture),
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(72.dp)
@@ -204,7 +205,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
 
                 Icon(
                     painter = painterResource(id = R.drawable.bin_icon),
-                    contentDescription = "Upload Placeholder",
+                    contentDescription = stringResource(R.string.cd_upload_placeholder),
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(42.dp)
@@ -274,7 +275,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Submit ID Card", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(stringResource(R.string.submit_id_card_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
 
@@ -289,7 +290,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Try again", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+                    Text(stringResource(R.string.try_again_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
                 }
             }
         }

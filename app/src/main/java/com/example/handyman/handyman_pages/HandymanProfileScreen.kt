@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,11 +97,11 @@ fun HandymanProfileScreen(navController: NavController) {
         val firstName = handymanData?.get("firstName") as? String ?: ""
         val lastName = handymanData?.get("lastName") as? String ?: ""
         val email = handymanData?.get("email") as? String ?: ""
-        val trade = handymanData?.get("primaryTrade") as? String ?: "No Trade Set"
-        val bio = handymanData?.get("bio") as? String ?: "No bio available."
+        val trade = handymanData?.get("primaryTrade") as? String ?: stringResource(R.string.no_trade_set_label)
+        val bio = handymanData?.get("bio") as? String ?: stringResource(R.string.no_bio_available_label)
         val experience = handymanData?.get("experienceYears") as? String ?: "0"
         val hourlyRate = handymanData?.get("hourlyRate") as? String ?: "0"
-        val city = handymanData?.get("city") as? String ?: "Location not set"
+        val city = handymanData?.get("city") as? String ?: stringResource(R.string.location_not_set_label)
         val photoUrl = handymanData?.get("profileImageUrl") as? String ?: ""
         
         val averageRating = (handymanData?.get("averageRating") as? Number)?.toDouble() ?: 0.0
@@ -129,7 +130,7 @@ fun HandymanProfileScreen(navController: NavController) {
                         .statusBarsPadding()
                         .padding(8.dp)
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.cd_back), tint = Color.White)
                 }
 
                 Column(
@@ -142,7 +143,7 @@ fun HandymanProfileScreen(navController: NavController) {
                         if (photoUrl.isNotEmpty()) {
                             Image(
                                 painter = rememberAsyncImagePainter(photoUrl),
-                                contentDescription = "Profile Picture",
+                                contentDescription = stringResource(R.string.cd_profile_picture),
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(CircleShape)
@@ -152,7 +153,7 @@ fun HandymanProfileScreen(navController: NavController) {
                         } else {
                             Image(
                                 painter = painterResource(id = R.drawable.sample_handyman),
-                                contentDescription = "Default Profile Picture",
+                                contentDescription = stringResource(R.string.cd_default_profile_picture),
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(CircleShape)
@@ -190,10 +191,10 @@ fun HandymanProfileScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    ProfileStat(label = "Experience", value = "$experience Yrs")
-                    ProfileStat(label = "Rate", value = "৳$hourlyRate/hr")
+                    ProfileStat(label = stringResource(R.string.experience_label), value = stringResource(R.string.years_short_format, experience))
+                    ProfileStat(label = stringResource(R.string.rate_label), value = stringResource(R.string.rate_per_hour_format, hourlyRate))
                     ProfileStat(
-                        label = if (reviewCount > 0) "Rating ($reviewCount)" else "No Rating",
+                        label = if (reviewCount > 0) stringResource(R.string.rating_count_format, reviewCount) else stringResource(R.string.no_rating_label),
                         value = if (reviewCount > 0) String.format("%.1f", averageRating) else "—"
                     )
                 }
@@ -202,7 +203,7 @@ fun HandymanProfileScreen(navController: NavController) {
 
                 // Bio Section
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Text("About Me", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.about_me_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(bio, fontSize = 14.sp, color = Color.DarkGray, lineHeight = 20.sp)
                 }
@@ -212,7 +213,7 @@ fun HandymanProfileScreen(navController: NavController) {
                 // Reviews Section
                 if (reviews.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        Text("Customer Reviews", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.customer_reviews_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(16.dp))
                         reviews.forEach { review ->
                             HandymanReviewItem(review)
@@ -236,18 +237,18 @@ fun HandymanProfileScreen(navController: NavController) {
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Edit Profile")
+                        Text(stringResource(R.string.edit_profile_btn))
                     }
                 } else if (intentHandymanId == null) {
                     Button(
-                        onClick = { 
+                        onClick = {
                             navController.navigate("handymanKYCLanding")
                         },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8A317)),
                         shape = RoundedCornerShape(25.dp)
                     ) {
-                        Text("Complete Verification")
+                        Text(stringResource(R.string.complete_verification_btn))
                     }
                 }
                 
@@ -259,7 +260,8 @@ fun HandymanProfileScreen(navController: NavController) {
 
 @Composable
 fun HandymanReviewItem(review: Review) {
-    var customerName by remember { mutableStateOf("Customer") }
+    val defaultCustomerName = stringResource(R.string.customer_fallback_name)
+    var customerName by remember { mutableStateOf(defaultCustomerName) }
     
     LaunchedEffect(review.customerId) {
         FirebaseDatabase.getInstance().getReference("User")

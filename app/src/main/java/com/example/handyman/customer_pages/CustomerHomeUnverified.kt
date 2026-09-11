@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,7 +108,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 if (profileImageUrl != null && profileImageUrl!!.isNotEmpty()) {
                     Image(
                         painter = rememberAsyncImagePainter(profileImageUrl),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.cd_profile_picture),
                         modifier = Modifier
                             .size(60.dp)
                             .clip(RoundedCornerShape(30.dp))
@@ -118,7 +119,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.character_customer),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.cd_profile_picture),
                         modifier = Modifier
                             .size(60.dp)
                             .clickable { navController.navigate("customerProfile") }
@@ -128,13 +129,13 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "Hello, $firstName $lastName.",
+                            stringResource(R.string.hello_name_format, firstName, lastName),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Unverified",
+                            text = stringResource(R.string.unverified_badge),
                             color = Color(0xFFE8A317),
                             fontSize = 12.sp,
                             modifier = Modifier
@@ -145,12 +146,12 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.bytesize_location),
-                            contentDescription = "Location",
+                            contentDescription = stringResource(R.string.cd_location),
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Unverified address", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = stringResource(R.string.unverified_address_label), fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
@@ -158,10 +159,10 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             Spacer(modifier = Modifier.height(24.dp))
 
             // Welcome Message
-            Text("Welcome, $firstName!", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.welcome_name_format, firstName), fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Verify your account and unlock access to our trusted Handymen services.",
+                stringResource(R.string.verify_unlock_hint),
                 fontSize = 16.sp,
                 color = Color.Gray,
             )
@@ -171,7 +172,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             // Illustration
             Image(
                 painter = painterResource(id = R.drawable.group_405), // Handyman illustration
-                contentDescription = "Illustration",
+                contentDescription = stringResource(R.string.cd_illustration),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
@@ -191,7 +192,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 shape = RoundedCornerShape(50)
             ) {
                 Text(
-                    "Start verification",
+                    stringResource(R.string.start_verification_btn),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray
@@ -210,19 +211,19 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = "Home",
+                    contentDescription = stringResource(R.string.cd_home),
                     tint = Color(0xFF8A4DFF),
                     modifier = Modifier.size(30.dp)
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = "List",
+                    contentDescription = stringResource(R.string.cd_list),
                     tint = Color.Gray,
                     modifier = Modifier.size(30.dp)
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = "Chat",
+                    contentDescription = stringResource(R.string.cd_chat),
                     tint = Color.Gray,
                     modifier = Modifier.size(30.dp)
                 )

@@ -14,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.FirebaseDatabase
 
@@ -51,14 +53,14 @@ fun CustomerEditProfile(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Profile", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.edit_profile_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = { 
+                    IconButton(onClick = {
                         if (!navController.popBackStack()) {
                             (context as? android.app.Activity)?.finish()
                         }
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
@@ -82,7 +84,7 @@ fun CustomerEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text("First Name") },
+                    label = { Text(stringResource(R.string.first_name_field_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -90,7 +92,7 @@ fun CustomerEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text("Last Name") },
+                    label = { Text(stringResource(R.string.last_name_field_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -98,7 +100,7 @@ fun CustomerEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = city,
                     onValueChange = { city = it },
-                    label = { Text("City") },
+                    label = { Text(stringResource(R.string.city_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -106,7 +108,7 @@ fun CustomerEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = phone,
                     onValueChange = { phone = it },
-                    label = { Text("Phone Number") },
+                    label = { Text(stringResource(R.string.phone_number_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -114,7 +116,7 @@ fun CustomerEditProfile(navController: NavController) {
                 OutlinedTextField(
                     value = bio,
                     onValueChange = { bio = it },
-                    label = { Text("Bio") },
+                    label = { Text(stringResource(R.string.bio_label)) },
                     modifier = Modifier.fillMaxWidth().height(120.dp),
                     maxLines = 5
                 )
@@ -131,17 +133,17 @@ fun CustomerEditProfile(navController: NavController) {
                             "bio" to bio
                         )
                         database.updateChildren(updates).addOnSuccessListener {
-                            Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.profile_updated_message), Toast.LENGTH_SHORT).show()
                             navController.popBackStack()
                         }.addOnFailureListener {
-                            Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.update_failed_message), Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB703)),
                     shape = RoundedCornerShape(25.dp)
                 ) {
-                    Text("Save Changes", color = Color.DarkGray, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.save_changes_btn), color = Color.DarkGray, fontWeight = FontWeight.Bold)
                 }
             }
         }

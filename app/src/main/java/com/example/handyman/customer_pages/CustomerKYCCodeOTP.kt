@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,13 +56,13 @@ fun CustomerKYCCodeOTP(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, fontWeight = FontWeight.Medium)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -80,10 +81,10 @@ fun CustomerKYCCodeOTP(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Text("Verify your phone number", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.verify_phone_title), fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Enter the 6-digit code sent to your mobile number.",
+            stringResource(R.string.enter_otp_hint),
             fontSize = 14.sp,
             color = Color.Gray
         )
@@ -92,16 +93,16 @@ fun CustomerKYCCodeOTP(
 
         OutlinedTextField(
             value = otpCode,
-            onValueChange = { 
+            onValueChange = {
                 otpCode = it
                 errorMessage = null
             },
-            label = { Text("OTP Code") },
+            label = { Text(stringResource(R.string.otp_code_label)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
             isError = (otpCode.isNotBlank() && !isValidOTP) || errorMessage != null,
-            placeholder = { Text("6-digit code") }
+            placeholder = { Text(stringResource(R.string.six_digit_code_placeholder)) }
         )
 
         if (errorMessage != null) {
@@ -149,17 +150,17 @@ fun CustomerKYCCodeOTP(
                                         navController.navigate("customerProfilePictureUpload")
                                     } else {
                                         isLoading = false
-                                        errorMessage = "User record not found in database."
+                                        errorMessage = context.getString(R.string.user_record_not_found_message)
                                         Log.e("KYC", "No database record for email: $currentEmail")
                                     }
                                 }.addOnFailureListener { e ->
                                     isLoading = false
-                                    errorMessage = "Database update failed"
+                                    errorMessage = context.getString(R.string.database_update_failed_message)
                                     Log.e("KYC", "Failed to update KYC status: ${e.message}")
                                 }
                             } else {
                                 isLoading = false
-                                errorMessage = exception?.message ?: "Verification failed. Please try again."
+                                errorMessage = exception?.message ?: context.getString(R.string.verification_failed_retry_message)
                                 Log.e("KYC", "OTP Verification failed: $errorMessage")
                             }
                         }
@@ -181,15 +182,15 @@ fun CustomerKYCCodeOTP(
                                         navController.navigate("customerProfilePictureUpload")
                                     } else {
                                         isLoading = false
-                                        errorMessage = "User record not found in database."
+                                        errorMessage = context.getString(R.string.user_record_not_found_message)
                                     }
                                 }.addOnFailureListener { e ->
                                     isLoading = false
-                                    errorMessage = "Database update failed"
+                                    errorMessage = context.getString(R.string.database_update_failed_message)
                                 }
                             } else {
                                 isLoading = false
-                                errorMessage = task.exception?.message ?: "Verification failed."
+                                errorMessage = task.exception?.message ?: context.getString(R.string.verification_failed_message)
                             }
                         }
                 }
@@ -206,7 +207,7 @@ fun CustomerKYCCodeOTP(
             if (isLoading) {
                 CircularProgressIndicator(color = Color.DarkGray, modifier = Modifier.size(24.dp))
             } else {
-                Text("Verify", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+                Text(stringResource(R.string.verify_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
             }
         }
     }
