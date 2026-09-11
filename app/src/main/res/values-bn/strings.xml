@@ -1,35 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--
-        Bangla (bn) translations — PLACEHOLDER, INTENTIONALLY EMPTY.
+        <string name="app_name">Handyman</string>
+        <string name="ac_repair_services">এসি মেরামত সেবা</string>
+        <string name="appliance_repair">যন্ত্রপাতি মেরামত</string>
+        <string name="cleaning_solution">পরিষ্কার সেবা</string>
+        <string name="beauty_and_wellness">সৌন্দর্য ও সুস্থতা</string>
+        <string name="shifting">শিফটিং</string>
+        <string name="men_care_and_salon">পুরুষদের যত্ন ও সেলুন</string>
+        <string name="health_and_care">স্বাস্থ্য ও যত্ন</string>
+        <string name="electronics_and_gadgets_repair">ইলেকট্রনিক্স ও গ্যাজেট মেরামত</string>
+        <string name="electric_and_plumbing">ইলেকট্রিক ও প্লাম্বিং</string>
+        <string name="pest_control">পোকামাকড় নিয়ন্ত্রণ</string>
+        <string name="driver_service">ড্রাইভার সেবা</string>
+        <string name="car_care_services">গাড়ির যত্ন সেবা</string>
+        <string name="trips_and_travels">ভ্রমণ ও ট্যুর</string>
+        <string name="car_rental">গাড়ি ভাড়া</string>
+        <string name="painting_and_renovation">রং ও সংস্কার</string>
+        <string name="emergency_services">জরুরি সেবা</string>
+        <string name="add_photo_hint">ছবি আমাদের হ্যান্ডিম্যানদের আপনাকে আরও ভালোভাবে সাহায্য করতে প্রস্তুত হতে সহায়তা করে!</string>
+        <string name="confirm_request">অনুরোধ নিশ্চিত করুন</string>
+        <string-array name="location_array">
+            <item>একটি অবস্থান নির্বাচন করুন</item>
+            <item>CBD</item>
+            <item>Camberwell</item>
+            <item>Richmond</item>
+            <item>Hawthorn</item>
+            <item>Docklands</item>
+        </string-array>
+        <string-array name="job_statuses_customer">
+            <item>সব</item>
+            <item>নির্ধারিত হয়নি</item>
+            <item>নির্ধারিত</item>
+            <item>চলমান</item>
+            <item>সম্পন্ন</item>
+            <item>বাতিল</item>
+        </string-array>
+        <string-array name="job_statuses_handyman">
+            <item>সব</item>
+            <item>মুলতুবি</item>
+            <item>গৃহীত</item>
+            <item>চলমান</item>
+            <item>সম্পন্ন</item>
+            <item>বাতিল</item>
+        </string-array>
 
-        Add translated <string> entries here using the same name= keys as
-        res/values/strings.xml. Any key not listed here automatically falls back
-        to the English value, so a partial file is safe to ship.
+        <!-- Content descriptions -->
+        <string name="cd_back">পেছনে</string>
+        <string name="cd_edit">সম্পাদনা</string>
+        <string name="cd_delete">মুছুন</string>
+        <string name="cd_logout">লগআউট</string>
+        <string name="cd_support">সহায়তা</string>
+        <string name="cd_edit_location">অবস্থান সম্পাদনা</string>
+        <string name="cd_enlarged_job_photo">বড় করা কাজের ছবি</string>
+        <string name="cd_close">বন্ধ করুন</string>
 
-        ============================ IMPORTANT ============================
-        Do NOT translate these two arrays:
+        <!-- Shared labels / buttons -->
+        <string name="job_details_title">কাজের বিবরণ</string>
+        <string name="view_profile">প্রোফাইল দেখুন</string>
+        <string name="view_details">বিস্তারিত দেখুন</string>
+        <string name="update_status">অবস্থা আপডেট করুন</string>
+        <string name="message_label">বার্তা</string>
+        <string name="btn_return">ফিরে যান</string>
+        <string name="cancel">বাতিল করুন</string>
+        <string name="location_loading">অবস্থান...</string>
+        <string name="verified_badge">যাচাইকৃত</string>
+        <string name="accept">গ্রহণ করুন</string>
+        <string name="decline">প্রত্যাখ্যান করুন</string>
+        <string name="review_customer">গ্রাহক পর্যালোচনা করুন</string>
+        <string name="proceed_with_payment">পেমেন্টের সাথে এগিয়ে যান</string>
+        <string name="leave_review">পর্যালোচনা দিন</string>
+        <string name="proceed_to_payment">পেমেন্টে এগিয়ে যান</string>
 
-            job_statuses_customer
-            job_statuses_handyman
+        <!-- Customer review dialog -->
+        <string name="how_was_your_experience">আপনার অভিজ্ঞতা কেমন ছিল?</string>
+        <string name="write_comment_hint">একটি মন্তব্য লিখুন (ঐচ্ছিক)</string>
 
-        They are not display-only labels. The selected spinner text is compared
-        against English string literals in code, for example:
+        <!-- Payment input dialog -->
+        <string name="enter_payment_amount">পেমেন্টের পরিমাণ লিখুন</string>
+        <string name="amount_in_bdt_hint">BDT-তে পরিমাণ</string>
 
-            HandymanJobListFragment.kt
-                "In-progress" -> Triple("assignedJobs", "acceptedJobs", "inProgressJobs")
-            CustomerJobListFragment.kt
-                "In-progress" -> "inProgressJobs"
+        <!-- Customer support form -->
+        <string name="customer_support_title">গ্রাহক সহায়তা</string>
+        <string name="full_name_label">পুরো নাম</string>
+        <string name="enter_your_name_hint">আপনার নাম লিখুন</string>
+        <string name="email_address_label">ইমেইল ঠিকানা</string>
+        <string name="enter_your_email_hint">আপনার ইমেইল লিখুন</string>
+        <string name="category_label">বিভাগ</string>
+        <string name="subject_label">বিষয়</string>
+        <string name="enter_subject_hint">বিষয় লিখুন</string>
+        <string name="type_message_hint">এখানে আপনার বার্তা লিখুন...</string>
+        <string name="submit_request">অনুরোধ জমা দিন</string>
 
-        Translating them makes every one of those comparisons fail and silently
-        breaks job filtering for both customers and handymen. Supporting Bangla
-        here requires separating the stored value from the displayed label,
-        which is a code change rather than a translation.
+        <!-- Job list headers -->
+        <string name="my_job_requests">আমার কাজের অনুরোধ</string>
+        <string name="my_assigned_jobs">আমার নির্ধারিত কাজ</string>
+        <string name="your_jobs">আপনার কাজ</string>
+        <string name="ready_for_new_tasks">নতুন কাজের জন্য প্রস্তুত?</string>
+        <string name="handyman_label_prefix">"হ্যান্ডিম্যান: "</string>
 
-        Also not usually translated:
-          - app_name (brand name)
-          - location_array (CBD, Camberwell, Richmond, Hawthorn, Docklands are
-            proper place names)
-        ==================================================================
-    -->
+        <!-- Payment screen -->
+        <string name="payment_title">পেমেন্ট</string>
+        <string name="job_title_label">কাজের শিরোনাম</string>
+        <string name="job_description_label">কাজের বিবরণ</string>
+        <string name="total_amount_label">মোট পরিমাণ</string>
+        <string name="select_payment_method">পেমেন্ট পদ্ধতি নির্বাচন করুন</string>
+        <string name="pay_with_bkash">bKash দিয়ে পেমেন্ট করুন</string>
+        <string name="pay_with_cash">নগদে পেমেন্ট করুন</string>
+
+        <!-- Job posting / editing form -->
+        <string name="describe_your_problem">আপনার সমস্যা বর্ণনা করুন</string>
+        <string name="describe_problem_hint">যেমন. আমার বাথরুমে পানি লিক হচ্ছে</string>
+        <string name="start_date_label">শুরুর তারিখ</string>
+        <string name="date_hint">dd/mm/yyyy</string>
+        <string name="end_date_label">শেষের তারিখ</string>
+        <string name="start_time_label">শুরুর সময়</string>
+        <string name="start_time_hint">10:00</string>
+        <string name="end_time_label">শেষের সময়</string>
+        <string name="end_time_hint">17:00</string>
+        <string name="location_label">অবস্থান</string>
+        <string name="or_pick_on_map">অথবা মানচিত্রে নির্বাচন করুন:</string>
+        <string name="salary_label">বেতন</string>
+        <string name="happy_to_negotiate">আমি আলোচনা করতে রাজি</string>
+        <string name="bdt_currency">BDT</string>
+        <string name="salary_min_hint">সর্বনিম্ন</string>
+        <string name="salary_max_hint">সর্বোচ্চ</string>
+        <string name="range_dash">—</string>
+        <string name="per_day">প্রতি দিন</string>
+        <string name="job_completed">কাজ সম্পন্ন</string>
+        <string name="attach_photos">ছবি সংযুক্ত করুন</string>
+        <string name="update_btn">আপডেট</string>
+
+        <!-- Job request done -->
+        <string name="job_booking_complete">কাজের বুকিং সম্পন্ন!</string>
+        <string name="return_home">হোমে ফিরে যান</string>
+
+        <!-- Order summary -->
+        <string name="submit_job_request">অনুরোধ জমা দিন</string>
+        <string name="posting_your_job">আপনার কাজ পোস্ট করা হচ্ছে...</string>
+
+        <!-- Service category / dashboard -->
+        <string name="all_jobs">সব কাজ</string>
+        <string name="welcome_back">আবার স্বাগতম!</string>
+
+
+        <!-- Payment success -->
+        <string name="payment_successful">পেমেন্ট সফল হয়েছে!</string>
+        <string name="job_completed_message">আপনার কাজ সম্পন্ন হয়েছে।</string>
+        <string name="download_invoice">চালান ডাউনলোড করুন</string>
+        <string name="how_was_the_service">সেবা কেমন ছিল?</string>
+        <string name="share_experience_hint">আপনার অভিজ্ঞতা শেয়ার করুন (ঐচ্ছিক)</string>
+        <string name="submit_review">পর্যালোচনা জমা দিন</string>
 </resources>

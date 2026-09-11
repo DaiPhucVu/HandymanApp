@@ -81,6 +81,7 @@ fun LanguageSelectionRoute(navController: NavController) {
             },
             onLanguageSelected = { language ->
                 LocaleHelper.setLanguage(context, language)
+                LocaleHelper.findActivity(context)?.recreate()
 
                 leaveScreen {
                     navController.navigate("chooseAccountType") {
