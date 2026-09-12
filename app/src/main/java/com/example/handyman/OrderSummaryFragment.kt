@@ -16,6 +16,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.time.LocalDateTime
 import java.util.UUID
+import com.example.handyman.utils.localizedServiceCategoryName
 
 class OrderSummaryFragment : Fragment() {
     override fun onCreateView(
@@ -42,20 +43,20 @@ class OrderSummaryFragment : Fragment() {
         val salaryTo      = args.salaryTo
         val paymentOption = args.paymentOption
 
-        view.findViewById<TextView>(R.id.tvJobTitle).text = serviceName
+        view.findViewById<TextView>(R.id.tvJobTitle).text = localizedServiceCategoryName(requireContext(), serviceName)
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         if (salaryFrom.isNotBlank() && salaryTo.isNotBlank()) {
             salaryDisplay.text = if (paymentOption == "Per Day")
-                "BDT $salaryFrom-$salaryTo/day"
+                getString(R.string.bdt_range_per_day_format, salaryFrom, salaryTo)
             else
-                "BDT $salaryFrom-$salaryTo"
+                getString(R.string.bdt_range_format, salaryFrom, salaryTo)
         } else {
-            salaryDisplay.text = "To be negotiated"
+            salaryDisplay.text = getString(R.string.to_be_negotiated_message)
         }
         view.findViewById<TextView>(R.id.tvJobSubtitle).text = jobDescription
         view.findViewById<TextView>(R.id.tvDate).text = if (dateFrom == dateTo)
-            dateFrom else "$dateFrom — $dateTo"
-        view.findViewById<TextView>(R.id.tvTime).text = "$timeFrom — $timeTo"
+            dateFrom else getString(R.string.range_dash_format, dateFrom, dateTo)
+        view.findViewById<TextView>(R.id.tvTime).text = getString(R.string.range_dash_format, timeFrom, timeTo)
         view.findViewById<TextView>(R.id.tvAddress).text = location
 
         view.findViewById<Button>(R.id.btnSubmitRequest)
@@ -108,7 +109,7 @@ class OrderSummaryFragment : Fragment() {
                                     .addOnFailureListener { e ->
                                         Toast.makeText(
                                             context,
-                                            "Image #$idx failed: ${e.message}",
+                                            getString(R.string.image_upload_failed_format, idx, e.message),
                                             Toast.LENGTH_LONG
                                         ).show()
                                     }
@@ -127,7 +128,7 @@ class OrderSummaryFragment : Fragment() {
                                 loadingOverlay.visibility = View.GONE
                                 Toast.makeText(
                                     context,
-                                    "One or more image uploads failed",
+                                    getString(R.string.some_image_uploads_failed_message),
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
@@ -136,7 +137,7 @@ class OrderSummaryFragment : Fragment() {
                         loadingOverlay.visibility = View.GONE
                         Toast.makeText(
                             context,
-                            "Failed to post job: ${e.message}",
+                            getString(R.string.failed_to_post_job_format, e.message),
                             Toast.LENGTH_LONG
                         ).show()
                     }

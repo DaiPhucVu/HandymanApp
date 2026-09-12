@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.example.handyman.utils.localizedJobStatusLabel
 import java.util.UUID
 
 class HandymanJobListFragment : Fragment() {
@@ -71,7 +72,7 @@ class HandymanJobListFragment : Fragment() {
             },
             onDelete = { job ->
                 // No-op or remove if we don't want any job removal from list by handyman
-                Toast.makeText(requireContext(), "Removal of assigned jobs not permitted.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.removal_not_permitted_message), Toast.LENGTH_SHORT).show()
             },
             onAccept = { job ->
                 acceptAssignedJob(job)
@@ -89,16 +90,17 @@ class HandymanJobListFragment : Fragment() {
 
                 if (nextStatuses.isEmpty()) {
                     context?.let {
-                        Toast.makeText(it, "No further updates available", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(it, getString(R.string.no_further_updates_message), Toast.LENGTH_SHORT).show()
                     }
                     return@HandymanJobListAdapter
                 }
 
+                val displayStatuses = nextStatuses.map { localizedJobStatusLabel(requireContext(), it) }.toTypedArray()
                 var chosen = 0
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Update status")
-                    .setSingleChoiceItems(nextStatuses, 0) { _, which -> chosen = which }
-                    .setPositiveButton("OK") { _, _ ->
+                    .setTitle(R.string.update_status_dialog_title)
+                    .setSingleChoiceItems(displayStatuses, 0) { _, which -> chosen = which }
+                    .setPositiveButton(R.string.ok_btn) { _, _ ->
                         val newStatus = nextStatuses[chosen]
                         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(job.jobId)
 
@@ -130,7 +132,7 @@ class HandymanJobListFragment : Fragment() {
                                                 }
                                         } else {
                                             context?.let {
-                                                Toast.makeText(it, "Waiting for customer to also update to $newStatus", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(it, getString(R.string.waiting_for_customer_update_format, localizedJobStatusLabel(it, newStatus)), Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                     }
@@ -138,7 +140,7 @@ class HandymanJobListFragment : Fragment() {
                                 })
                             }
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.cancel, null)
                     .show()
             },
             onLeaveReview = { job ->
@@ -147,7 +149,7 @@ class HandymanJobListFragment : Fragment() {
             onPaymentProceed = { job ->
                 if (normalizeJobStatus(job.jobStatus) != "Done") {
                     context?.let {
-                        Toast.makeText(it, "Job is not marked as Done yet.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(it, getString(R.string.job_not_marked_done_message), Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     showPaymentDialog(job)
@@ -159,14 +161,18 @@ class HandymanJobListFragment : Fragment() {
         val spinner = view.findViewById<Spinner>(R.id.spinnerStatus)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, v: View?, pos: Int, id: Long) {
-                val display = parent.getItemAtPosition(pos) as String
-                currentCategoryKey = when (display) {
-                    "Pending" -> "pendingJobs"
-                    "Accepted"  -> "acceptedJobs"
-                    "In-progress" -> "inProgressJobs"
-                    "Done"        -> "completedJobs"
-                    "Cancelled" -> "cancelledJobs"
-                    else          -> "allJobs"
+                // Position-based, not string-based: the spinner's displayed text is
+                // localized via @array/job_statuses_handyman, so comparing it against
+                // English literals here would silently break in Bangla. Order must
+                // match that array exactly: All, Pending, Accepted, In-progress,
+                // Done, Cancelled.
+                currentCategoryKey = when (pos) {
+                    1 -> "pendingJobs"
+                    2 -> "acceptedJobs"
+                    3 -> "inProgressJobs"
+                    4 -> "completedJobs"
+                    5 -> "cancelledJobs"
+                    else -> "allJobs"
                 }
                 fetchJobsForCategory(currentCategoryKey)
             }
@@ -183,18 +189,18 @@ class HandymanJobListFragment : Fragment() {
         val etComment = dialogView.findViewById<EditText>(R.id.etComment)
         val tvTitle = dialogView.findViewById<android.widget.TextView>(R.id.tvReviewTitle)
 
-        tvTitle.text = "How was your experience with this customer?"
+        tvTitle.text = getString(R.string.how_was_experience_customer_message)
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Review Customer")
+            .setTitle(R.string.review_customer)
             .setView(dialogView)
-            .setPositiveButton("Submit") { _, _ ->
+            .setPositiveButton(R.string.submit_btn) { _, _ ->
                 val rating = ratingBar.rating
                 val comment = etComment.text.toString()
 
                 if (rating == 0f) {
                     context?.let {
-                        Toast.makeText(it, "Please provide a rating", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(it, getString(R.string.please_provide_rating_message), Toast.LENGTH_SHORT).show()
                     }
                     return@setPositiveButton
                 }
@@ -222,18 +228,18 @@ class HandymanJobListFragment : Fragment() {
                             .setValue(true)
                             .addOnSuccessListener {
                                 context?.let {
-                                    Toast.makeText(it, "Review submitted!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(it, getString(R.string.review_submitted_message), Toast.LENGTH_SHORT).show()
                                 }
                                 fetchJobsForCategory(currentCategoryKey)
                             }
                     }
                     .addOnFailureListener { e ->
                         context?.let {
-                            Toast.makeText(it, "Failed to submit review: ${e.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(it, getString(R.string.failed_to_submit_review_format, e.message), Toast.LENGTH_SHORT).show()
                         }
                     }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -271,25 +277,25 @@ class HandymanJobListFragment : Fragment() {
 
     private fun showPaymentDialog(job: Job) {
         val input = EditText(requireContext())
-        input.hint = "Enter amount in BDT"
-        
+        input.hint = getString(R.string.enter_amount_bdt_hint)
+
         AlertDialog.Builder(requireContext())
-            .setTitle("Enter Final Payment")
+            .setTitle(R.string.enter_final_payment_title)
             .setView(input)
-            .setPositiveButton("Submit") { _, _ ->
+            .setPositiveButton(R.string.submit_btn) { _, _ ->
                 val amount = input.text.toString()
                 if (amount.isNotEmpty()) {
                     FirebaseDatabase.getInstance().getReference("Job")
                         .child(job.jobId).child("handypay").setValue(amount)
                         .addOnSuccessListener {
                             context?.let {
-                                Toast.makeText(it, "Payment recorded: BDT $amount", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(it, getString(R.string.payment_recorded_format, amount), Toast.LENGTH_SHORT).show()
                             }
                             fetchJobsForCategory(currentCategoryKey)
                         }
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -325,20 +331,20 @@ class HandymanJobListFragment : Fragment() {
                 addJobIdIfMissing(handymanRef, "acceptedJobs", job.jobId)
                 addJobIdIfMissing(handymanRef, "allJobs", job.jobId)
 
-                Toast.makeText(requireContext(), "Job accepted.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.job_accepted_message), Toast.LENGTH_SHORT).show()
                 fetchJobsForCategory(currentCategoryKey)
             }
             .addOnFailureListener { error ->
-                Toast.makeText(requireContext(), "Failed to accept job: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.failed_to_accept_job_format, error.message), Toast.LENGTH_LONG).show()
             }
     }
 
     private fun confirmDeclineAssignedJob(job: Job) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Decline job?")
-            .setMessage("This will unassign the job and return it to the open job list.")
-            .setPositiveButton("Decline") { _, _ -> declineAssignedJob(job) }
-            .setNegativeButton("Cancel", null)
+            .setTitle(R.string.decline_job_title)
+            .setMessage(R.string.decline_job_message)
+            .setPositiveButton(R.string.decline_btn) { _, _ -> declineAssignedJob(job) }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -366,11 +372,11 @@ class HandymanJobListFragment : Fragment() {
                 }
                 addJobIdIfMissing(handymanRef, "cancelledJobs", job.jobId)
 
-                Toast.makeText(requireContext(), "Job declined.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.job_declined_message), Toast.LENGTH_SHORT).show()
                 fetchJobsForCategory(currentCategoryKey)
             }
             .addOnFailureListener { error ->
-                Toast.makeText(requireContext(), "Failed to decline job: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.failed_to_decline_job_format, error.message), Toast.LENGTH_LONG).show()
             }
     }
 

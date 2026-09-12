@@ -23,12 +23,23 @@ class SupportForm : AppCompatActivity() {
     private lateinit var spinnerCategory: Spinner
     private lateinit var btnSubmit: Button
 
+    // Canonical English values — stored in Firebase and used as the source of
+    // truth. Never shown directly; see categoryDisplayLabels() for what's
+    // actually rendered in the spinner.
     private val categories = listOf(
         "Technical Issue",
         "Billing & Payments",
         "Account Management",
         "Feature Request",
         "General Inquiry"
+    )
+
+    private fun categoryDisplayLabels(): List<String> = listOf(
+        getString(R.string.support_category_technical_issue),
+        getString(R.string.support_category_billing_payments),
+        getString(R.string.support_category_account_management),
+        getString(R.string.support_category_feature_request),
+        getString(R.string.support_category_general_inquiry)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,8 +58,11 @@ class SupportForm : AppCompatActivity() {
             finish()
         }
 
-        // Set up Spinner
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        // Set up Spinner — display localized labels, but the value stored to
+        // Firebase must stay the canonical English category so existing/other
+        // data isn't split across languages. Read the selection by position,
+        // not by the displayed text.
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryDisplayLabels())
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategory.adapter = adapter
 
@@ -56,10 +70,10 @@ class SupportForm : AppCompatActivity() {
             val name = editName.text.toString().trim()
             val email = editEmail.text.toString().trim()
             val subject = editSubject.text.toString().trim()
-            val category = spinnerCategory.selectedItem?.toString() ?: ""
+            val category = categories.getOrElse(spinnerCategory.selectedItemPosition) { "" }
             val message = editMessage.text.toString().trim()
 
-            val error = FormValidator.validate(name, email, subject, message, category)
+            val error = FormValidator.validate(this, name, email, subject, message, category)
             if (error != null) {
                 Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -88,10 +102,10 @@ class SupportForm : AppCompatActivity() {
             supportRequestsRef.child(id).setValue(supportRequest)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Support request submitted!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.support_request_submitted_message), Toast.LENGTH_LONG).show()
                         clearForm()
                     } else {
-                        Toast.makeText(this, "Failed to submit support request.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.failed_to_submit_support_request_message), Toast.LENGTH_LONG).show()
                     }
                 }
         }

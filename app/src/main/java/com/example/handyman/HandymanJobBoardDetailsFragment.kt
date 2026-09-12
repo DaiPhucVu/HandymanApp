@@ -41,6 +41,7 @@ import org.osmdroid.views.overlay.Marker
 import android.location.Geocoder
 import java.util.Locale
 import java.util.UUID
+import com.example.handyman.utils.localizedServiceCategoryName
 
 class HandymanJobBoardDetailsFragment : Fragment() {
     override fun onCreateView(
@@ -76,34 +77,34 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val argLng = args.longitude
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
-        jobTitle.text = if (serviceName.isNotBlank()) serviceName else "Untitled Job"
+        jobTitle.text = if (serviceName.isNotBlank()) localizedServiceCategoryName(requireContext(), serviceName) else getString(R.string.untitled_job_label)
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         if (salaryFrom != "" && salaryTo != "") {
             if (paymentOption == "Per Day") {
-                salaryDisplay.text = "BDT $salaryFrom-$salaryTo/day"
+                salaryDisplay.text = getString(R.string.bdt_range_per_day_format, salaryFrom, salaryTo)
             } else {
-                salaryDisplay.text = "BDT $salaryFrom-$salaryTo"
+                salaryDisplay.text = getString(R.string.bdt_range_format, salaryFrom, salaryTo)
             }
         } else {
-            salaryDisplay.text = "To be negotiated"
+            salaryDisplay.text = getString(R.string.to_be_negotiated_message)
         }
         val jobDescDisplay = view.findViewById<TextView>(R.id.tvJobSubtitle)
         jobDescDisplay.text = if (jobDescription.isNotBlank()) jobDescription else ""
         val dateDisplay = view.findViewById<TextView>(R.id.tvDate)
         if (dateFrom == dateTo) {
-            dateDisplay.text = "$dateFrom"
+            dateDisplay.text = dateFrom
         } else {
-            dateDisplay.text = "$dateFrom — $dateTo"
+            dateDisplay.text = getString(R.string.range_dash_format, dateFrom, dateTo)
         }
         val timeDisplay = view.findViewById<TextView>(R.id.tvTime)
-        timeDisplay.text = "$timeFrom — $timeTo"
+        timeDisplay.text = getString(R.string.range_dash_format, timeFrom, timeTo)
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
         
         val customerNameDisplay = view.findViewById<TextView>(R.id.tvTitle)
         val customerRatingDisplay = view.findViewById<TextView>(R.id.tvRating)
         val btnViewProfile = view.findViewById<Button>(R.id.btnViewProfile)
-        customerNameDisplay.text = "Loading..."
-        
+        customerNameDisplay.text = getString(R.string.loading_ellipsis_label)
+
         // Fetch customer name and rating from Firebase
         val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
         userRef.get().addOnSuccessListener { snapshot ->
@@ -112,13 +113,13 @@ class HandymanJobBoardDetailsFragment : Fragment() {
             val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
             val rating = snapshot.child("averageRating").getValue(Double::class.java) ?: 0.0
             val reviewCount = snapshot.child("reviewCount").getValue(Int::class.java) ?: 0
-            
+
             if (firstName != null) {
                 customerNameDisplay.text = "$firstName $lastName"
-                customerRatingDisplay.text = if (reviewCount > 0) String.format("%.1f", rating) else "No rating yet"
+                customerRatingDisplay.text = if (reviewCount > 0) String.format("%.1f", rating) else getString(R.string.no_rating_yet_label)
             } else {
-                customerNameDisplay.text = "Customer"
-                customerRatingDisplay.text = "No rating yet"
+                customerNameDisplay.text = getString(R.string.customer_fallback_name)
+                customerRatingDisplay.text = getString(R.string.no_rating_yet_label)
             }
         }
 
@@ -154,7 +155,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
 
             val citySuburb = snapshot.child("citySuburb").getValue(String::class.java)
             if (!citySuburb.isNullOrBlank()) {
-                locationDisplay.text = "$citySuburb (Approximate)"
+                locationDisplay.text = getString(R.string.approximate_location_format, citySuburb)
             } else if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
                 // Fallback Geocoding for older jobs or missing data
                 try {
@@ -162,16 +163,16 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                     val addresses = geocoder.getFromLocation(lat, lng, 1)
                     if (!addresses.isNullOrEmpty()) {
                         val address = addresses[0]
-                        val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea ?: "Approximate Location"
-                        locationDisplay.text = if (city != "Approximate Location") "$city (Approximate)" else city
+                        val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea
+                        locationDisplay.text = if (city != null) getString(R.string.approximate_location_format, city) else getString(R.string.approximate_location_label)
                     } else {
-                        locationDisplay.text = "Approximate Location"
+                        locationDisplay.text = getString(R.string.approximate_location_label)
                     }
                 } catch (e: Exception) {
-                    locationDisplay.text = "Approximate Location"
+                    locationDisplay.text = getString(R.string.approximate_location_label)
                 }
             } else {
-                locationDisplay.text = "Approximate Location"
+                locationDisplay.text = getString(R.string.approximate_location_label)
             }
 
             if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
@@ -212,7 +213,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                     val intent = Intent(context, ChatClientActivity::class.java).apply {
                         putExtra("chatID", compositeChatId)
                         putExtra("uid", otherMember?.get("uid") ?: customerId)
-                        putExtra("username", otherMember?.get("username") ?: "Customer")
+                        putExtra("username", otherMember?.get("username") ?: getString(R.string.customer_fallback_name))
                     }
                     context.startActivity(intent)
                 }
@@ -221,10 +222,10 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                     // First fetch customer name
                     val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
                     userRef.child("firstName").get().addOnSuccessListener { snapshot ->
-                        val cName = snapshot.getValue(String::class.java) ?: "Customer"
+                        val cName = snapshot.getValue(String::class.java) ?: getString(R.string.customer_fallback_name)
                         createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, cName)
                     }.addOnFailureListener {
-                        createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, "Customer")
+                        createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, getString(R.string.customer_fallback_name))
                     }
                 }
             }
@@ -259,7 +260,7 @@ class HandymanJobBoardDetailsFragment : Fragment() {
                 context.startActivity(intent)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to create chat: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.failed_to_create_chat_format, e.message), Toast.LENGTH_SHORT).show()
             }
     }
 

@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.handyman.payment.InitPaymentRequest
 import com.example.handyman.payment.PaymentApi
+import com.example.handyman.utils.localizedServiceCategoryName
 import com.google.firebase.database.*
 import kotlinx.coroutines.launch
 
@@ -59,31 +60,31 @@ class CustomerJobPaymentFragment : Fragment() {
 
         database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val jobTitle = snapshot.child("jobCat").getValue(String::class.java) ?: "Unknown Job"
+                val jobTitle = snapshot.child("jobCat").getValue(String::class.java) ?: getString(R.string.unknown_job_label)
                 val jobDesc = snapshot.child("jobDesc").getValue(String::class.java) ?: ""
                 requestedAmount = snapshot.child("handypay").getValue(String::class.java) ?: ""
 
-                jobTitleView.text = jobTitle
+                jobTitleView.text = localizedServiceCategoryName(requireContext(), jobTitle)
                 jobDescView.text = jobDesc
 
                 if (requestedAmount.isBlank()) {
-                    requestedAmountView.text = "Handyman has not set a requested amount yet."
+                    requestedAmountView.text = getString(R.string.handyman_no_amount_set_message)
                     btnPayCash.isEnabled = false
                     btnPayBkash.isEnabled = false
                     Toast.makeText(
                         context,
-                        "You cannot proceed until the handyman sets a requested amount.",
+                        getString(R.string.cannot_proceed_no_amount_message),
                         Toast.LENGTH_LONG,
                     ).show()
                 } else {
-                    requestedAmountView.text = "Requested Amount: BDT $requestedAmount"
+                    requestedAmountView.text = getString(R.string.requested_amount_format, requestedAmount)
                     btnPayCash.isEnabled = true
                     btnPayBkash.isEnabled = true
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Failed to load job data.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.failed_to_load_job_message), Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -97,29 +98,29 @@ class CustomerJobPaymentFragment : Fragment() {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_payment_input, null)
         val etAmount = dialogView.findViewById<EditText>(R.id.etAmount)
-        dialogView.findViewById<android.widget.TextView>(R.id.tvPaymentTitle).text = "Pay with Cash"
-        etAmount.hint = "Enter amount to pay in cash"
+        dialogView.findViewById<android.widget.TextView>(R.id.tvPaymentTitle).text = getString(R.string.pay_with_cash_title)
+        etAmount.hint = getString(R.string.enter_cash_amount_hint)
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Cash Payment")
+            .setTitle(R.string.cash_payment_title)
             .setView(dialogView)
-            .setPositiveButton("Pay") { _, _ ->
+            .setPositiveButton(R.string.pay_btn) { _, _ ->
                 val entered = etAmount.text.toString().trim()
                 if (entered.isBlank()) {
-                    Toast.makeText(context, "Please enter a payment amount.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.enter_payment_amount_message), Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
                 if (entered != requestedAmount) {
                     Toast.makeText(
                         context,
-                        "Amount must exactly match BDT $requestedAmount",
+                        getString(R.string.amount_must_match_format, requestedAmount),
                         Toast.LENGTH_LONG,
                     ).show()
                     return@setPositiveButton
                 }
                 writeCashPayment(entered)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -131,11 +132,11 @@ class CustomerJobPaymentFragment : Fragment() {
         )
         database.updateChildren(updates)
             .addOnSuccessListener {
-                Toast.makeText(context, "Payment recorded.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.payment_recorded_dot_message), Toast.LENGTH_SHORT).show()
                 navigateToSuccess()
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Payment failed. Please try again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.payment_failed_retry_message), Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -143,21 +144,21 @@ class CustomerJobPaymentFragment : Fragment() {
 
     private fun handleBkashPayment() {
         if (requestedAmount.isBlank()) {
-            Toast.makeText(context, "No amount set yet.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.no_amount_set_message), Toast.LENGTH_SHORT).show()
             return
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Pay with bKash")
-            .setMessage("You'll be taken to the secure bKash checkout for BDT $requestedAmount.\n\nTap Continue to proceed.")
-            .setPositiveButton("Continue") { _, _ -> startSslCommerzCheckout() }
-            .setNegativeButton("Cancel", null)
+            .setTitle(R.string.pay_with_bkash_title)
+            .setMessage(getString(R.string.bkash_checkout_message_format, requestedAmount))
+            .setPositiveButton(R.string.continue_btn) { _, _ -> startSslCommerzCheckout() }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
     private fun startSslCommerzCheckout() {
         val progress = ProgressDialog(requireContext()).apply {
-            setMessage("Preparing secure checkout…")
+            setMessage(getString(R.string.preparing_checkout_message))
             setCancelable(false)
             show()
         }
@@ -165,7 +166,7 @@ class CustomerJobPaymentFragment : Fragment() {
         val amountValue = requestedAmount.toDoubleOrNull()
         if (amountValue == null) {
             progress.dismiss()
-            Toast.makeText(context, "Invalid amount.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.invalid_amount_message), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -186,7 +187,7 @@ class CustomerJobPaymentFragment : Fragment() {
                 progress.dismiss()
                 Toast.makeText(
                     context,
-                    "Could not start payment: ${e.localizedMessage}",
+                    getString(R.string.could_not_start_payment_format, e.localizedMessage),
                     Toast.LENGTH_LONG,
                 ).show()
             }
@@ -217,7 +218,7 @@ class CustomerJobPaymentFragment : Fragment() {
                         stopWatchingJobStatus()
                         Toast.makeText(
                             context,
-                            "bKash payment confirmed.",
+                            getString(R.string.bkash_confirmed_message),
                             Toast.LENGTH_SHORT,
                         ).show()
                         navigateToSuccess()
@@ -227,7 +228,7 @@ class CustomerJobPaymentFragment : Fragment() {
                         stopWatchingJobStatus()
                         Toast.makeText(
                             context,
-                            "Payment failed or cancelled.",
+                            getString(R.string.payment_failed_cancelled_message),
                             Toast.LENGTH_LONG,
                         ).show()
                     }

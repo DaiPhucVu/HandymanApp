@@ -36,6 +36,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import com.example.handyman.utils.localizedServiceCategoryName
 
 class CustomerJobDetailsFragment : Fragment() {
 
@@ -70,7 +71,7 @@ class CustomerJobDetailsFragment : Fragment() {
         val jobStatus = args.jobStatus
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
-        jobTitle.text = if (serviceName.isNotBlank()) serviceName else "Untitled Job"
+        jobTitle.text = if (serviceName.isNotBlank()) localizedServiceCategoryName(requireContext(), serviceName) else getString(R.string.untitled_job_label)
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
 
@@ -79,14 +80,14 @@ class CustomerJobDetailsFragment : Fragment() {
             val custpay = snapshot.child("custpay").getValue(String::class.java) ?: ""
 
             if (paymentStatus == "done" && custpay.isNotBlank()) {
-                salaryDisplay.text = "Paid: BDT $custpay"
+                salaryDisplay.text = getString(R.string.paid_bdt_format, custpay)
             } else if (salaryFrom.isNotBlank() && salaryTo.isNotBlank()) {
                 salaryDisplay.text = if (paymentOption == "Per Day")
-                    "BDT $salaryFrom-$salaryTo/day"
+                    getString(R.string.bdt_range_per_day_format, salaryFrom, salaryTo)
                 else
-                    "BDT $salaryFrom-$salaryTo"
+                    getString(R.string.bdt_range_format, salaryFrom, salaryTo)
             } else {
-                salaryDisplay.text = "To be negotiated"
+                salaryDisplay.text = getString(R.string.to_be_negotiated_message)
             }
 
             // Update Map from coordinates in Firebase
@@ -104,7 +105,7 @@ class CustomerJobDetailsFragment : Fragment() {
                 val marker = Marker(mapView)
                 marker.position = jobLocation
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                marker.title = "Job Location"
+                marker.title = getString(R.string.cd_job_location_marker)
                 mapView.overlays.add(marker)
                 mapView.invalidate()
             } else {
@@ -116,12 +117,12 @@ class CustomerJobDetailsFragment : Fragment() {
         jobDescDisplay.text = if (jobDescription.isNotBlank()) jobDescription else ""
         val dateDisplay = view.findViewById<TextView>(R.id.tvDate)
         if (dateFrom == dateTo) {
-            dateDisplay.text = "$dateFrom"
+            dateDisplay.text = dateFrom
         } else {
-            dateDisplay.text = "$dateFrom — $dateTo"
+            dateDisplay.text = getString(R.string.range_dash_format, dateFrom, dateTo)
         }
         val timeDisplay = view.findViewById<TextView>(R.id.tvTime)
-        timeDisplay.text = "$timeFrom — $timeTo"
+        timeDisplay.text = getString(R.string.range_dash_format, timeFrom, timeTo)
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
         locationDisplay.text = location
 
@@ -154,7 +155,7 @@ class CustomerJobDetailsFragment : Fragment() {
                 .get().addOnSuccessListener { snapshot ->
                     val fName = snapshot.child("firstName").getValue(String::class.java) ?: ""
                     val lName = snapshot.child("lastName").getValue(String::class.java) ?: ""
-                    tvHandymanName.text = "Handyman: $fName $lName"
+                    tvHandymanName.text = getString(R.string.handyman_label_prefix) + "$fName $lName"
                 }
             
             btnViewProfile.setOnClickListener {

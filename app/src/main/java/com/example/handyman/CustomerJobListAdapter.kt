@@ -9,6 +9,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.handyman.utils.localizedJobStatusLabel
+import com.example.handyman.utils.localizedServiceCategoryName
 
 class CustomerJobListAdapter(
     private val onViewDetails: (Job) -> Unit,
@@ -48,25 +50,26 @@ class CustomerJobListAdapter(
 
 
         fun bind(item: Job) {
-            tvJobTitle.text = if (!item.jobCat.isNullOrBlank()) item.jobCat else (item.title ?: "Untitled Job")
+            val context = itemView.context
+            tvJobTitle.text = if (!item.jobCat.isNullOrBlank()) localizedServiceCategoryName(context, item.jobCat) else (item.title ?: context.getString(R.string.untitled_job_label))
             tvJobDesc.text = if (!item.jobDesc.isNullOrBlank()) item.jobDesc else (item.description ?: "")
             if (item.paymentStatus == "done" && !item.custpay.isNullOrBlank()) {
-                tvSalary.text = "Paid: BDT ${item.custpay}"
+                tvSalary.text = context.getString(R.string.paid_bdt_format, item.custpay)
             } else if (item.jobSalaryFrom.isNotBlank() && item.jobSalaryTo.isNotBlank()) {
                 tvSalary.text = if (item.jobPaymentOption == "Per Day")
-                    "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
+                    context.getString(R.string.bdt_range_per_day_format, item.jobSalaryFrom, item.jobSalaryTo)
                 else
-                    "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}"
+                    context.getString(R.string.bdt_range_format, item.jobSalaryFrom, item.jobSalaryTo)
             } else {
-                tvSalary.text = "To be negotiated"
+                tvSalary.text = context.getString(R.string.to_be_negotiated_message)
             }
 
             tvDate.text = if (item.jobDateFrom == item.jobDateTo)
                 item.jobDateFrom
             else
-                "${item.jobDateFrom} — ${item.jobDateTo}"
+                context.getString(R.string.range_dash_format, item.jobDateFrom, item.jobDateTo)
 
-            tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
+            tvTime.text = context.getString(R.string.range_dash_format, item.jobTimeFrom, item.jobTimeTo)
             tvLocation.text = if (!item.jobLocation.isNullOrBlank()) item.jobLocation else (item.location ?: "")
 
             if (hideStatus) {
@@ -80,7 +83,7 @@ class CustomerJobListAdapter(
                         "Assigned"
                     else -> item.jobStatusCustomer!!
                 }
-                status.text = displayStatus
+                status.text = localizedJobStatusLabel(context, displayStatus)
 
                 when (displayStatus) {
                     "Not assigned" -> status.setBackgroundResource(R.drawable.status_not_assigned)
@@ -94,7 +97,7 @@ class CustomerJobListAdapter(
                 updateBttn.visibility = View.GONE
                 btnProceedToPayment.visibility = View.GONE
                 btnLeaveReview.visibility = if (item.isReviewedByCustomer) View.GONE else View.VISIBLE
-                status.text = "Payment: Done"
+                status.text = context.getString(R.string.status_payment_done)
                 status.setBackgroundResource(R.drawable.status_done)
             } else {
                 updateBttn.visibility = View.VISIBLE
@@ -118,7 +121,7 @@ class CustomerJobListAdapter(
                 updateBttn.setOnClickListener {
                     Toast.makeText(
                         itemView.context,
-                        "Please assign a handyman before updating status!",
+                        context.getString(R.string.please_assign_handyman_message),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -133,7 +136,7 @@ class CustomerJobListAdapter(
                     updateBttn.setOnClickListener {
                         Toast.makeText(
                             itemView.context,
-                            "Job is already done!",
+                            context.getString(R.string.job_already_done_message),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

@@ -1,9 +1,12 @@
 package com.example.handyman
 
+import android.content.Context
+
 object FormValidator {
     private val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
 
     fun validate(
+        context: Context,
         name: String,
         email: String,
         subject: String,
@@ -11,11 +14,11 @@ object FormValidator {
         category: String
     ): String? {
         if (name.isEmpty() || email.isEmpty() || subject.isEmpty() || message.isEmpty() || category.isEmpty()) {
-            return "Please fill out all fields."
+            return context.getString(R.string.please_fill_all_fields_message)
         }
 
         if (!email.matches(emailRegex)) {
-            return "Please enter a valid email."
+            return context.getString(R.string.please_enter_valid_email_message)
         }
 
         return null

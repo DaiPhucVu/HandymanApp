@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.handyman.utils.localizedServiceCategoryName
 
 class ServiceCategoryAdapter(private val customerId: String, private val onItemClick: (ServiceCategory) -> Unit) : ListAdapter<ServiceCategory, ServiceCategoryAdapter.ViewHolder>(ServiceCategoryDiff) {
 
@@ -31,7 +32,7 @@ class ServiceCategoryAdapter(private val customerId: String, private val onItemC
             Log.d("ServiceCategoryAdapter", "Binding item: ${item.name}")
 
             serviceImage.setImageResource(item.iconResId)
-            serviceName.text = item.name
+            serviceName.text = localizedServiceCategoryName(itemView.context, item.name)
 
             itemView.setOnClickListener {
                 Log.d("ServiceCategoryAdapter", "Item clicked: ${item.name}")

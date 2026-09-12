@@ -443,4 +443,146 @@
     <string name="thank_you_for_review_message">Thank you for your review!</string>
     <string name="failed_to_submit_review_message">Failed to submit review</string>
     <string name="invoice_content_format">--- INVOICE ---\nJob: %1$s\nDate: %2$s\nLocation: %3$s\nAmount Paid: BDT %4$s\nPayment Method: %5$s\nStatus: Paid\n---------------\nThank you for using Profix!</string>
+
+    <!-- Service category home screen (legacy View, ServiceCategoryFragment) -->
+    <string name="service_category_title">What do you need help with?</string>
+    <string name="service_category_subtitle">Pick a task category to start a request</string>
+    <string name="hello_name_only_format">Hello, %1$s</string>
+    <string name="trips_and_travel_category">Trips and Travel</string>
+    <string name="emergency_service_category">Emergency Service</string>
+    <string name="date_range_format">%1$s to %2$s</string>
+
+    <!-- Job status labels (legacy View layer) -->
+    <string name="status_pending">Pending</string>
+    <string name="status_accepted">Accepted</string>
+    <string name="status_assigned">Assigned</string>
+    <string name="status_not_assigned">Not assigned</string>
+    <string name="status_in_progress">In-progress</string>
+    <string name="status_done">Done</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_all">All</string>
+    <string name="status_payment_done">Payment: Done</string>
+
+    <!-- Shared salary/date/time/location display formats (legacy View layer) -->
+    <string name="paid_bdt_format">Paid: BDT %1$s</string>
+    <string name="bdt_range_per_day_format">BDT %1$s-%2$s/day</string>
+    <string name="bdt_range_format">BDT %1$s-%2$s</string>
+    <string name="to_be_negotiated_message">To be negotiated</string>
+    <string name="range_dash_format">%1$s — %2$s</string>
+    <string name="approximate_location_format">%1$s (Approximate)</string>
+    <string name="approximate_location_label">Approximate Location</string>
+    <string name="location_not_specified_label">Location not specified</string>
+    <string name="salary_range_paymentoption_format">BDT %1$s - %2$s (%3$s)</string>
+    <string name="untitled_job_label">Untitled Job</string>
+    <string name="loading_ellipsis_label">Loading…</string>
+    <string name="no_rating_yet_label">No rating yet</string>
+    <string name="cd_job_location_marker">Job Location</string>
+
+    <!-- CustomerJobListFragment -->
+    <string name="only_not_yet_assigned_can_be_edited_message">Only jobs that are not yet assigned can be edited.</string>
+    <string name="database_error_format">Database error: %1$s</string>
+    <string name="cannot_cancel_message">Cannot cancel.</string>
+    <string name="delete_job_title">Delete job?</string>
+    <string name="delete_job_confirm_message">Are you sure you want to delete this job?</string>
+    <string name="yes_btn">Yes</string>
+    <string name="job_marked_inactive_message">Job marked as inactive</string>
+    <string name="failed_to_update_job_status_format">Failed to update job status: %1$s</string>
+    <string name="job_cancelled_message">Job has been cancelled.</string>
+    <string name="no_btn">No</string>
+    <string name="error_checking_job_existence_format">Error checking job existence: %1$s</string>
+    <string name="no_further_updates_message">No further updates available</string>
+    <string name="update_status_dialog_title">Update status</string>
+    <string name="status_updated_to_format">Status updated to %1$s</string>
+    <string name="failed_to_update_status_format">Failed to update status: %1$s</string>
+    <string name="job_not_marked_done_message">Job is not marked as Done yet.</string>
+    <string name="how_was_experience_handyman_message">How was your experience with this handyman?</string>
+    <string name="review_handyman_title">Review Handyman</string>
+    <string name="please_provide_rating_message">Please provide a rating</string>
+    <string name="review_submitted_message">Review submitted!</string>
+    <string name="review_failed_format">Failed: %1$s</string>
+    <string name="error_loading_jobs_message">Error loading jobs</string>
+
+    <!-- HandymanJobListFragment -->
+    <string name="removal_not_permitted_message">Removal of assigned jobs not permitted.</string>
+    <string name="waiting_for_customer_update_format">Waiting for customer to also update to %1$s</string>
+    <string name="how_was_experience_customer_message">How was your experience with this customer?</string>
+    <string name="failed_to_submit_review_format">Failed to submit review: %1$s</string>
+    <string name="enter_amount_bdt_hint">Enter amount in BDT</string>
+    <string name="enter_final_payment_title">Enter Final Payment</string>
+    <string name="payment_recorded_format">Payment recorded: BDT %1$s</string>
+    <string name="job_accepted_message">Job accepted.</string>
+    <string name="failed_to_accept_job_format">Failed to accept job: %1$s</string>
+    <string name="decline_job_title">Decline job?</string>
+    <string name="decline_job_message">This will unassign the job and return it to the open job list.</string>
+    <string name="decline_btn">Decline</string>
+    <string name="job_declined_message">Job declined.</string>
+    <string name="failed_to_decline_job_format">Failed to decline job: %1$s</string>
+
+    <!-- CustomerJobListAdapter -->
+    <string name="please_assign_handyman_message">Please assign a handyman before updating status!</string>
+    <string name="job_already_done_message">Job is already done!</string>
+
+    <!-- HandymanJobListAdapter -->
+    <string name="job_not_assigned_to_you_message">This job has not been assigned to you yet!</string>
+    <string name="job_assigned_to_other_message">This job is assigned to another handyman.</string>
+
+    <!-- CustomerJobPaymentFragment -->
+    <string name="handyman_no_amount_set_message">Handyman has not set a requested amount yet.</string>
+    <string name="cannot_proceed_no_amount_message">You cannot proceed until the handyman sets a requested amount.</string>
+    <string name="requested_amount_format">Requested Amount: BDT %1$s</string>
+    <string name="failed_to_load_job_message">Failed to load job data.</string>
+    <string name="pay_with_cash_title">Pay with Cash</string>
+    <string name="enter_cash_amount_hint">Enter amount to pay in cash</string>
+    <string name="cash_payment_title">Cash Payment</string>
+    <string name="pay_btn">Pay</string>
+    <string name="enter_payment_amount_message">Please enter a payment amount.</string>
+    <string name="amount_must_match_format">Amount must exactly match BDT %1$s</string>
+    <string name="payment_recorded_dot_message">Payment recorded.</string>
+    <string name="payment_failed_retry_message">Payment failed. Please try again.</string>
+    <string name="no_amount_set_message">No amount set yet.</string>
+    <string name="pay_with_bkash_title">Pay with bKash</string>
+    <string name="bkash_checkout_message_format">You\'ll be taken to the secure bKash checkout for BDT %1$s.\n\nTap Continue to proceed.</string>
+    <string name="preparing_checkout_message">Preparing secure checkout…</string>
+    <string name="invalid_amount_message">Invalid amount.</string>
+    <string name="could_not_start_payment_format">Could not start payment: %1$s</string>
+    <string name="bkash_confirmed_message">bKash payment confirmed.</string>
+    <string name="payment_failed_cancelled_message">Payment failed or cancelled.</string>
+
+    <!-- HandymanJobListDetailsFragment -->
+    <string name="loading_location_message">Loading location…</string>
+
+    <!-- JobEditFragment -->
+    <string name="please_describe_problem_message">Please describe your problem</string>
+    <string name="please_select_start_date_message">Please select a start date</string>
+    <string name="please_select_end_date_message">Please select an end date</string>
+    <string name="please_select_start_time_message">Please select a start time</string>
+    <string name="please_select_end_time_message">Please select an end time</string>
+    <string name="please_select_salary_range_message">Please select an appropriate salary range</string>
+    <string name="please_select_payment_option_message">Please select an option for salary payment</string>
+    <string name="please_choose_salary_message">Please choose a salary</string>
+    <string name="please_select_location_message">Please select a location</string>
+    <string name="details_saved_message">Details saved</string>
+    <string name="failed_to_save_format">Failed to save: %1$s</string>
+
+    <!-- JobRequestDoneFragment -->
+    <string name="booking_confirmed_format">Booking confirmed on\n%1$s</string>
+
+    <!-- OrderSummaryFragment -->
+    <string name="image_upload_failed_format">Image #%1$d failed: %2$s</string>
+    <string name="some_image_uploads_failed_message">One or more image uploads failed</string>
+
+    <!-- SupportForm -->
+    <string name="support_category_technical_issue">Technical Issue</string>
+    <string name="support_category_billing_payments">Billing &amp; Payments</string>
+    <string name="support_category_account_management">Account Management</string>
+    <string name="support_category_feature_request">Feature Request</string>
+    <string name="support_category_general_inquiry">General Inquiry</string>
+    <string name="support_request_submitted_message">Support request submitted!</string>
+    <string name="failed_to_submit_support_request_message">Failed to submit support request.</string>
+
+    <!-- FormValidator -->
+    <string name="please_fill_all_fields_message">Please fill out all fields.</string>
+    <string name="please_enter_valid_email_message">Please enter a valid email.</string>
+    <string name="unknown_job_label">Unknown Job</string>
+    <string name="failed_to_create_chat_format">Failed to create chat: %1$s</string>
 </resources>

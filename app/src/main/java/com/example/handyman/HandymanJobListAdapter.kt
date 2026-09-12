@@ -12,6 +12,8 @@ import android.location.Geocoder
 import java.util.Locale
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.handyman.utils.localizedJobStatusLabel
+import com.example.handyman.utils.localizedServiceCategoryName
 
 
 class HandymanJobListAdapter(
@@ -55,40 +57,41 @@ class HandymanJobListAdapter(
 
 
         fun bind(item: Job) {
+            val context = itemView.context
             // Bind your Job data to the views with fallback logic
-            tvJobTitle.text = if (!item.jobCat.isNullOrBlank()) item.jobCat else (item.title ?: "Untitled Job")
+            tvJobTitle.text = if (!item.jobCat.isNullOrBlank()) localizedServiceCategoryName(context, item.jobCat) else (item.title ?: context.getString(R.string.untitled_job_label))
             tvJobDesc.text = if (!item.jobDesc.isNullOrBlank()) item.jobDesc else (item.description ?: "")
 
             if (item.paymentStatus == "done" && item.custpay != null && item.custpay.isNotEmpty()) {
-                tvSalary.text = "Paid: BDT ${item.custpay}"
+                tvSalary.text = context.getString(R.string.paid_bdt_format, item.custpay)
             } else if (item.jobSalaryFrom != null && item.jobSalaryFrom.isNotEmpty() && item.jobSalaryTo != null && item.jobSalaryTo.isNotEmpty()) {
                 if (item.jobPaymentOption == "Per Day") {
-                    tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
+                    tvSalary.text = context.getString(R.string.bdt_range_per_day_format, item.jobSalaryFrom, item.jobSalaryTo)
                 } else {
-                    tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}"
+                    tvSalary.text = context.getString(R.string.bdt_range_format, item.jobSalaryFrom, item.jobSalaryTo)
                 }
             } else {
-                tvSalary.text = "To be negotiated"
+                tvSalary.text = context.getString(R.string.to_be_negotiated_message)
             }
             if (item.jobDateFrom == item.jobDateTo) {
                 tvDate.text = item.jobDateFrom
             } else {
-                tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
+                tvDate.text = context.getString(R.string.range_dash_format, item.jobDateFrom, item.jobDateTo)
             }
-            tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            
+            tvTime.text = context.getString(R.string.range_dash_format, item.jobTimeFrom, item.jobTimeTo)
+
             val isAssigned = item.assignedTo == handymanId
             if (isAssigned) {
-                tvLocation.text = if (!item.jobLocation.isNullOrBlank()) item.jobLocation else (item.location ?: "Location not specified")
+                tvLocation.text = if (!item.jobLocation.isNullOrBlank()) item.jobLocation else (item.location ?: context.getString(R.string.location_not_specified_label))
             } else {
                 if (!item.citySuburb.isNullOrBlank()) {
-                    tvLocation.text = "${item.citySuburb} (Approximate)"
+                    tvLocation.text = context.getString(R.string.approximate_location_format, item.citySuburb)
                 } else {
-                    tvLocation.text = "Approximate Location"
+                    tvLocation.text = context.getString(R.string.approximate_location_label)
                     
                     // Fallback geocoding for the list view
                     if (item.latitude != null && item.longitude != null && item.latitude != 0.0 && item.longitude != 0.0) {
-                        val context = itemView.context
+                        val expectedTitle = if (!item.jobCat.isNullOrBlank()) localizedServiceCategoryName(context, item.jobCat) else (item.title ?: context.getString(R.string.untitled_job_label))
                         Thread {
                             try {
                                 val geocoder = Geocoder(context, Locale.getDefault())
@@ -99,8 +102,8 @@ class HandymanJobListAdapter(
                                     if (city != null) {
                                         itemView.post {
                                             // Re-check if this ViewHolder is still showing the same job
-                                            if (tvJobTitle.text == (if (!item.jobCat.isNullOrBlank()) item.jobCat else (item.title ?: "Untitled Job"))) {
-                                                tvLocation.text = "$city (Approximate)"
+                                            if (tvJobTitle.text == expectedTitle) {
+                                                tvLocation.text = context.getString(R.string.approximate_location_format, city)
                                             }
                                         }
                                     }
@@ -137,7 +140,7 @@ class HandymanJobListAdapter(
                     normalizedStatus == "Cancelled" -> "Cancelled"
                     else -> "Done"
                 }
-                status.text = displayStatus
+                status.text = localizedJobStatusLabel(context, displayStatus)
 
                 // apply matching background
                 when (displayStatus) {
@@ -153,7 +156,7 @@ class HandymanJobListAdapter(
                 assignmentActions.visibility = View.GONE
                 btnProceedPayment.visibility = View.GONE
                 btnLeaveReview.visibility = if (item.isReviewedByHandyman) View.GONE else View.VISIBLE
-                status.text = "Payment: Done"
+                status.text = context.getString(R.string.status_payment_done)
                 status.setBackgroundResource(R.drawable.status_done)
             } else {
                 updateBttn.visibility = View.VISIBLE
@@ -182,7 +185,7 @@ class HandymanJobListAdapter(
                 updateBttn.setOnClickListener {
                     Toast.makeText(
                         itemView.context,
-                        "This job has not been assigned to you yet!",
+                        context.getString(R.string.job_not_assigned_to_you_message),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -193,7 +196,7 @@ class HandymanJobListAdapter(
                 updateBttn.setOnClickListener {
                     Toast.makeText(
                         itemView.context,
-                        "This job is assigned to another handyman.",
+                        context.getString(R.string.job_assigned_to_other_message),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -216,7 +219,7 @@ class HandymanJobListAdapter(
                     updateBttn.setOnClickListener {
                         Toast.makeText(
                             itemView.context,
-                            "Job is already done!",
+                            context.getString(R.string.job_already_done_message),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

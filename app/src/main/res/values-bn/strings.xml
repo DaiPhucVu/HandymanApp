@@ -445,4 +445,146 @@
         <string name="thank_you_for_review_message">আপনার পর্যালোচনার জন্য ধন্যবাদ!</string>
         <string name="failed_to_submit_review_message">পর্যালোচনা জমা দিতে ব্যর্থ হয়েছে</string>
         <string name="invoice_content_format">--- চালান ---\nকাজ: %1$s\nতারিখ: %2$s\nঅবস্থান: %3$s\nপরিশোধিত পরিমাণ: BDT %4$s\nপেমেন্ট পদ্ধতি: %5$s\nঅবস্থা: পরিশোধিত\n---------------\nProfix ব্যবহার করার জন্য ধন্যবাদ!</string>
+
+        <!-- Service category home screen (legacy View, ServiceCategoryFragment) -->
+        <string name="service_category_title">আপনার কী সাহায্য প্রয়োজন?</string>
+        <string name="service_category_subtitle">অনুরোধ শুরু করতে একটি কাজের বিভাগ বেছে নিন</string>
+        <string name="hello_name_only_format">হ্যালো, %1$s</string>
+        <string name="trips_and_travel_category">ভ্রমণ ও ট্যুর</string>
+        <string name="emergency_service_category">জরুরি সেবা</string>
+        <string name="date_range_format">%1$s থেকে %2$s</string>
+
+        <!-- Job status labels (legacy View layer) -->
+        <string name="status_pending">মুলতুবি</string>
+        <string name="status_accepted">গৃহীত</string>
+        <string name="status_assigned">নির্ধারিত</string>
+        <string name="status_not_assigned">নির্ধারিত হয়নি</string>
+        <string name="status_in_progress">চলমান</string>
+        <string name="status_done">সম্পন্ন</string>
+        <string name="status_cancelled">বাতিল</string>
+        <string name="status_all">সব</string>
+        <string name="status_payment_done">পেমেন্ট: সম্পন্ন</string>
+
+        <!-- Shared salary/date/time/location display formats (legacy View layer) -->
+        <string name="paid_bdt_format">পরিশোধিত: BDT %1$s</string>
+        <string name="bdt_range_per_day_format">BDT %1$s-%2$s/দিন</string>
+        <string name="bdt_range_format">BDT %1$s-%2$s</string>
+        <string name="to_be_negotiated_message">আলোচনা সাপেক্ষে</string>
+        <string name="range_dash_format">%1$s — %2$s</string>
+        <string name="approximate_location_format">%1$s (আনুমানিক)</string>
+        <string name="approximate_location_label">আনুমানিক অবস্থান</string>
+        <string name="location_not_specified_label">অবস্থান উল্লেখ করা হয়নি</string>
+        <string name="salary_range_paymentoption_format">BDT %1$s - %2$s (%3$s)</string>
+        <string name="untitled_job_label">শিরোনামহীন কাজ</string>
+        <string name="loading_ellipsis_label">লোড হচ্ছে…</string>
+        <string name="no_rating_yet_label">এখনও কোনো রেটিং নেই</string>
+        <string name="cd_job_location_marker">কাজের অবস্থান</string>
+
+        <!-- CustomerJobListFragment -->
+        <string name="only_not_yet_assigned_can_be_edited_message">শুধুমাত্র নির্ধারিত না হওয়া কাজগুলো সম্পাদনা করা যায়।</string>
+        <string name="database_error_format">ডাটাবেস ত্রুটি: %1$s</string>
+        <string name="cannot_cancel_message">বাতিল করা যাবে না।</string>
+        <string name="delete_job_title">কাজ মুছবেন?</string>
+        <string name="delete_job_confirm_message">আপনি কি নিশ্চিত যে এই কাজটি মুছতে চান?</string>
+        <string name="yes_btn">হ্যাঁ</string>
+        <string name="job_marked_inactive_message">কাজটি নিষ্ক্রিয় হিসেবে চিহ্নিত করা হয়েছে</string>
+        <string name="failed_to_update_job_status_format">কাজের অবস্থা আপডেট করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="job_cancelled_message">কাজটি বাতিল করা হয়েছে।</string>
+        <string name="no_btn">না</string>
+        <string name="error_checking_job_existence_format">কাজের অস্তিত্ব যাচাই করতে ত্রুটি: %1$s</string>
+        <string name="no_further_updates_message">আর কোনো আপডেট উপলব্ধ নেই</string>
+        <string name="update_status_dialog_title">অবস্থা আপডেট করুন</string>
+        <string name="status_updated_to_format">অবস্থা %1$s এ আপডেট হয়েছে</string>
+        <string name="failed_to_update_status_format">অবস্থা আপডেট করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="job_not_marked_done_message">কাজটি এখনও সম্পন্ন হিসেবে চিহ্নিত করা হয়নি।</string>
+        <string name="how_was_experience_handyman_message">এই হ্যান্ডিম্যানের সাথে আপনার অভিজ্ঞতা কেমন ছিল?</string>
+        <string name="review_handyman_title">হ্যান্ডিম্যান পর্যালোচনা</string>
+        <string name="please_provide_rating_message">অনুগ্রহ করে একটি রেটিং দিন</string>
+        <string name="review_submitted_message">পর্যালোচনা জমা দেওয়া হয়েছে!</string>
+        <string name="review_failed_format">ব্যর্থ হয়েছে: %1$s</string>
+        <string name="error_loading_jobs_message">কাজ লোড করতে ত্রুটি</string>
+
+        <!-- HandymanJobListFragment -->
+        <string name="removal_not_permitted_message">নির্ধারিত কাজ অপসারণের অনুমতি নেই।</string>
+        <string name="waiting_for_customer_update_format">গ্রাহকও %1$s এ আপডেট করার অপেক্ষায়</string>
+        <string name="how_was_experience_customer_message">এই গ্রাহকের সাথে আপনার অভিজ্ঞতা কেমন ছিল?</string>
+        <string name="failed_to_submit_review_format">পর্যালোচনা জমা দিতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="enter_amount_bdt_hint">BDT-তে পরিমাণ লিখুন</string>
+        <string name="enter_final_payment_title">চূড়ান্ত পেমেন্ট লিখুন</string>
+        <string name="payment_recorded_format">পেমেন্ট রেকর্ড করা হয়েছে: BDT %1$s</string>
+        <string name="job_accepted_message">কাজ গৃহীত হয়েছে।</string>
+        <string name="failed_to_accept_job_format">কাজ গ্রহণ করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="decline_job_title">কাজ প্রত্যাখ্যান করবেন?</string>
+        <string name="decline_job_message">এটি কাজের নির্ধারণ বাতিল করবে এবং এটি খোলা কাজের তালিকায় ফিরিয়ে দেবে।</string>
+        <string name="decline_btn">প্রত্যাখ্যান</string>
+        <string name="job_declined_message">কাজ প্রত্যাখ্যান করা হয়েছে।</string>
+        <string name="failed_to_decline_job_format">কাজ প্রত্যাখ্যান করতে ব্যর্থ হয়েছে: %1$s</string>
+
+        <!-- CustomerJobListAdapter -->
+        <string name="please_assign_handyman_message">অবস্থা আপডেট করার আগে একজন হ্যান্ডিম্যান নির্ধারণ করুন!</string>
+        <string name="job_already_done_message">কাজ ইতিমধ্যে সম্পন্ন হয়েছে!</string>
+
+        <!-- HandymanJobListAdapter -->
+        <string name="job_not_assigned_to_you_message">এই কাজটি এখনও আপনাকে দেওয়া হয়নি!</string>
+        <string name="job_assigned_to_other_message">এই কাজটি অন্য একজন হ্যান্ডিম্যানকে দেওয়া হয়েছে।</string>
+
+        <!-- CustomerJobPaymentFragment -->
+        <string name="handyman_no_amount_set_message">হ্যান্ডিম্যান এখনও কোনো অনুরোধকৃত পরিমাণ নির্ধারণ করেননি।</string>
+        <string name="cannot_proceed_no_amount_message">হ্যান্ডিম্যান পরিমাণ নির্ধারণ না করা পর্যন্ত আপনি এগিয়ে যেতে পারবেন না।</string>
+        <string name="requested_amount_format">অনুরোধকৃত পরিমাণ: BDT %1$s</string>
+        <string name="failed_to_load_job_message">কাজের তথ্য লোড করতে ব্যর্থ হয়েছে।</string>
+        <string name="pay_with_cash_title">নগদে পেমেন্ট করুন</string>
+        <string name="enter_cash_amount_hint">নগদে পরিশোধ করার পরিমাণ লিখুন</string>
+        <string name="cash_payment_title">নগদ পেমেন্ট</string>
+        <string name="pay_btn">পরিশোধ করুন</string>
+        <string name="enter_payment_amount_message">অনুগ্রহ করে পেমেন্টের পরিমাণ লিখুন।</string>
+        <string name="amount_must_match_format">পরিমাণ অবশ্যই BDT %1$s এর সাথে মিলতে হবে</string>
+        <string name="payment_recorded_dot_message">পেমেন্ট রেকর্ড করা হয়েছে।</string>
+        <string name="payment_failed_retry_message">পেমেন্ট ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
+        <string name="no_amount_set_message">এখনও কোনো পরিমাণ নির্ধারণ করা হয়নি।</string>
+        <string name="pay_with_bkash_title">bKash দিয়ে পেমেন্ট করুন</string>
+        <string name="bkash_checkout_message_format">আপনাকে BDT %1$s এর জন্য নিরাপদ bKash চেকআউটে নিয়ে যাওয়া হবে।\n\nএগিয়ে যেতে চালিয়ে যান-এ ট্যাপ করুন।</string>
+        <string name="preparing_checkout_message">নিরাপদ চেকআউট প্রস্তুত করা হচ্ছে…</string>
+        <string name="invalid_amount_message">অবৈধ পরিমাণ।</string>
+        <string name="could_not_start_payment_format">পেমেন্ট শুরু করা যায়নি: %1$s</string>
+        <string name="bkash_confirmed_message">bKash পেমেন্ট নিশ্চিত হয়েছে।</string>
+        <string name="payment_failed_cancelled_message">পেমেন্ট ব্যর্থ হয়েছে অথবা বাতিল হয়েছে।</string>
+
+        <!-- HandymanJobListDetailsFragment -->
+        <string name="loading_location_message">অবস্থান লোড হচ্ছে…</string>
+
+        <!-- JobEditFragment -->
+        <string name="please_describe_problem_message">অনুগ্রহ করে আপনার সমস্যা বর্ণনা করুন</string>
+        <string name="please_select_start_date_message">অনুগ্রহ করে একটি শুরুর তারিখ নির্বাচন করুন</string>
+        <string name="please_select_end_date_message">অনুগ্রহ করে একটি শেষের তারিখ নির্বাচন করুন</string>
+        <string name="please_select_start_time_message">অনুগ্রহ করে একটি শুরুর সময় নির্বাচন করুন</string>
+        <string name="please_select_end_time_message">অনুগ্রহ করে একটি শেষের সময় নির্বাচন করুন</string>
+        <string name="please_select_salary_range_message">অনুগ্রহ করে একটি উপযুক্ত বেতনের পরিসীমা নির্বাচন করুন</string>
+        <string name="please_select_payment_option_message">অনুগ্রহ করে বেতন পরিশোধের একটি বিকল্প নির্বাচন করুন</string>
+        <string name="please_choose_salary_message">অনুগ্রহ করে একটি বেতন নির্বাচন করুন</string>
+        <string name="please_select_location_message">অনুগ্রহ করে একটি অবস্থান নির্বাচন করুন</string>
+        <string name="details_saved_message">বিবরণ সংরক্ষণ করা হয়েছে</string>
+        <string name="failed_to_save_format">সংরক্ষণ করতে ব্যর্থ হয়েছে: %1$s</string>
+
+        <!-- JobRequestDoneFragment -->
+        <string name="booking_confirmed_format">বুকিং নিশ্চিত হয়েছে\n%1$s তারিখে</string>
+
+        <!-- OrderSummaryFragment -->
+        <string name="image_upload_failed_format">ছবি #%1$d ব্যর্থ হয়েছে: %2$s</string>
+        <string name="some_image_uploads_failed_message">একটি বা একাধিক ছবি আপলোড ব্যর্থ হয়েছে</string>
+
+        <!-- SupportForm -->
+        <string name="support_category_technical_issue">প্রযুক্তিগত সমস্যা</string>
+        <string name="support_category_billing_payments">বিলিং ও পেমেন্ট</string>
+        <string name="support_category_account_management">অ্যাকাউন্ট ব্যবস্থাপনা</string>
+        <string name="support_category_feature_request">ফিচার অনুরোধ</string>
+        <string name="support_category_general_inquiry">সাধারণ জিজ্ঞাসা</string>
+        <string name="support_request_submitted_message">সহায়তার অনুরোধ জমা দেওয়া হয়েছে!</string>
+        <string name="failed_to_submit_support_request_message">সহায়তার অনুরোধ জমা দিতে ব্যর্থ হয়েছে।</string>
+
+        <!-- FormValidator -->
+        <string name="please_fill_all_fields_message">অনুগ্রহ করে সমস্ত ক্ষেত্র পূরণ করুন।</string>
+        <string name="please_enter_valid_email_message">অনুগ্রহ করে একটি বৈধ ইমেইল লিখুন।</string>
+        <string name="unknown_job_label">অজানা কাজ</string>
+        <string name="failed_to_create_chat_format">চ্যাট তৈরি করতে ব্যর্থ হয়েছে: %1$s</string>
 </resources>

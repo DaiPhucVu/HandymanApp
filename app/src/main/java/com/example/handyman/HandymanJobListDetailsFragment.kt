@@ -41,6 +41,7 @@ import org.osmdroid.views.overlay.Marker
 import android.location.Geocoder
 import java.util.UUID
 import java.util.Locale
+import com.example.handyman.utils.localizedServiceCategoryName
 
 class HandymanJobListDetailsFragment : Fragment() {
     override fun onCreateView(
@@ -76,7 +77,7 @@ class HandymanJobListDetailsFragment : Fragment() {
         val argLng = args.longitude
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
-        jobTitle.text = if (!serviceName.isNullOrEmpty()) serviceName else "Untitled Job"
+        jobTitle.text = if (!serviceName.isNullOrEmpty()) localizedServiceCategoryName(requireContext(), serviceName) else getString(R.string.untitled_job_label)
         val salaryDisplay = view.findViewById<TextView>(R.id.tvPrice)
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
 
@@ -84,24 +85,24 @@ class HandymanJobListDetailsFragment : Fragment() {
         jobDescDisplay.text = if (!jobDescription.isNullOrEmpty()) jobDescription else ""
         val dateDisplay = view.findViewById<TextView>(R.id.tvDate)
         if (dateFrom == dateTo) {
-            dateDisplay.text = "$dateFrom"
+            dateDisplay.text = dateFrom
         } else {
-            dateDisplay.text = "$dateFrom — $dateTo"
+            dateDisplay.text = getString(R.string.range_dash_format, dateFrom, dateTo)
         }
         val timeDisplay = view.findViewById<TextView>(R.id.tvTime)
-        timeDisplay.text = "$timeFrom — $timeTo"
+        timeDisplay.text = getString(R.string.range_dash_format, timeFrom, timeTo)
         val locationDisplay = view.findViewById<TextView>(R.id.tvAddress)
         val isAssigned = assignedTo == SessionManager.getLoggedInUserId(requireContext())
-        
+
         // Removed initial redundant jobRef.get() here as it's handled in the main map update block
-        locationDisplay.text = "Loading location..."
+        locationDisplay.text = getString(R.string.loading_location_message)
 
         val customerNameDisplay = view.findViewById<TextView>(R.id.tvTitle)
         val customerRatingDisplay = view.findViewById<TextView>(R.id.tvRating)
         val btnViewProfile = view.findViewById<Button>(R.id.btnViewProfile)
         val ivProfile = view.findViewById<ImageView>(R.id.ivProfile)
-        
-        customerNameDisplay.text = "Loading..."
+
+        customerNameDisplay.text = getString(R.string.loading_ellipsis_label)
         
         // Fetch customer name and rating from Firebase
         val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
@@ -116,7 +117,7 @@ class HandymanJobListDetailsFragment : Fragment() {
                 customerNameDisplay.text = "$firstName $lastName"
                 customerRatingDisplay.text = String.format(Locale.getDefault(), "%.1f", rating)
             } else {
-                customerNameDisplay.text = "Customer"
+                customerNameDisplay.text = getString(R.string.customer_fallback_name)
             }
 
             if (!profileImageUrl.isNullOrEmpty()) {
@@ -159,7 +160,7 @@ class HandymanJobListDetailsFragment : Fragment() {
                 locationDisplay.text = "$location, Melbourne, VIC"
             } else {
                 if (!citySuburb.isNullOrBlank()) {
-                    locationDisplay.text = "$citySuburb (Approximate)"
+                    locationDisplay.text = getString(R.string.approximate_location_format, citySuburb)
                 } else if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
                     // Fallback Geocoding
                     try {
@@ -167,16 +168,16 @@ class HandymanJobListDetailsFragment : Fragment() {
                         val addresses = geocoder.getFromLocation(lat, lng, 1)
                         if (!addresses.isNullOrEmpty()) {
                             val address = addresses[0]
-                            val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea ?: "Approximate Location"
-                            locationDisplay.text = if (city != "Approximate Location") "$city (Approximate)" else city
+                            val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea
+                            locationDisplay.text = if (city != null) getString(R.string.approximate_location_format, city) else getString(R.string.approximate_location_label)
                         } else {
-                            locationDisplay.text = "Approximate Location"
+                            locationDisplay.text = getString(R.string.approximate_location_label)
                         }
                     } catch (e: Exception) {
-                        locationDisplay.text = "Approximate Location"
+                        locationDisplay.text = getString(R.string.approximate_location_label)
                     }
                 } else {
-                    locationDisplay.text = "Approximate Location"
+                    locationDisplay.text = getString(R.string.approximate_location_label)
                 }
             }
 
@@ -194,7 +195,7 @@ class HandymanJobListDetailsFragment : Fragment() {
                     val marker = Marker(mapView)
                     marker.position = jobLocation
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    marker.title = "Job Location"
+                    marker.title = getString(R.string.cd_job_location_marker)
                     mapView.overlays.add(marker)
                 } else {
                     mapView.controller.setZoom(10.0) // Zoom out further for 5km radius
@@ -216,14 +217,14 @@ class HandymanJobListDetailsFragment : Fragment() {
             val custpay = snapshot.child("custpay").getValue(String::class.java) ?: ""
 
             if (paymentStatus == "done" && custpay.isNotBlank()) {
-                salaryDisplay.text = "Paid: BDT $custpay"
+                salaryDisplay.text = getString(R.string.paid_bdt_format, custpay)
             } else if (salaryFrom.isNotBlank() && salaryTo.isNotBlank()) {
                 salaryDisplay.text = if (paymentOption == "Per Day")
-                    "BDT $salaryFrom-$salaryTo/day"
+                    getString(R.string.bdt_range_per_day_format, salaryFrom, salaryTo)
                 else
-                    "BDT $salaryFrom-$salaryTo"
+                    getString(R.string.bdt_range_format, salaryFrom, salaryTo)
             } else {
-                salaryDisplay.text = "To be negotiated"
+                salaryDisplay.text = getString(R.string.to_be_negotiated_message)
             }
         }
 
@@ -245,7 +246,7 @@ class HandymanJobListDetailsFragment : Fragment() {
                     val intent = Intent(context, ChatClientActivity::class.java).apply {
                         putExtra("chatID", compositeChatId)
                         putExtra("uid", otherMember?.get("uid") ?: customerId)
-                        putExtra("username", otherMember?.get("username") ?: "Customer")
+                        putExtra("username", otherMember?.get("username") ?: getString(R.string.customer_fallback_name))
                     }
                     context.startActivity(intent)
                 }
@@ -254,10 +255,10 @@ class HandymanJobListDetailsFragment : Fragment() {
                     // First fetch customer name
                     val userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId)
                     userRef.child("firstName").get().addOnSuccessListener { snapshot ->
-                        val cName = snapshot.getValue(String::class.java) ?: "Customer"
+                        val cName = snapshot.getValue(String::class.java) ?: getString(R.string.customer_fallback_name)
                         createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, cName)
                     }.addOnFailureListener {
-                        createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, "Customer")
+                        createAndOpenChat(context, compositeChatId, jobId, currentHandymanId, customerId, getString(R.string.customer_fallback_name))
                     }
                 }
             }
@@ -292,7 +293,7 @@ class HandymanJobListDetailsFragment : Fragment() {
                 context.startActivity(intent)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to create chat: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.failed_to_create_chat_format, e.message), Toast.LENGTH_SHORT).show()
             }
     }
 

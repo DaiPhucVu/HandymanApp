@@ -27,6 +27,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import com.example.handyman.utils.getCurrentYearMonth
 import com.example.handyman.utils.incrementMetric
+import com.example.handyman.utils.localizedJobStatusLabel
 
 class CustomerJobListFragment : Fragment() {
     private var currentCategoryKey = "allJobs"
@@ -93,7 +94,7 @@ class CustomerJobListFragment : Fragment() {
                             if (!snapshot.exists()) {
                                 Toast.makeText(
                                     context,
-                                    "Only jobs that are not yet assigned can be edited.",
+                                    getString(R.string.only_not_yet_assigned_can_be_edited_message),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return
@@ -122,7 +123,7 @@ class CustomerJobListFragment : Fragment() {
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(context, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.database_error_format, error.message), Toast.LENGTH_SHORT).show()
                         }
                     })
             },
@@ -139,16 +140,16 @@ class CustomerJobListFragment : Fragment() {
                             if (!customerSnapshot.exists()) {
                                 Toast.makeText(
                                     context,
-                                    "Cannot cancel.",
+                                    getString(R.string.cannot_cancel_message),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return
                             }
 
                             AlertDialog.Builder(requireContext())
-                                .setTitle("Delete job?")
-                                .setMessage("Are you sure you want to delete this job?")
-                                .setPositiveButton("Yes") { _, _ ->
+                                .setTitle(R.string.delete_job_title)
+                                .setMessage(R.string.delete_job_confirm_message)
+                                .setPositiveButton(R.string.yes_btn) { _, _ ->
 
                                     // Step 1: Set job status to "Inactive"
                                     val jobRef = FirebaseDatabase.getInstance()
@@ -159,14 +160,14 @@ class CustomerJobListFragment : Fragment() {
                                         .addOnSuccessListener {
                                             Toast.makeText(
                                                 context,
-                                                "Job marked as inactive",
+                                                getString(R.string.job_marked_inactive_message),
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         }
                                         .addOnFailureListener { e ->
                                             Toast.makeText(
                                                 context,
-                                                "Failed to update job status: ${e.message}",
+                                                getString(R.string.failed_to_update_job_status_format, e.message),
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
@@ -205,19 +206,19 @@ class CustomerJobListFragment : Fragment() {
                                     // Step 5: Update the UI
                                     Toast.makeText(
                                         context,
-                                        "Job has been cancelled.",
+                                        getString(R.string.job_cancelled_message),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     fetchJobsForCategory(currentCategoryKey)
                                 }
-                                .setNegativeButton("No", null)
+                                .setNegativeButton(R.string.no_btn, null)
                                 .show()
                         }
 
                         override fun onCancelled(error: DatabaseError) {
                             Toast.makeText(
                                 context,
-                                "Error checking job existence: ${error.message}",
+                                getString(R.string.error_checking_job_existence_format, error.message),
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -234,18 +235,19 @@ class CustomerJobListFragment : Fragment() {
                 }
 
                 if (nextStatuses.isEmpty()) {
-                    Toast.makeText(context, "No further updates available", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.no_further_updates_message), Toast.LENGTH_SHORT).show()
                     return
                 }
 
                 // now show the dialog with only the valid choices
+                val displayStatuses = nextStatuses.map { localizedJobStatusLabel(requireContext(), it) }.toTypedArray()
                 var chosen = 0
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Update status")
-                    .setSingleChoiceItems(nextStatuses, 0) { _, which ->
+                    .setTitle(R.string.update_status_dialog_title)
+                    .setSingleChoiceItems(displayStatuses, 0) { _, which ->
                         chosen = which
                     }
-                    .setPositiveButton("OK") { _, _ ->
+                    .setPositiveButton(R.string.ok_btn) { _, _ ->
                         val newStatus = nextStatuses[chosen]
                         val jobRef = FirebaseDatabase.getInstance()
                             .getReference("Job")
@@ -256,7 +258,7 @@ class CustomerJobListFragment : Fragment() {
                             .addOnSuccessListener {
                                 Toast.makeText(
                                     context,
-                                    "Status updated to $newStatus",
+                                    getString(R.string.status_updated_to_format, localizedJobStatusLabel(requireContext(), newStatus)),
                                     Toast.LENGTH_SHORT
                                 ).show()
 
@@ -316,18 +318,18 @@ class CustomerJobListFragment : Fragment() {
                             .addOnFailureListener { e ->
                                 Toast.makeText(
                                     context,
-                                    "Failed to update status: ${e.message}",
+                                    getString(R.string.failed_to_update_status_format, e.message),
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.cancel, null)
                     .show()
             },
 
             onProceedToPayment = { job ->
                 if (job.jobStatus != "Done") {
-                    Toast.makeText(context, "Job is not marked as Done yet.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.job_not_marked_done_message), Toast.LENGTH_SHORT).show()
                     return@CustomerJobListAdapter
                 }
 
@@ -350,15 +352,19 @@ class CustomerJobListFragment : Fragment() {
             override fun onItemSelected(
                 parent: AdapterView<*>, v: View?, pos: Int, id: Long
             ) {
-                val display = parent.getItemAtPosition(pos) as String
-                currentCategoryKey = when (display) {
-                    "Assigned"      -> "assignedJobs"
-                    "Not assigned"  -> "notAssignedJobs"
-                    "All"           -> "allJobs"
-                    "In-progress"   -> "inProgressJobs"
-                    "Done"          -> "completedJobs"
-                    "Cancelled"     -> "cancelledJobs"
-                    else            -> return
+                // Position-based, not string-based: the spinner's displayed text is
+                // localized via @array/job_statuses_customer, so comparing it against
+                // English literals here would silently break in Bangla. Order must
+                // match that array exactly: All, Not assigned, Assigned, In-progress,
+                // Done, Cancelled.
+                currentCategoryKey = when (pos) {
+                    0 -> "allJobs"
+                    1 -> "notAssignedJobs"
+                    2 -> "assignedJobs"
+                    3 -> "inProgressJobs"
+                    4 -> "completedJobs"
+                    5 -> "cancelledJobs"
+                    else -> return
                 }
                 fetchJobsForCategory(currentCategoryKey)
             }
@@ -375,17 +381,17 @@ class CustomerJobListFragment : Fragment() {
         val etComment = dialogView.findViewById<EditText>(R.id.etComment)
         val tvTitle = dialogView.findViewById<TextView>(R.id.tvReviewTitle)
         
-        tvTitle.text = "How was your experience with this handyman?"
+        tvTitle.text = getString(R.string.how_was_experience_handyman_message)
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Review Handyman")
+            .setTitle(R.string.review_handyman_title)
             .setView(dialogView)
-            .setPositiveButton("Submit") { _, _ ->
+            .setPositiveButton(R.string.submit_btn) { _, _ ->
                 val rating = ratingBar.rating
                 val comment = etComment.text.toString()
 
                 if (rating == 0f) {
-                    Toast.makeText(context, "Please provide a rating", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.please_provide_rating_message), Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
@@ -411,14 +417,14 @@ class CustomerJobListFragment : Fragment() {
                             .child("isReviewedByCustomer")
                             .setValue(true)
                         
-                        Toast.makeText(context, "Review submitted!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.review_submitted_message), Toast.LENGTH_SHORT).show()
                         fetchJobsForCategory(currentCategoryKey)
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.review_failed_format, e.message), Toast.LENGTH_SHORT).show()
                     }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -492,7 +498,7 @@ class CustomerJobListFragment : Fragment() {
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.e("CustomerJobList", "Error loading $category: ${error.message}")
-                Toast.makeText(context, "Error loading $category", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.error_loading_jobs_message), Toast.LENGTH_SHORT).show()
             }
         })
     }

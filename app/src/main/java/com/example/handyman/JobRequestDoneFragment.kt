@@ -25,7 +25,7 @@ class JobRequestDoneFragment: Fragment() {
         val month = calendar.get(Calendar.MONTH) + 1
         val year = calendar.get(Calendar.YEAR)
         val currentDate = String.format("%02d/%02d/%04d", day, month, year)
-        confirmMessage.text = "Booking confirmed on\n$currentDate"
+        confirmMessage.text = getString(R.string.booking_confirmed_format, currentDate)
 
         val backBttn = view.findViewById<TextView>(R.id.btnBack)
         backBttn.setOnClickListener{

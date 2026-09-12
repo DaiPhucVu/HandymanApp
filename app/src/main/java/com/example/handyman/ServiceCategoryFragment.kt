@@ -44,7 +44,8 @@ class ServiceCategoryFragment : Fragment() {
         val userName = SessionManager.getLoggedInUserName(requireContext())
 
         // Update greeting
-        view.findViewById<android.widget.TextView>(R.id.tvGreeting)?.text = "Hello, $userName"
+        view.findViewById<android.widget.TextView>(R.id.tvGreeting)?.text =
+            getString(R.string.hello_name_only_format, userName)
 
         val tvLocation = view.findViewById<android.widget.TextView>(R.id.tvLocation)
         val currentCity = SessionManager.getLoggedInCity(requireContext())

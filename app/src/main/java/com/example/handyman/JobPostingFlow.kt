@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.database.FirebaseDatabase
 import com.example.handyman.utils.SessionManager
+import com.example.handyman.utils.localizedServiceCategoryName
 import android.widget.Toast
 import java.util.*
 import coil.compose.AsyncImage
@@ -759,11 +760,11 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
         }
         val pleaseCompleteFormat = stringResource(R.string.please_complete_format)
 
-        ReviewSection(title = stringResource(R.string.review_service_title), content = viewModel.serviceCategory, onEdit = {
+        ReviewSection(title = stringResource(R.string.review_service_title), content = localizedServiceCategoryName(viewModel.serviceCategory), onEdit = {
             viewModel.isEditing = true
             navController.navigate("customerHome")
         })
-        ReviewSection(title = stringResource(R.string.review_description_timing_title), content = viewModel.problemDesc + "\n" + viewModel.dateFrom + " to " + viewModel.dateTo, onEdit = {
+        ReviewSection(title = stringResource(R.string.review_description_timing_title), content = viewModel.problemDesc + "\n" + stringResource(R.string.date_range_format, viewModel.dateFrom, viewModel.dateTo), onEdit = {
             viewModel.isEditing = true
             navController.navigate("jobPostingDescription")
         })

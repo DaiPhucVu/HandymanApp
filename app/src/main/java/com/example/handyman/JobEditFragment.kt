@@ -347,29 +347,29 @@ class JobEditFragment : Fragment() {
         val update = view.findViewById<Button>(R.id.btnUpdate)
         update.setOnClickListener {
             if (etDescribeProblem.text.isBlank()) {
-                Toast.makeText(requireContext(), "Please describe your problem", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), getString(R.string.please_describe_problem_message), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
 
             if (etDateFrom.text.isBlank()) {
-                Toast.makeText(requireContext(), "Please select a start date", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.please_select_start_date_message), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (etDateTo.text.isBlank()) {
-                Toast.makeText(requireContext(), "Please select an end date", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.please_select_end_date_message), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (etTimeFrom.text.isBlank()) {
-                Toast.makeText(requireContext(), "Please select a start time", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), getString(R.string.please_select_start_time_message), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
 
             if (etTimeTo.text.isBlank()) {
-                Toast.makeText(requireContext(), "Please select an end time", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), getString(R.string.please_select_end_time_message), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
@@ -378,7 +378,7 @@ class JobEditFragment : Fragment() {
                 if (etFromSalary.text.toString().toInt() >= etToSalary.text.toString().toInt()) {
                     Toast.makeText(
                         requireContext(),
-                        "Please select an appropriate salary range",
+                        getString(R.string.please_select_salary_range_message),
                         Toast.LENGTH_SHORT
                     ).show()
                     return@setOnClickListener
@@ -386,7 +386,7 @@ class JobEditFragment : Fragment() {
                 if (radioGroup.checkedRadioButtonId == -1) {
                     Toast.makeText(
                         requireContext(),
-                        "Please select an option for salary payment",
+                        getString(R.string.please_select_payment_option_message),
                         Toast.LENGTH_SHORT
                     ).show()
                     return@setOnClickListener
@@ -396,15 +396,18 @@ class JobEditFragment : Fragment() {
                 if (etFromSalary.text.isBlank() or etToSalary.text.isBlank()) {
                     Toast.makeText(
                         requireContext(),
-                        "Please choose a salary",
+                        getString(R.string.please_choose_salary_message),
                         Toast.LENGTH_SHORT
                     ).show()
                     return@setOnClickListener
                 }
             }
 
-            if (spinner.selectedItem.toString() == "Select a location") {
-                Toast.makeText(requireContext(), "Please select a location", Toast.LENGTH_SHORT)
+            if (spinner.selectedItemPosition == 0) {
+                // Position-based check: index 0 is the localized placeholder
+                // ("Select a location"); comparing displayed text against the
+                // English literal would silently break in Bangla.
+                Toast.makeText(requireContext(), getString(R.string.please_select_location_message), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
@@ -452,7 +455,7 @@ class JobEditFragment : Fragment() {
 
             dbRef.updateChildren(updates)
                 .addOnSuccessListener {
-                    Toast.makeText(requireContext(), "Details saved", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.details_saved_message), Toast.LENGTH_SHORT).show()
 
                     val storageRef = Firebase.storage
                         .reference
@@ -479,7 +482,7 @@ class JobEditFragment : Fragment() {
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(requireContext(),
-                        "Failed to save: ${e.localizedMessage}",
+                        getString(R.string.failed_to_save_format, e.localizedMessage),
                         Toast.LENGTH_LONG
                     ).show()
                 }

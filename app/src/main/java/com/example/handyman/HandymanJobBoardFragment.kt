@@ -40,7 +40,7 @@ class HandymanJobBoardFragment : Fragment() {
 
         val tvGreeting = view.findViewById<TextView>(R.id.tvGreeting)
         val userName = SessionManager.getLoggedInUserName(requireContext())
-        tvGreeting.text = "Hello, $userName"
+        tvGreeting.text = getString(R.string.hello_name_only_format, userName)
 
         val tvLocation = view.findViewById<TextView>(R.id.tvLocation)
         val currentCity = SessionManager.getLoggedInCity(requireContext())
@@ -170,7 +170,7 @@ class HandymanJobBoardFragment : Fragment() {
                                 context?.let {
                                     Toast.makeText(
                                         it,
-                                        "Error loading jobs: ${error.message}",
+                                        getString(R.string.error_loading_jobs_message),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -183,7 +183,7 @@ class HandymanJobBoardFragment : Fragment() {
                     context?.let {
                         Toast.makeText(
                             it,
-                            "Error loading cancelled jobs: ${error.message}",
+                            getString(R.string.error_loading_jobs_message),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
