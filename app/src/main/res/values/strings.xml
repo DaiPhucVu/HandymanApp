@@ -585,4 +585,12 @@
     <string name="please_enter_valid_email_message">Please enter a valid email.</string>
     <string name="unknown_job_label">Unknown Job</string>
     <string name="failed_to_create_chat_format">Failed to create chat: %1$s</string>
+
+    <!-- Field validation messages (P69-51). Bangla translations pending. -->
+    <string name="error_first_name_required">Enter your first name</string>
+    <string name="error_last_name_required">Enter your last name</string>
+    <string name="error_email_invalid">Enter a valid email address, for example name@example.com</string>
+    <string name="error_password_too_short">Password must be at least 8 characters</string>
+    <string name="error_passwords_do_not_match">Passwords do not match</string>
+    <string name="error_phone_invalid">Enter the number in international format, for example +8801712345678</string>
 </resources>

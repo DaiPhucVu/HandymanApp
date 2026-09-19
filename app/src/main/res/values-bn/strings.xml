@@ -587,4 +587,13 @@
         <string name="please_enter_valid_email_message">অনুগ্রহ করে একটি বৈধ ইমেইল লিখুন।</string>
         <string name="unknown_job_label">অজানা কাজ</string>
         <string name="failed_to_create_chat_format">চ্যাট তৈরি করতে ব্যর্থ হয়েছে: %1$s</string>
+
+        <!-- Field validation messages (P69-51) -->
+        <string name="error_first_name_required">নামের প্রথম অংশ লিখুন</string>
+        <string name="error_last_name_required">নামের শেষ অংশ লিখুন</string>
+        <string name="error_email_invalid">একটি বৈধ ইমেইল ঠিকানা লিখুন, যেমন name@example.com</string>
+        <string name="error_password_too_short">পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে</string>
+        <string name="error_passwords_do_not_match">পাসওয়ার্ড দুটি মিলছে না</string>
+        <!-- Example kept in ASCII digits: the phone field only accepts those. -->
+        <string name="error_phone_invalid">আন্তর্জাতিক ফরম্যাটে নম্বর লিখুন, যেমন +8801712345678</string>
 </resources>

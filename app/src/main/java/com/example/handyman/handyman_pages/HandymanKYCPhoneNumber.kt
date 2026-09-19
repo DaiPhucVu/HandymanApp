@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -119,9 +118,14 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
             isError = (phoneNumber.isNotBlank() && !isValidPhone) || errorMessage != null
         )
 
-        if (errorMessage != null) {
+        // Server error wins; otherwise explain the expected format instead of
+        // only turning the field red.
+        val phoneError = errorMessage
+            ?: stringResource(R.string.error_phone_invalid)
+                .takeIf { phoneNumber.isNotBlank() && !isValidPhone }
+        if (phoneError != null) {
             Text(
-                text = errorMessage!!,
+                text = phoneError,
                 color = Color.Red,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 4.dp)

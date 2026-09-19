@@ -47,6 +47,9 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
+    var firstNameTouched by remember { mutableStateOf(false) }
+    var lastNameTouched by remember { mutableStateOf(false) }
+
     val isValid = firstName.isNotBlank() &&
             lastName.isNotBlank() &&
             android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() &&
@@ -97,17 +100,21 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
 
         OutlinedTextField(
             value = firstName,
-            onValueChange = { firstName = it },
+            onValueChange = { firstName = it; firstNameTouched = true },
             label = { Text(stringResource(R.string.first_name_label)) },
             singleLine = true,
+            isError = firstNameTouched && firstName.isBlank(),
+            supportingText = { if (firstNameTouched && firstName.isBlank()) Text(stringResource(R.string.error_first_name_required)) },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = lastName,
-            onValueChange = { lastName = it },
+            onValueChange = { lastName = it; lastNameTouched = true },
             label = { Text(stringResource(R.string.last_name_label)) },
             singleLine = true,
+            isError = lastNameTouched && lastName.isBlank(),
+            supportingText = { if (lastNameTouched && lastName.isBlank()) Text(stringResource(R.string.error_last_name_required)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -115,6 +122,8 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
             value = email,
             onValueChange = { email = it },
             label = { Text(stringResource(R.string.email_label)) },
+            isError = email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches(),
+            supportingText = { if (email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) Text(stringResource(R.string.error_email_invalid)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -134,7 +143,9 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = password.isNotBlank() && password.length < 8,
+            supportingText = { if (password.isNotBlank() && password.length < 8) Text(stringResource(R.string.error_password_too_short)) }
         )
 
         OutlinedTextField(
@@ -151,7 +162,9 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = confirmPassword.isNotBlank() && confirmPassword != password,
+            supportingText = { if (confirmPassword.isNotBlank() && confirmPassword != password) Text(stringResource(R.string.error_passwords_do_not_match)) }
         )
 
         Spacer(modifier = Modifier.height(24.dp))

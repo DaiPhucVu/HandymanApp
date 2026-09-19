@@ -95,6 +95,8 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
             value = email,
             onValueChange = { email = it },
             label = { Text(stringResource(R.string.email_label)) },
+            isError = email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches(),
+            supportingText = { if (email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) Text(stringResource(R.string.error_email_invalid)) },
             placeholder = { Text(stringResource(R.string.email_placeholder)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -105,6 +107,8 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
             value = password,
             onValueChange = { password = it },
             label = { Text(stringResource(R.string.password_label)) },
+            isError = password.isNotBlank() && password.length < 8,
+            supportingText = { if (password.isNotBlank() && password.length < 8) Text(stringResource(R.string.error_password_too_short)) },
             placeholder = { Text(stringResource(R.string.password_placeholder_min8)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
