@@ -1,6 +1,5 @@
 package com.example.handyman.handyman_pages
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,24 +11,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import com.example.handyman.utils.SessionManager
-import com.google.firebase.database.FirebaseDatabase
 
 @Composable
-fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavController) {
-    val context = LocalContext.current
+fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavController, signupViewModel: HandymanSignupViewModel) {
     val scrollState = rememberScrollState()
 
     val textFieldModifier = Modifier
@@ -226,40 +222,19 @@ fun HandymanKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
 
         Button(
             onClick = {
-                val currentEmail = SessionManager.getLoggedInEmail(context)
-                val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
-                val query = handymanRef.orderByChild("email").equalTo(currentEmail)
-
-                val addressData = mapOf(
-                    "houseNumber" to houseNumber,
-                    "street" to street,
-                    "area" to area,
-                    "postCode" to postCode,
-                    "division" to division,
-                    "district" to district,
-                    "thana" to thana,
-                    "city" to city,
-                    "country" to country,
-                    "notes" to note
-                )
-
-                query.get().addOnSuccessListener { snapshot ->
-                    for (child in snapshot.children) {
-                        child.ref.updateChildren(addressData)
-                            .addOnSuccessListener {
-                                SessionManager.saveLoggedInCity(context, city)
-                                navController.navigate("handymanKYCPhoneNumber")
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("KYC", "Failed to save address: ${e.message}")
-                            }
-                    }
-                    if (!snapshot.exists()) {
-                        Log.e("KYC", "No handyman found for email: $currentEmail")
-                    }
-                }.addOnFailureListener { e ->
-                    Log.e("KYC", "Query error: ${e.message}")
-                }
+                // Account is not created yet — just hold the address until phone
+                // verification succeeds at the end of the KYC flow.
+                signupViewModel.houseNumber = houseNumber
+                signupViewModel.street = street
+                signupViewModel.area = area
+                signupViewModel.postCode = postCode
+                signupViewModel.division = division
+                signupViewModel.district = district
+                signupViewModel.thana = thana
+                signupViewModel.city = city
+                signupViewModel.country = country
+                signupViewModel.notes = note
+                navController.navigate("handymanKycPhoneNumber")
             },
             enabled = isFormComplete,
             modifier = Modifier

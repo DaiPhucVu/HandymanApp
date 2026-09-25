@@ -26,9 +26,7 @@ import com.example.handyman.components.StepCircle
 import android.location.Geocoder
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
-import com.example.handyman.utils.SessionManager
-import com.google.firebase.database.FirebaseDatabase
-import android.widget.Toast
+import com.example.handyman.CustomerSignupViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,7 +38,7 @@ import org.osmdroid.views.overlay.Marker
 
 
 @Composable
-fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavController) {
+fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavController, signupViewModel: CustomerSignupViewModel) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -351,40 +349,21 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
 
         Button(
             onClick = {
-                val userId = SessionManager.currentUserID ?: SessionManager.getLoggedInUserId(context)
-                if (userId.isBlank()) {
-                    Log.e("KYC", "No logged-in user ID found")
-                    Toast.makeText(context, context.getString(R.string.session_error_message), Toast.LENGTH_LONG).show()
-                    return@Button
-                }
-
-                val addressData = mapOf(
-                    "houseNumber" to houseNumber.trim(),
-                    "street" to street.trim(),
-                    "area" to area.trim(),
-                    "postcode" to postCode.trim(),
-                    "division" to division.trim(),
-                    "district" to district.trim(),
-                    "thana" to thana.trim(),
-                    "city" to city.trim(),
-                    "country" to country.trim(),
-                    "notes" to note.trim(),
-                    "latitude" to latitude,
-                    "longitude" to longitude,
-                    "kycStatus" to "AddressSubmitted"
-                )
-
-                FirebaseDatabase.getInstance().getReference("User")
-                    .child(userId)
-                    .updateChildren(addressData)
-                    .addOnSuccessListener {
-                        SessionManager.saveLoggedInCity(context, city.trim())
-                        navController.navigate("customerKycPhoneNumber")
-                    }
-                    .addOnFailureListener { error ->
-                        Log.e("KYC", "Failed to update address: ${error.message}")
-                        Toast.makeText(context, context.getString(R.string.failed_to_save_address_message), Toast.LENGTH_LONG).show()
-                    }
+                // Account is not created yet — just hold the address until phone
+                // verification succeeds at the end of the KYC flow.
+                signupViewModel.houseNumber = houseNumber.trim()
+                signupViewModel.street = street.trim()
+                signupViewModel.area = area.trim()
+                signupViewModel.postcode = postCode.trim()
+                signupViewModel.division = division.trim()
+                signupViewModel.district = district.trim()
+                signupViewModel.thana = thana.trim()
+                signupViewModel.city = city.trim()
+                signupViewModel.country = country.trim()
+                signupViewModel.notes = note.trim()
+                signupViewModel.latitude = latitude
+                signupViewModel.longitude = longitude
+                navController.navigate("customerKycPhoneNumber")
             },
             enabled = isFormComplete,
             modifier = Modifier

@@ -22,11 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
-import com.example.handyman.utils.SessionManager
-import com.google.firebase.database.FirebaseDatabase
 
 fun findActivity(context: Context): android.app.Activity? {
     var currentContext = context
@@ -38,7 +37,7 @@ fun findActivity(context: Context): android.app.Activity? {
 }
 
 @Composable
-fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavController) {
+fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavController, signupViewModel: HandymanSignupViewModel) {
     val context = LocalContext.current
     var phoneNumber by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -68,7 +67,7 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
                 contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { navController.navigate("handymanKycAddressForm") }
+                    .clickable { navController.navigate("handymanKYCAddressForm") }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.account_verification_title), fontSize = 20.sp)
@@ -169,18 +168,10 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier,navController: NavContr
                         token: com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
                     ) {
                         isLoading = false
-                        // Save phone number to database before navigating
-                        val currentEmail = SessionManager.getLoggedInEmail(context)
-                        val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
-                        handymanRef.orderByChild("email").equalTo(currentEmail)
-                            .get().addOnSuccessListener { snapshot ->
-                                for (child in snapshot.children) {
-                                    child.ref.child("phoneNumber").setValue(phoneNumber)
-                                }
-                                navController.navigate("handymanKycCodeOTP/$verificationId/$phoneNumber")
-                            }.addOnFailureListener {
-                                navController.navigate("handymanKycCodeOTP/$verificationId/$phoneNumber")
-                            }
+                        // Account is not created yet — the phone number is only
+                        // committed once OTP verification succeeds.
+                        signupViewModel.phoneNumber = phoneNumber
+                        navController.navigate("handymanKycCodeOTP/$verificationId/$phoneNumber")
                     }
                 }
 

@@ -1,6 +1,5 @@
 package com.example.handyman.handyman_pages
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,17 +18,11 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
-import com.google.firebase.database.FirebaseDatabase
-import com.example.handyman.utils.SessionManager
-import java.text.SimpleDateFormat
-import java.util.*
-import com.example.handyman.utils.getCurrentYearMonth
-import com.example.handyman.utils.incrementMetric
 
 @Composable
-fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
-    val context = LocalContext.current
+fun HandymanSignup(modifier: Modifier = Modifier, navController: NavController, signupViewModel: HandymanSignupViewModel) {
     val scrollState = rememberScrollState()
 
     var firstName by remember { mutableStateOf("") }
@@ -177,50 +169,13 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
 
         Button(
             onClick = {
-                val handymanId = UUID.randomUUID().toString()
-                val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(Date())
-
-                val handymanData = mapOf(
-                    "handymanId" to handymanId,
-                    "firstName" to firstName,
-                    "lastName" to lastName,
-                    "email" to email,
-                    "password" to password,
-                    "isPhoneVerified" to false,
-                    "photoIdCard" to "",
-                    "nid" to "",
-                    "houseNumber" to "",
-                    "street" to "",
-                    "area" to "",
-                    "division" to "",
-                    "district" to "",
-                    "thana" to "",
-                    "city" to "",
-                    "country" to "",
-                    "postcode" to "",
-                    "notes" to "",
-                    "verificationStatus" to "",
-                    "approvedBy" to "",
-                    "createdAt" to timestamp,
-                    "updatedAt" to timestamp,
-                    "averageRating" to 0.0,
-                    "reviewCount" to 0
-                )
-
-                val ref = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanId)
-                ref.setValue(handymanData)
-                    .addOnSuccessListener {
-                        val (year, month) = getCurrentYearMonth()
-                        incrementMetric("serviceAnalytics/2025/$year/$month/newHandymen")
-                        incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
-
-                        SessionManager.saveSession(context, email, handymanId, firstName)
-                        Toast.makeText(context, context.getString(R.string.account_created_success_message), Toast.LENGTH_LONG).show()
-                        navController.navigate("handymanSkills")
-                    }
-                    .addOnFailureListener { error ->
-                        Toast.makeText(context, context.getString(R.string.failed_to_sign_up_format, error.message), Toast.LENGTH_LONG).show()
-                    }
+                // Account is not created yet — just hold the details until phone
+                // verification succeeds at the end of the KYC flow.
+                signupViewModel.firstName = firstName
+                signupViewModel.lastName = lastName
+                signupViewModel.email = email
+                signupViewModel.password = password
+                navController.navigate("handymanSkills")
             },
             enabled = isValid,
             modifier = Modifier

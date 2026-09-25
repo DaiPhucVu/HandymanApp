@@ -1,6 +1,5 @@
 package com.example.handyman.handyman_pages
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,18 +15,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
-import com.example.handyman.utils.SessionManager
-import com.google.firebase.database.FirebaseDatabase
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -48,11 +45,8 @@ private fun tradeDisplayName(trade: String): String = when (trade) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HandymanSkillsScreen(navController: NavController) {
-    val context = LocalContext.current
+fun HandymanSkillsScreen(navController: NavController, signupViewModel: HandymanSignupViewModel) {
     val scrollState = rememberScrollState()
-    val database = FirebaseDatabase.getInstance().getReference("Handyman")
-    val userId = SessionManager.getLoggedInUserId(context)
 
     var selectedTrade by remember { mutableStateOf("") }
     var otherTrade by remember { mutableStateOf("") }
@@ -205,22 +199,13 @@ fun HandymanSkillsScreen(navController: NavController) {
         ) {
             Button(
                 onClick = {
-                    if (userId != null) {
-                        val updates = mapOf(
-                            "primaryTrade" to finalTrade,
-                            "experienceYears" to experienceYears,
-                            "hourlyRate" to hourlyRate,
-                            "bio" to skillDescription,
-                            "skills" to listOf(finalTrade)
-                        )
-                        database.child(userId).updateChildren(updates)
-                            .addOnSuccessListener {
-                                navController.navigate("handymanKYCLanding")
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, context.getString(R.string.failed_to_save_skills_message), Toast.LENGTH_SHORT).show()
-                            }
-                    }
+                    // Account is not created yet — just hold the skills until phone
+                    // verification succeeds at the end of the KYC flow.
+                    signupViewModel.primaryTrade = finalTrade
+                    signupViewModel.experienceYears = experienceYears
+                    signupViewModel.hourlyRate = hourlyRate
+                    signupViewModel.bio = skillDescription
+                    navController.navigate("handymanKYCLanding")
                 },
                 enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth().height(56.dp),

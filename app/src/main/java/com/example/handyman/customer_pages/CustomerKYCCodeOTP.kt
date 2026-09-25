@@ -1,6 +1,7 @@
 package com.example.handyman.customer_pages
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,10 +19,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.database.FirebaseDatabase
+import com.example.handyman.CustomerSignupViewModel
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
 import com.example.handyman.utils.SessionManager
+import com.example.handyman.utils.getCurrentYearMonth
+import com.example.handyman.utils.incrementMetric
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthProvider
@@ -31,7 +39,8 @@ fun CustomerKYCCodeOTP(
     modifier: Modifier = Modifier,
     navController: NavController,
     verificationId: String,
-    phoneNumber: String
+    phoneNumber: String,
+    signupViewModel: CustomerSignupViewModel
 ) {
     var otpCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -39,9 +48,6 @@ fun CustomerKYCCodeOTP(
     val isValidOTP = otpCode.matches(Regex("^\\d{6}$"))
 
     val context = LocalContext.current
-    val currentEmail = SessionManager.getLoggedInEmail(context)
-
-    Log.d("KYC", "currentEmail: $currentEmail")
 
 
     Column(
@@ -125,39 +131,73 @@ fun CustomerKYCCodeOTP(
 
                 val credential = PhoneAuthProvider.getCredential(verificationId, otpCode)
 
+                // Only reached once OTP verification actually succeeds — this is
+                // the first point the account record is written anywhere.
+                fun createAccount() {
+                    val userId = UUID.randomUUID().toString()
+                    val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(Date())
+
+                    val userData = mapOf(
+                        "userId" to userId,
+                        "firstName" to signupViewModel.firstName,
+                        "lastName" to signupViewModel.lastName,
+                        "email" to signupViewModel.email,
+                        "password" to signupViewModel.password,
+                        "createdAt" to timestamp,
+                        "updatedAt" to timestamp,
+                        "isPhoneVerified" to true,
+                        "phoneNumber" to phoneNumber,
+                        "photoIdCard" to "",
+                        "houseNumber" to signupViewModel.houseNumber,
+                        "street" to signupViewModel.street,
+                        "area" to signupViewModel.area,
+                        "division" to signupViewModel.division,
+                        "district" to signupViewModel.district,
+                        "thana" to signupViewModel.thana,
+                        "city" to signupViewModel.city,
+                        "country" to signupViewModel.country,
+                        "postcode" to signupViewModel.postcode,
+                        "latitude" to signupViewModel.latitude,
+                        "longitude" to signupViewModel.longitude,
+                        "notes" to signupViewModel.notes,
+                        "status" to "Verified",
+                        "approvedBy" to "",
+                        "averageRating" to 0.0,
+                        "reviewCount" to 0
+                    )
+
+                    FirebaseDatabase.getInstance().getReference("User").child(userId)
+                        .setValue(userData)
+                        .addOnSuccessListener {
+                            val (year, month) = getCurrentYearMonth()
+                            incrementMetric("serviceAnalytics/2025/$year/$month/newCustomers")
+                            incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
+
+                            SessionManager.saveSession(context, signupViewModel.email, userId, signupViewModel.firstName, signupViewModel.city)
+                            signupViewModel.clear()
+                            isLoading = false
+                            Toast.makeText(context, context.getString(R.string.account_created_success_message), Toast.LENGTH_LONG).show()
+                            navController.navigate("customerProfilePictureUpload")
+                        }
+                        .addOnFailureListener { e ->
+                            isLoading = false
+                            errorMessage = context.getString(R.string.error_creating_account_message)
+                            Log.e("KYC", "Failed to create account: ${e.message}")
+                        }
+                }
+
                 if (currentUser != null) {
-                    // Link phone to existing email account
+                    // Link phone to an existing Firebase Auth session, if one is lingering
                     currentUser.linkWithCredential(credential)
                         .addOnCompleteListener { task ->
                             val exception = task.exception
-                            if (task.isSuccessful || (exception is com.google.firebase.auth.FirebaseAuthUserCollisionException || 
+                            if (task.isSuccessful || (exception is com.google.firebase.auth.FirebaseAuthUserCollisionException ||
                                        exception?.message?.contains("already", ignoreCase = true) == true)) {
-                                
+
                                 if (exception != null) {
                                     Log.i("KYC", "Phone already linked, but OTP was valid. Proceeding.")
                                 }
-
-                                val userRef = FirebaseDatabase.getInstance().getReference("User")
-                                val query = userRef.orderByChild("email").equalTo(currentEmail)
-
-                                query.get().addOnSuccessListener { snapshot ->
-                                    if (snapshot.exists()) {
-                                        for (child in snapshot.children) {
-                                            child.ref.child("isPhoneVerified").setValue(true)
-                                            child.ref.child("status").setValue("Verified")
-                                        }
-                                        isLoading = false
-                                        navController.navigate("customerProfilePictureUpload")
-                                    } else {
-                                        isLoading = false
-                                        errorMessage = context.getString(R.string.user_record_not_found_message)
-                                        Log.e("KYC", "No database record for email: $currentEmail")
-                                    }
-                                }.addOnFailureListener { e ->
-                                    isLoading = false
-                                    errorMessage = context.getString(R.string.database_update_failed_message)
-                                    Log.e("KYC", "Failed to update KYC status: ${e.message}")
-                                }
+                                createAccount()
                             } else {
                                 isLoading = false
                                 errorMessage = exception?.message ?: context.getString(R.string.verification_failed_retry_message)
@@ -165,29 +205,11 @@ fun CustomerKYCCodeOTP(
                             }
                         }
                 } else {
-                    // If not logged in, sign in with phone
+                    // Normal signup path: no Firebase Auth session yet
                     auth.signInWithCredential(credential)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val userRef = FirebaseDatabase.getInstance().getReference("User")
-                                val query = userRef.orderByChild("email").equalTo(currentEmail)
-
-                                query.get().addOnSuccessListener { snapshot ->
-                                    if (snapshot.exists()) {
-                                        for (child in snapshot.children) {
-                                            child.ref.child("isPhoneVerified").setValue(true)
-                                            child.ref.child("status").setValue("Verified")
-                                        }
-                                        isLoading = false
-                                        navController.navigate("customerProfilePictureUpload")
-                                    } else {
-                                        isLoading = false
-                                        errorMessage = context.getString(R.string.user_record_not_found_message)
-                                    }
-                                }.addOnFailureListener { e ->
-                                    isLoading = false
-                                    errorMessage = context.getString(R.string.database_update_failed_message)
-                                }
+                                createAccount()
                             } else {
                                 isLoading = false
                                 errorMessage = task.exception?.message ?: context.getString(R.string.verification_failed_message)

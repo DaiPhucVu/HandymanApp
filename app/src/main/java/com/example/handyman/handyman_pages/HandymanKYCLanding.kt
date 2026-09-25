@@ -108,7 +108,7 @@ fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavControll
         // Upload Button
         Button(
             onClick = {
-                navController.navigate("handymanKycCaptureID")
+                navController.navigate("handymanKYCCaptureID")
             },
             modifier = Modifier
                 .fillMaxWidth()

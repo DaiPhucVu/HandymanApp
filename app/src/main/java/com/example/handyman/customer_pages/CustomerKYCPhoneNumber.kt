@@ -25,8 +25,7 @@ import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
-import com.example.handyman.utils.SessionManager
-import com.google.firebase.database.FirebaseDatabase
+import com.example.handyman.CustomerSignupViewModel
 
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
@@ -45,7 +44,7 @@ fun findActivity(context: Context): android.app.Activity? {
 }
 
 @Composable
-fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavController) {
+fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavController, signupViewModel: CustomerSignupViewModel) {
     val context = LocalContext.current
     var phoneNumber by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -174,17 +173,10 @@ fun CustomerKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
                         token: PhoneAuthProvider.ForceResendingToken
                     ) {
                         isLoading = false
-                        val currentEmail = SessionManager.getLoggedInEmail(context)
-                        FirebaseDatabase.getInstance().getReference("User")
-                            .orderByChild("email").equalTo(currentEmail)
-                            .get().addOnSuccessListener { snapshot ->
-                                for (child in snapshot.children) {
-                                    child.ref.child("phoneNumber").setValue(phoneNumber)
-                                }
-                                navController.navigate("customerKycCodeOTP/$verificationId/$phoneNumber")
-                            }.addOnFailureListener {
-                                navController.navigate("customerKycCodeOTP/$verificationId/$phoneNumber")
-                            }
+                        // Account is not created yet — the phone number is only
+                        // committed once OTP verification succeeds.
+                        signupViewModel.phoneNumber = phoneNumber
+                        navController.navigate("customerKycCodeOTP/$verificationId/$phoneNumber")
                     }
                 }
 

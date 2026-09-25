@@ -26,18 +26,17 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
-import com.example.handyman.utils.SessionManager
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavController) {
+fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavController, signupViewModel: HandymanSignupViewModel) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var tempUri by remember { mutableStateOf<Uri?>(null) }
     var isUploading by remember { mutableStateOf(false) }
@@ -108,7 +107,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                 contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { navController.navigate("handymanKycLanding") }
+                    .clickable { navController.navigate("handymanKYCLanding") }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.id_card_photo_title), fontSize = 20.sp, fontWeight = FontWeight.Medium)
@@ -219,10 +218,11 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                     onClick = {
                         if (selectedImageUri != null) {
                             isUploading = true
-                            val currentEmail = SessionManager.getLoggedInEmail(context)
-                            val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
-                            val query = handymanRef.orderByChild("email").equalTo(currentEmail)
 
+                            // Storage upload happens immediately (it isn't tied to
+                            // an account record); the resulting URL is held in the
+                            // ViewModel and only attached to a user record once
+                            // phone verification succeeds at the end of the flow.
                             val storageRef = FirebaseStorage.getInstance().reference
                             val fileName = "photo_id_cards/${System.currentTimeMillis()}_${selectedImageUri!!.lastPathSegment}"
                             val photoRef = storageRef.child(fileName)
@@ -230,29 +230,12 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                             photoRef.putFile(selectedImageUri!!)
                                 .addOnSuccessListener {
                                     photoRef.downloadUrl.addOnSuccessListener { uri ->
-                                        val downloadUrl = uri.toString()
-
-                                        query.get().addOnSuccessListener { snapshot ->
-                                            for (child in snapshot.children) {
-                                                child.ref.child("photoIdCard").setValue(downloadUrl)
-                                                    .addOnSuccessListener {
-                                                        isUploading = false
-                                                        navController.navigate("handymanKYCCertificates")
-                                                    }
-                                                    .addOnFailureListener { e ->
-                                                        isUploading = false
-                                                        Log.e("KYC", "Failed to save photo URL: ${e.message}")
-                                                    }
-                                            }
-
-                                            if (!snapshot.exists()) {
-                                                isUploading = false
-                                                Log.e("KYC", "No handyman found with email: $currentEmail")
-                                            }
-                                        }.addOnFailureListener { e ->
-                                            isUploading = false
-                                            Log.e("KYC", "Query failed: ${e.message}")
-                                        }
+                                        signupViewModel.photoIdCard = uri.toString()
+                                        isUploading = false
+                                        navController.navigate("handymanKYCCertificates")
+                                    }.addOnFailureListener { e ->
+                                        isUploading = false
+                                        Log.e("KYC", "Failed to get download URL: ${e.message}")
                                     }
                                 }
                                 .addOnFailureListener { e ->

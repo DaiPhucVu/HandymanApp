@@ -1,7 +1,6 @@
 package com.example.handyman.customer_pages
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,19 +21,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.firebase.database.FirebaseDatabase
+import com.example.handyman.CustomerSignupViewModel
 import com.example.handyman.R
-import com.example.handyman.utils.SessionManager
-import java.util.*
-import java.text.SimpleDateFormat
-import com.example.handyman.utils.getCurrentYearMonth
-import com.example.handyman.utils.incrementMetric
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 
 @Composable
-fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) {
+fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController, signupViewModel: CustomerSignupViewModel) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -171,56 +165,14 @@ fun CustomerSignup(modifier: Modifier = Modifier, navController: NavController) 
 
         Button(
             onClick = {
-                val userId = UUID.randomUUID().toString()
-                val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(Date())
-                val userRef = FirebaseDatabase.getInstance().getReference("User").child(userId)
-
-                val userData = mapOf(
-                    "userId" to userId,
-                    "firstName" to firstName,
-                    "lastName" to lastName,
-                    "email" to email,
-                    "password" to password,
-                    "createdAt" to timestamp,
-                    "updatedAt" to timestamp,
-                    "isPhoneVerified" to false,
-                    "photoIdCard" to "",
-                    "houseNumber" to "",
-                    "street" to "",
-                    "area" to "",
-                    "division" to "",
-                    "district" to "",
-                    "thana" to "",
-                    "city" to "",
-                    "country" to "",
-                    "postcode" to "",
-                    "latitude" to 0.0,
-                    "longitude" to 0.0,
-                    "notes" to "",
-                    "status" to "Pending",
-                    "approvedBy" to "",
-                    "createdAt" to timestamp,
-                    "updatedAt" to timestamp,
-                    "averageRating" to 0.0,
-                    "reviewCount" to 0
-                )
-
-                Log.d("Signup", "Attempting to create user: $userData")
-                userRef.setValue(userData)
-                    .addOnSuccessListener {
-                        val (year, month) = getCurrentYearMonth()
-                        incrementMetric("serviceAnalytics/2025/$year/$month/newCustomers")
-                        incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
-
-                        Log.d("Signup", "Successfully created user.")
-                        SessionManager.saveSession(context, email, userId, firstName)
-                        Toast.makeText(context, context.getString(R.string.account_created_success_message), Toast.LENGTH_LONG).show()
-                        navController.navigate("customerKycAddressForm")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("Signup", "Error creating account", e)
-                        Toast.makeText(context, context.getString(R.string.error_creating_account_message), Toast.LENGTH_LONG).show()
-                    }
+                // Account is not created yet — just hold the details until phone
+                // verification succeeds at the end of the KYC flow.
+                signupViewModel.firstName = firstName
+                signupViewModel.lastName = lastName
+                signupViewModel.email = email
+                signupViewModel.password = password
+                Log.d("Signup", "Signup details captured, continuing to address step")
+                navController.navigate("customerKycAddressForm")
             },
             enabled = isValid,
             colors = ButtonDefaults.buttonColors(containerColor = if (isValid) Color(0xFFFFB703) else Color.LightGray),

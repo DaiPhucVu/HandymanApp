@@ -31,6 +31,8 @@ import com.example.handyman.utils.LocaleHelper
 fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landingPage") {
     val navController = rememberNavController()
     val jobPostingViewModel: JobPostingViewModel = viewModel()
+    val customerSignupViewModel: CustomerSignupViewModel = viewModel()
+    val handymanSignupViewModel: HandymanSignupViewModel = viewModel()
     val context = LocalContext.current
     var showLanguagePicker by remember { mutableStateOf(false) }
 
@@ -173,10 +175,10 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
                 )
             }
         ) {
-            HandymanSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            HandymanSignup(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
         composable("handymanSkills") {
-            HandymanSkillsScreen(navController)
+            HandymanSkillsScreen(navController, handymanSignupViewModel)
         }
         composable("handymanLogin") {
             HandymanLogin(Modifier.fillMaxSize().systemBarsPadding(), navController)
@@ -188,18 +190,18 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
             HandymanKYCLanding(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKYCCaptureID") {
-            HandymanKYCCaptureID(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            HandymanKYCCaptureID(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
         composable("handymanKYCAddressForm") {
-            HandymanKYCAddressForm(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            HandymanKYCAddressForm(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
         composable("handymanKycPhoneNumber") {
-            HandymanKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            HandymanKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
         composable("handymanKycCodeOTP/{verificationId}/{phoneNumber}") { backStackEntry ->
             val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
             val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
-            HandymanKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId, phoneNumber)
+            HandymanKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId, phoneNumber, handymanSignupViewModel)
         }
         composable("handymanKycSubmitted") {
             HandymanKYCSubmitted(Modifier.fillMaxSize().systemBarsPadding(), navController)
@@ -208,7 +210,7 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
             HandymanKYCProcessing(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
         composable("handymanKYCCertificates") {
-            HandymanKYCCertificates(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            HandymanKYCCertificates(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
         composable("handymanProfile") {
             HandymanProfileScreen(navController)
@@ -235,7 +237,7 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
                 )
             }
         ) {
-            CustomerSignup(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            CustomerSignup(Modifier.fillMaxSize().systemBarsPadding(), navController, customerSignupViewModel)
         }
         composable("customerHome") {
             CustomerHome(Modifier.fillMaxSize().systemBarsPadding(), navController, jobPostingViewModel)
@@ -250,17 +252,17 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
             CustomerKYCCaptureID(navController, Modifier.fillMaxSize().systemBarsPadding())
         }
         composable("customerKycAddressForm") {
-            CustomerKYCAddressForm(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            CustomerKYCAddressForm(Modifier.fillMaxSize().systemBarsPadding(), navController, customerSignupViewModel)
         }
         composable("customerKycPhoneNumber") {
-            CustomerKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController)
+            CustomerKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController, customerSignupViewModel)
         }
 
-        //OTP 
+        //OTP
         composable("customerKycCodeOTP/{verificationId}/{phoneNumber}") { backStackEntry ->
             val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
             val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
-            CustomerKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId, phoneNumber)
+            CustomerKYCCodeOTP(Modifier.fillMaxSize().systemBarsPadding(), navController, verificationId, phoneNumber, customerSignupViewModel)
         }
 
         composable("customerKycSubmitted") {

@@ -12,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,11 +19,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
-import com.example.handyman.utils.SessionManager
-import com.google.firebase.database.FirebaseDatabase
 
 /** Bangladesh NIDs are issued in these lengths (old 13/17-digit and current 10-digit). */
 private val VALID_NID_LENGTHS = setOf(10, 13, 17)
@@ -44,8 +42,7 @@ private fun isValidNid(nid: String) = nid.length in VALID_NID_LENGTHS && nid.all
  * this step keeps working without a change on that side.
  */
 @Composable
-fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavController) {
-    val context = LocalContext.current
+fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavController, signupViewModel: HandymanSignupViewModel) {
     val scrollState = rememberScrollState()
     var isSaving by remember { mutableStateOf(false) }
 
@@ -149,28 +146,11 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
         ) {
             Button(
                 onClick = {
-                    isSaving = true
-                    val email = SessionManager.getLoggedInEmail(context)
-                    val dbRef = FirebaseDatabase.getInstance().getReference("Handyman")
-                    val query = dbRef.orderByChild("email").equalTo(email)
-
-                    query.get().addOnSuccessListener { snapshot ->
-                        val updateMap = mapOf(
-                            "nid" to nid,
-                            "certificateApprovedStatus" to "pending"
-                        )
-
-                        for (child in snapshot.children) {
-                            child.ref.updateChildren(updateMap)
-                                .addOnSuccessListener {
-                                    isSaving = false
-                                    navController.navigate("handymanKYCAddressForm")
-                                }
-                                .addOnFailureListener { isSaving = false }
-                        }
-                    }.addOnFailureListener {
-                        isSaving = false
-                    }
+                    // Account is not created yet — just hold the NID until phone
+                    // verification succeeds at the end of the KYC flow.
+                    signupViewModel.nid = nid
+                    signupViewModel.certificateApprovedStatus = "pending"
+                    navController.navigate("handymanKYCAddressForm")
                 },
                 enabled = isFormValid && !isSaving,
                 modifier = Modifier
@@ -201,18 +181,9 @@ fun HandymanKYCCertificates(modifier: Modifier = Modifier, navController: NavCon
                 fontSize = 14.sp,
                 modifier = Modifier
                     .clickable(enabled = !isSaving) {
-                        val email = SessionManager.getLoggedInEmail(context)
-                        val dbRef = FirebaseDatabase.getInstance().getReference("Handyman")
-                        val query = dbRef.orderByChild("email").equalTo(email)
-                        query.get().addOnSuccessListener { snapshot ->
-                            for (child in snapshot.children) {
-                                child.ref.child("professionalCertificate").setValue("skipped")
-                                child.ref.child("certificateApprovedStatus").setValue("not_provided")
-                            }
-                            navController.navigate("handymanKYCAddressForm")
-                        }.addOnFailureListener {
-                            navController.navigate("handymanKYCAddressForm")
-                        }
+                        signupViewModel.professionalCertificate = "skipped"
+                        signupViewModel.certificateApprovedStatus = "not_provided"
+                        navController.navigate("handymanKYCAddressForm")
                     }
                     .padding(8.dp)
             )
