@@ -164,8 +164,9 @@ class HandymanJobBoardDetailsFragment : Fragment() {
             if (!isAdded) return@addOnSuccessListener
 
             val currentAssignedTo = snapshot.child("assignedTo").getValue(String::class.java)
-            val alreadyApplied = snapshot.child("quotedHandymen").child(currentHandymanId)
-                .getValue(Boolean::class.java) == true
+            // Any entry counts as applied; legacy jobs store non-Boolean values here, which
+            // getValue(Boolean) would throw on.
+            val alreadyApplied = snapshot.child("quotedHandymen").child(currentHandymanId).exists()
             if (!currentAssignedTo.isNullOrBlank()) {
                 btnApply.isEnabled = false
                 btnApply.text = getString(R.string.job_no_longer_available_label)

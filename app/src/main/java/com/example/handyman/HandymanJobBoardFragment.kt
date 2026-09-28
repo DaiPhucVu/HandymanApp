@@ -143,7 +143,13 @@ class HandymanJobBoardFragment : Fragment() {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val availableJobs = snapshot.children.mapNotNull { child ->
                                     // 1) Deserialize the Job object
-                                    val job = child.getValue(Job::class.java) ?: return@mapNotNull null
+                                    // One malformed job record must not crash the whole board
+                                    val job = try {
+                                        child.getValue(Job::class.java)
+                                    } catch (e: Exception) {
+                                        Log.e("HandymanJobBoard", "Skipping unreadable job ${child.key}", e)
+                                        null
+                                    } ?: return@mapNotNull null
 
                                     // 2) Filter out inactive jobs
                                     if (job.jobStatus == "Inactive") return@mapNotNull null

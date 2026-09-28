@@ -42,7 +42,10 @@ data class Job(
     val assignedBy: Any? = null,
     val assignment: Any? = null,
     val assignmentHistory: Any? = null,
-    val quotedHandymen: Map<String, Boolean>? = null,
+    // Values are `true` for new applications, but older jobs hold legacy quote data (Strings)
+    // from the removed quoting feature. Typing this as Map<String, Boolean> made Firebase throw
+    // "Failed to convert value of type java.lang.String to boolean" and crash the job board.
+    val quotedHandymen: Any? = null,
     val isReviewedByCustomer: Boolean = false,
     val isReviewedByHandyman: Boolean = false
 )
