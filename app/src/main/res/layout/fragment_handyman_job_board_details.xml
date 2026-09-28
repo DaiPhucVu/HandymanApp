@@ -306,6 +306,19 @@
         android:layout_margin="20dp">
 
         <Button
+            android:id="@+id/btnApply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#2D2E5E"
+            android:text="@string/apply_for_job_button"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
             android:id="@+id/btnReturn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

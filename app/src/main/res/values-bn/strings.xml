@@ -61,6 +61,11 @@
         <string name="update_status">অবস্থা আপডেট করুন</string>
         <string name="message_label">বার্তা</string>
         <string name="btn_return">ফিরে যান</string>
+        <string name="apply_for_job_button">এই কাজের জন্য আবেদন করুন</string>
+        <string name="applied_label">আবেদন করা হয়েছে</string>
+        <string name="job_no_longer_available_label">কাজটি আর উপলব্ধ নেই</string>
+        <string name="application_submitted_message">আপনার আবেদন জমা দেওয়া হয়েছে!</string>
+        <string name="application_failed_message">আবেদন জমা দিতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।</string>
         <string name="cancel">বাতিল করুন</string>
         <string name="location_loading">অবস্থান...</string>
         <string name="verified_badge">যাচাইকৃত</string>

@@ -133,8 +133,26 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val btnMessage: Button = view.findViewById(R.id.btnMessage)
 
         val btnReturn: Button = view.findViewById(R.id.btnReturn)
+        val btnApply: Button = view.findViewById(R.id.btnApply)
 
         val currentHandymanId = SessionManager.getLoggedInUserId(requireContext())
+
+        btnApply.setOnClickListener {
+            btnApply.isEnabled = false
+            FirebaseDatabase.getInstance().getReference("Job").child(jobId)
+                .child("quotedHandymen").child(currentHandymanId)
+                .setValue(true)
+                .addOnSuccessListener {
+                    if (!isAdded) return@addOnSuccessListener
+                    btnApply.text = getString(R.string.applied_label)
+                    Toast.makeText(requireContext(), getString(R.string.application_submitted_message), Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    if (!isAdded) return@addOnFailureListener
+                    btnApply.isEnabled = true
+                    Toast.makeText(requireContext(), getString(R.string.application_failed_message), Toast.LENGTH_SHORT).show()
+                }
+        }
         
         // Setup MapView
         val mapView = view.findViewById<MapView>(R.id.mapView)
@@ -144,7 +162,18 @@ class HandymanJobBoardDetailsFragment : Fragment() {
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(jobId)
         jobRef.get().addOnSuccessListener { snapshot ->
             if (!isAdded) return@addOnSuccessListener
-            
+
+            val currentAssignedTo = snapshot.child("assignedTo").getValue(String::class.java)
+            val alreadyApplied = snapshot.child("quotedHandymen").child(currentHandymanId)
+                .getValue(Boolean::class.java) == true
+            if (!currentAssignedTo.isNullOrBlank()) {
+                btnApply.isEnabled = false
+                btnApply.text = getString(R.string.job_no_longer_available_label)
+            } else if (alreadyApplied) {
+                btnApply.isEnabled = false
+                btnApply.text = getString(R.string.applied_label)
+            }
+
             // Handle Map Coordinates first to use in fallback geocoding
             var lat = snapshot.child("latitude").getValue(Double::class.java)
             var lng = snapshot.child("longitude").getValue(Double::class.java)

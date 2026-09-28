@@ -60,6 +60,11 @@
     <string name="update_status">Update Status</string>
     <string name="message_label">Message</string>
     <string name="btn_return">Return</string>
+    <string name="apply_for_job_button">Apply for this Job</string>
+    <string name="applied_label">Applied</string>
+    <string name="job_no_longer_available_label">Job No Longer Available</string>
+    <string name="application_submitted_message">Your application has been submitted!</string>
+    <string name="application_failed_message">Failed to submit application. Please try again.</string>
     <string name="cancel">Cancel</string>
     <string name="location_loading">Location...</string>
     <string name="verified_badge">Verified</string>

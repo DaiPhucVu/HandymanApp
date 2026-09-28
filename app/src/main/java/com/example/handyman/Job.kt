@@ -42,6 +42,7 @@ data class Job(
     val assignedBy: Any? = null,
     val assignment: Any? = null,
     val assignmentHistory: Any? = null,
+    val quotedHandymen: Map<String, Boolean>? = null,
     val isReviewedByCustomer: Boolean = false,
     val isReviewedByHandyman: Boolean = false
 )
