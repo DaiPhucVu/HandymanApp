@@ -294,7 +294,8 @@
     <string name="verify_phone_title">Verify your phone number</string>
     <string name="otp_hint">Get a one-time-passcode (OTP) to verify your mobile number</string>
     <string name="mobile_label">Mobile</string>
-    <string name="phone_number_placeholder">+8801234567890</string>
+    <string name="phone_number_placeholder">01712345678</string>
+    <string name="country_code_label">Country code</string>
     <string name="error_activity_not_found_message">Error: Activity not found</string>
     <string name="verification_failed_format">Verification failed: %1$s</string>
     <string name="get_otp_btn">Get OTP</string>
@@ -592,5 +593,10 @@
     <string name="error_email_invalid">Enter a valid email address, for example name@example.com</string>
     <string name="error_password_too_short">Password must be at least 8 characters</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>
-    <string name="error_phone_invalid">Enter the number in international format, for example +8801712345678</string>
+    <string name="error_phone_invalid">Enter a valid phone number for this country code</string>
+    <string name="error_phone_invalid_bd">Enter a valid Bangladesh number, for example 01712345678</string>
+    <string name="error_country_code_invalid">Enter a valid country code (1-3 digits)</string>
+    <string name="error_phone_not_valid">This phone number is not valid. Please check it and try again.</string>
+    <string name="error_too_many_attempts">Too many attempts. Please wait a while and try again.</string>
+    <string name="error_phone_send_failed">We couldn\'t send the code. Please try again.</string>
 </resources>

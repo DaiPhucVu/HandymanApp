@@ -296,7 +296,8 @@
         <string name="verify_phone_title">আপনার ফোন নম্বর যাচাই করুন</string>
         <string name="otp_hint">আপনার মোবাইল নম্বর যাচাই করতে একটি ওয়ান-টাইম-পাসকোড (OTP) নিন</string>
         <string name="mobile_label">মোবাইল</string>
-        <string name="phone_number_placeholder">+8801234567890</string>
+        <string name="phone_number_placeholder">01712345678</string>
+        <string name="country_code_label">কান্ট্রি কোড</string>
         <string name="error_activity_not_found_message">ত্রুটি: অ্যাক্টিভিটি পাওয়া যায়নি</string>
         <string name="verification_failed_format">যাচাইকরণ ব্যর্থ হয়েছে: %1$s</string>
         <string name="get_otp_btn">OTP পান</string>
@@ -595,5 +596,10 @@
         <string name="error_password_too_short">পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে</string>
         <string name="error_passwords_do_not_match">পাসওয়ার্ড দুটি মিলছে না</string>
         <!-- Example kept in ASCII digits: the phone field only accepts those. -->
-        <string name="error_phone_invalid">আন্তর্জাতিক ফরম্যাটে নম্বর লিখুন, যেমন +8801712345678</string>
+        <string name="error_phone_invalid">এই কান্ট্রি কোডের জন্য একটি সঠিক ফোন নম্বর লিখুন</string>
+        <string name="error_phone_invalid_bd">একটি সঠিক বাংলাদেশি নম্বর লিখুন, যেমন 01712345678</string>
+        <string name="error_country_code_invalid">একটি সঠিক কান্ট্রি কোড লিখুন (১-৩ সংখ্যা)</string>
+        <string name="error_phone_not_valid">এই ফোন নম্বরটি সঠিক নয়। অনুগ্রহ করে যাচাই করে আবার চেষ্টা করুন।</string>
+        <string name="error_too_many_attempts">অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ অপেক্ষা করে আবার চেষ্টা করুন।</string>
+        <string name="error_phone_send_failed">কোড পাঠানো যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
 </resources>

@@ -25,6 +25,7 @@ import com.example.handyman.components.StepCircle
 import com.example.handyman.utils.SessionManager
 import com.example.handyman.utils.getCurrentYearMonth
 import com.example.handyman.utils.incrementMetric
+import com.example.handyman.utils.normalizeOtpInput
 import com.google.firebase.database.FirebaseDatabase
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -103,7 +104,8 @@ fun HandymanKYCCodeOTP(
         OutlinedTextField(
             value = otpCode,
             onValueChange = {
-                otpCode = it
+                // Strips spaces/invisible chars and converts Bangla digits to ASCII
+                otpCode = normalizeOtpInput(it)
                 errorMessage = null
             },
             label = { Text(stringResource(R.string.otp_code_label)) },

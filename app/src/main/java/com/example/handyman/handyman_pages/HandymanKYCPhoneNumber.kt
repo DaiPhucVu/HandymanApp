@@ -26,6 +26,12 @@ import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
 import com.example.handyman.components.DividerLine
 import com.example.handyman.components.StepCircle
+import com.example.handyman.components.PhoneNumberField
+import com.example.handyman.components.verificationErrorMessage
+import com.example.handyman.utils.DEFAULT_COUNTRY_CODE
+import com.example.handyman.utils.PhoneError
+import com.example.handyman.utils.buildE164
+import com.example.handyman.utils.validatePhone
 
 fun findActivity(context: Context): android.app.Activity? {
     var currentContext = context
@@ -39,18 +45,15 @@ fun findActivity(context: Context): android.app.Activity? {
 @Composable
 fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavController, signupViewModel: HandymanSignupViewModel) {
     val context = LocalContext.current
-    var phoneNumber by remember { mutableStateOf("") }
+    var countryCode by remember { mutableStateOf(DEFAULT_COUNTRY_CODE) }
+    var nationalNumber by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
 
-    val textFieldModifier = Modifier
-        .fillMaxWidth()
-        .height(56.dp)
-
-    // Universal regex for phone numbers: ^\+?[1-9]\d{1,14}$
-    val isValidPhone = phoneNumber.matches(Regex("^\\+?[1-9]\\d{1,14}$"))
+    val phoneValidation = validatePhone(countryCode, nationalNumber)
+    val isValidPhone = phoneValidation == null
 
     Column(
         modifier = modifier
@@ -104,24 +107,29 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(stringResource(R.string.mobile_label), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-        OutlinedTextField(
-            value = phoneNumber,
-            onValueChange = {
-                phoneNumber = it
+        // Country code (default +880) and number are separate fields; both strip spaces and
+        // invisible characters, convert Bangla digits to ASCII and enforce the length limit.
+        PhoneNumberField(
+            countryCode = countryCode,
+            nationalNumber = nationalNumber,
+            onChange = { code, number ->
+                countryCode = code
+                nationalNumber = number
                 errorMessage = null
             },
-            //follows the E.164 international phone format
-            //Max 15 digits, No spaces or symbols, + is optional
-            placeholder = { Text(stringResource(R.string.phone_number_placeholder)) },
-            modifier = textFieldModifier,
-            isError = (phoneNumber.isNotBlank() && !isValidPhone) || errorMessage != null
+            countryCodeError = phoneValidation == PhoneError.COUNTRY_CODE,
+            numberError = (nationalNumber.isNotEmpty() && phoneValidation != null) || errorMessage != null
         )
 
         // Server error wins; otherwise explain the expected format instead of
         // only turning the field red.
-        val phoneError = errorMessage
-            ?: stringResource(R.string.error_phone_invalid)
-                .takeIf { phoneNumber.isNotBlank() && !isValidPhone }
+        val phoneError = errorMessage ?: when {
+            phoneValidation == PhoneError.COUNTRY_CODE -> stringResource(R.string.error_country_code_invalid)
+            nationalNumber.isEmpty() -> null
+            phoneValidation == PhoneError.BANGLADESH -> stringResource(R.string.error_phone_invalid_bd)
+            phoneValidation == PhoneError.GENERIC -> stringResource(R.string.error_phone_invalid)
+            else -> null
+        }
         if (phoneError != null) {
             Text(
                 text = phoneError,
@@ -143,13 +151,8 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
                 isLoading = true
                 errorMessage = null
 
-                // Format number for Firebase
-                val formattedNumber = if (phoneNumber.startsWith("+")) {
-                    phoneNumber
-                } else {
-                    // Default to +880 if no country code provided
-                    "+880$phoneNumber"
-                }
+                // E.164 number, e.g. +8801712345678 (a leading 0 is dropped)
+                val formattedNumber = buildE164(countryCode, nationalNumber)
 
                 val callbacks = object : com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(credential: com.google.firebase.auth.PhoneAuthCredential) {
@@ -158,9 +161,9 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
 
                     override fun onVerificationFailed(e: com.google.firebase.FirebaseException) {
                         isLoading = false
-                        errorMessage = e.message
+                        // Friendly text for the user; the raw Firebase error stays in Logcat.
+                        errorMessage = verificationErrorMessage(context, e)
                         Log.e("KYC", "Verification failed: ${e.message}", e)
-                        Toast.makeText(context, context.getString(R.string.verification_failed_format, e.message), Toast.LENGTH_LONG).show()
                     }
 
                     override fun onCodeSent(
@@ -170,8 +173,8 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
                         isLoading = false
                         // Account is not created yet — the phone number is only
                         // committed once OTP verification succeeds.
-                        signupViewModel.phoneNumber = phoneNumber
-                        navController.navigate("handymanKycCodeOTP/$verificationId/$phoneNumber")
+                        signupViewModel.phoneNumber = formattedNumber
+                        navController.navigate("handymanKycCodeOTP/$verificationId/$formattedNumber")
                     }
                 }
 
