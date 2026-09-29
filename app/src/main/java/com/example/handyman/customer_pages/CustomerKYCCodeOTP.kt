@@ -54,6 +54,7 @@ fun CustomerKYCCodeOTP(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .background(Color.White)
             .padding(24.dp)
     ) {
@@ -108,9 +109,10 @@ fun CustomerKYCCodeOTP(
             label = { Text(stringResource(R.string.otp_code_label)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             isError = (otpCode.isNotBlank() && !isValidOTP) || errorMessage != null,
-            placeholder = { Text(stringResource(R.string.six_digit_code_placeholder)) }
+            placeholder = { Text(stringResource(R.string.six_digit_code_placeholder)) },
+            singleLine = true
         )
 
         if (errorMessage != null) {

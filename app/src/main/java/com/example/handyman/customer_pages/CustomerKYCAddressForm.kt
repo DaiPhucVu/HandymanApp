@@ -44,7 +44,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
 
     val textFieldModifier = Modifier
         .fillMaxWidth()
-        .height(56.dp)
+        .heightIn(min = 56.dp)
 
     var houseNumber by remember { mutableStateOf("") }
     var street by remember { mutableStateOf("") }
@@ -189,7 +189,8 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 onValueChange = { houseNumber = it },
                 label = { Text(stringResource(R.string.house_number_label)) },
                 modifier = textFieldModifier,
-                isError = houseNumber.isNotBlank() && !isValidHouseNumber
+                isError = houseNumber.isNotBlank() && !isValidHouseNumber,
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -199,7 +200,8 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 onValueChange = { street = it },
                 label = { Text(stringResource(R.string.street_label)) },
                 modifier = textFieldModifier,
-                isError = street.isNotBlank() && !isValidStreet
+                isError = street.isNotBlank() && !isValidStreet,
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -210,14 +212,16 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     onValueChange = { area = it },
                     label = { Text(stringResource(R.string.neighborhood_label)) },
                     modifier = Modifier.weight(1f),
-                    isError = area.isNotBlank() && !isValidArea
+                    isError = area.isNotBlank() && !isValidArea,
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = postCode,
                     onValueChange = { postCode = it },
                     label = { Text(stringResource(R.string.post_code_label)) },
                     modifier = Modifier.weight(1f),
-                    isError = postCode.isNotBlank() && !isValidPostCode
+                    isError = postCode.isNotBlank() && !isValidPostCode,
+                    singleLine = true
                 )
             }
 
@@ -229,14 +233,16 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     onValueChange = { division = it },
                     label = { Text(stringResource(R.string.division_label)) },
                     modifier = Modifier.weight(1f),
-                    isError = division.isNotBlank() && !isValidDivision
+                    isError = division.isNotBlank() && !isValidDivision,
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = district,
                     onValueChange = { district = it },
                     label = { Text(stringResource(R.string.district_label)) },
                     modifier = Modifier.weight(1f),
-                    isError = district.isNotBlank() && !isValidDistrict
+                    isError = district.isNotBlank() && !isValidDistrict,
+                    singleLine = true
                 )
             }
 
@@ -248,14 +254,16 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                     onValueChange = { thana = it },
                     label = { Text(stringResource(R.string.thana_label)) },
                     modifier = Modifier.weight(1f),
-                    isError = thana.isNotBlank() && !isValidThana
+                    isError = thana.isNotBlank() && !isValidThana,
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = city,
                     onValueChange = { city = it },
                     label = { Text(stringResource(R.string.city_label)) },
                     modifier = Modifier.weight(1f),
-                    isError = city.isNotBlank() && !isValidCity
+                    isError = city.isNotBlank() && !isValidCity,
+                    singleLine = true
                 )
             }
 
@@ -266,7 +274,8 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
                 onValueChange = { country = it },
                 label = { Text(stringResource(R.string.country_label)) },
                 modifier = textFieldModifier,
-                isError = country.isNotBlank() && !isValidCountry
+                isError = country.isNotBlank() && !isValidCountry,
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(12.dp))

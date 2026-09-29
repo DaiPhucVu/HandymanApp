@@ -61,7 +61,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
         })
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize().imePadding()) {
 
         // Top right logout
         Row(
@@ -165,7 +165,7 @@ fun CustomerHome(modifier: Modifier = Modifier, navController: NavController, vi
                 placeholder = { Text(stringResource(R.string.search_services_placeholder)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 shape = RoundedCornerShape(12.dp)
             )
 

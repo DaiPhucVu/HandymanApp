@@ -163,7 +163,8 @@ fun HandymanSkillsScreen(navController: NavController, signupViewModel: Handyman
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                )
+                ),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -175,7 +176,8 @@ fun HandymanSkillsScreen(navController: NavController, signupViewModel: Handyman
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                )
+                ),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -184,7 +186,7 @@ fun HandymanSkillsScreen(navController: NavController, signupViewModel: Handyman
                 value = skillDescription,
                 onValueChange = { skillDescription = it },
                 label = { Text(stringResource(R.string.short_bio_label)) },
-                modifier = Modifier.fillMaxWidth().height(120.dp),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
                 maxLines = 5
             )
 

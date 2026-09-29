@@ -180,7 +180,7 @@ fun JobPostingDescriptionScreen(
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(modifier = Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(stringResource(R.string.describe_your_problem), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
@@ -189,7 +189,7 @@ fun JobPostingDescriptionScreen(
                 viewModel.problemDesc = it
             },
             placeholder = { Text(stringResource(R.string.describe_problem_hint)) },
-            modifier = Modifier.fillMaxWidth().height(150.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
             shape = RoundedCornerShape(12.dp)
         )
 
@@ -209,7 +209,8 @@ fun JobPostingDescriptionScreen(
                         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
             Box(modifier = Modifier.weight(1f)) {
@@ -224,7 +225,8 @@ fun JobPostingDescriptionScreen(
                         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
         }
@@ -245,7 +247,8 @@ fun JobPostingDescriptionScreen(
                         }, 10, 0, true).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
             Box(modifier = Modifier.weight(1f)) {
@@ -260,7 +263,8 @@ fun JobPostingDescriptionScreen(
                         }, 17, 0, true).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
         }
@@ -362,7 +366,8 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 mapViewRef?.let { searchAddress(viewModel.locationAddress, it) }
-            })
+            }),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -480,14 +485,16 @@ fun JobPostingSalaryScreen(navController: NavController, viewModel: JobPostingVi
                     onValueChange = { viewModel.salaryMin = it },
                     label = { Text(stringResource(R.string.min_bdt_label)) },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = viewModel.salaryMax,
                     onValueChange = { viewModel.salaryMax = it },
                     label = { Text(stringResource(R.string.max_bdt_label)) },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
                 )
             }
         }
@@ -750,7 +757,7 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             }
     }
 
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(modifier = Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
 
         val localizedPaymentOption = when (viewModel.paymentOption) {

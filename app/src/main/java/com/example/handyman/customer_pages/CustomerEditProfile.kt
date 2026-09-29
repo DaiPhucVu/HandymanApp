@@ -77,6 +77,7 @@ fun CustomerEditProfile(navController: NavController) {
                     .fillMaxSize()
                     .padding(padding)
                     .background(Color.White)
+                    .imePadding()
                     .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -85,7 +86,8 @@ fun CustomerEditProfile(navController: NavController) {
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = { Text(stringResource(R.string.first_name_field_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 
@@ -93,7 +95,8 @@ fun CustomerEditProfile(navController: NavController) {
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text(stringResource(R.string.last_name_field_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -101,7 +104,8 @@ fun CustomerEditProfile(navController: NavController) {
                     value = city,
                     onValueChange = { city = it },
                     label = { Text(stringResource(R.string.city_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -109,7 +113,8 @@ fun CustomerEditProfile(navController: NavController) {
                     value = phone,
                     onValueChange = { phone = it },
                     label = { Text(stringResource(R.string.phone_number_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -117,7 +122,7 @@ fun CustomerEditProfile(navController: NavController) {
                     value = bio,
                     onValueChange = { bio = it },
                     label = { Text(stringResource(R.string.bio_label)) },
-                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
                     maxLines = 5
                 )
                 

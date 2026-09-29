@@ -94,7 +94,8 @@ fun HandymanEditProfile(navController: NavController) {
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = { Text(stringResource(R.string.first_name_field_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -102,7 +103,8 @@ fun HandymanEditProfile(navController: NavController) {
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text(stringResource(R.string.last_name_field_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -113,7 +115,8 @@ fun HandymanEditProfile(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                    )
+                    ),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -124,7 +127,8 @@ fun HandymanEditProfile(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                    )
+                    ),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -132,7 +136,7 @@ fun HandymanEditProfile(navController: NavController) {
                     value = bio,
                     onValueChange = { bio = it },
                     label = { Text(stringResource(R.string.bio_label)) },
-                    modifier = Modifier.fillMaxWidth().height(150.dp),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
                     maxLines = 5
                 )
                 

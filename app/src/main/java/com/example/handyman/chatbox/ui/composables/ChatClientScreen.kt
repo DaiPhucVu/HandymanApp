@@ -121,6 +121,7 @@ fun ChatClientScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .background(color = Color.White)
     ) {
         // Name display and buttons on top of screen
