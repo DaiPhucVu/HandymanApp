@@ -10,6 +10,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.example.handyman.Navigation
+import com.example.handyman.MainJobBoard
+import android.content.Intent
 import com.example.handyman.ui.theme.HandymanTheme
 import com.example.handyman.utils.LocaleHelper
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +33,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        handleIntent(intent)
+
         val startDestination = intent.getStringExtra("startDestination") ?: "landingPage"
 
         setContent {
@@ -41,6 +45,30 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     startDestination = startDestination
                 )
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val data = intent.data
+        if (data != null && data.scheme == "handymanapp" && data.host == "payment") {
+            val jobId = data.getQueryParameter("jobId")
+            val customerId = data.getQueryParameter("customerId")
+            val status = data.getQueryParameter("status")
+
+            if (jobId != null && customerId != null) {
+                val nextIntent = Intent(this, MainJobBoard::class.java).apply {
+                    putExtra("user_type", "customer")
+                    putExtra("target_fragment", if (status == "success") "paymentSuccess" else "customerJobList")
+                    putExtra("jobId", jobId)
+                    putExtra("customerId", customerId)
+                }
+                startActivity(nextIntent)
             }
         }
     }

@@ -49,10 +49,10 @@ class MainJobBoard : AppCompatActivity() {
         val startDestination = when(userType) {
             "customer" -> {
                 val targetFragment = intent.getStringExtra("target_fragment")
-                if (targetFragment == "customerJobList") {
-                    R.id.customerJobListFragment
-                } else {
-                    R.id.serviceCategoryFragment
+                when (targetFragment) {
+                    "customerJobList" -> R.id.customerJobListFragment
+                    "paymentSuccess" -> R.id.paymentSuccessFragment
+                    else -> R.id.serviceCategoryFragment
                 }
             }
             "handyman" -> R.id.handymanJobBoardFragment
@@ -64,6 +64,11 @@ class MainJobBoard : AppCompatActivity() {
         }
 
         navGraph.setStartDestination(startDestination)
-        navHostFragment.navController.graph = navGraph
+
+        val bundle = Bundle()
+        intent.getStringExtra("jobId")?.let { bundle.putString("jobId", it) }
+        intent.getStringExtra("customerId")?.let { bundle.putString("customerId", it) }
+
+        navHostFragment.navController.setGraph(navGraph, bundle)
     }
 }

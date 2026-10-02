@@ -57,7 +57,7 @@ class HandymanJobListDetailsFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        val args = HandymanJobBoardDetailsFragmentArgs.fromBundle(requireArguments())
+        val args = HandymanJobListDetailsFragmentArgs.fromBundle(requireArguments())
 
         val customerId = args.customerId
         val jobId = args.jobId
@@ -162,20 +162,30 @@ class HandymanJobListDetailsFragment : Fragment() {
                 if (!citySuburb.isNullOrBlank()) {
                     locationDisplay.text = getString(R.string.approximate_location_format, citySuburb)
                 } else if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
-                    // Fallback Geocoding
-                    try {
-                        val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                        val addresses = geocoder.getFromLocation(lat, lng, 1)
-                        if (!addresses.isNullOrEmpty()) {
-                            val address = addresses[0]
-                            val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea
-                            locationDisplay.text = if (city != null) getString(R.string.approximate_location_format, city) else getString(R.string.approximate_location_label)
-                        } else {
-                            locationDisplay.text = getString(R.string.approximate_location_label)
+                    // Fallback Geocoding - Move to background thread
+                    val finalLat = lat
+                    val finalLng = lng
+                    Thread {
+                        try {
+                            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                            val addresses = geocoder.getFromLocation(finalLat, finalLng, 1)
+                            if (!addresses.isNullOrEmpty()) {
+                                val address = addresses[0]
+                                val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea
+                                activity?.runOnUiThread {
+                                    locationDisplay.text = if (city != null) getString(R.string.approximate_location_format, city) else getString(R.string.approximate_location_label)
+                                }
+                            } else {
+                                activity?.runOnUiThread {
+                                    locationDisplay.text = getString(R.string.approximate_location_label)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            activity?.runOnUiThread {
+                                locationDisplay.text = getString(R.string.approximate_location_label)
+                            }
                         }
-                    } catch (e: Exception) {
-                        locationDisplay.text = getString(R.string.approximate_location_label)
-                    }
+                    }.start()
                 } else {
                     locationDisplay.text = getString(R.string.approximate_location_label)
                 }
