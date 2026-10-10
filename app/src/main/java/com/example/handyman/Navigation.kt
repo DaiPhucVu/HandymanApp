@@ -239,9 +239,6 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         ) {
             CustomerSignup(Modifier.fillMaxSize().systemBarsPadding(), navController, customerSignupViewModel)
         }
-        composable("customerHome") {
-            CustomerHome(Modifier.fillMaxSize().systemBarsPadding(), navController, jobPostingViewModel)
-        }
         composable("customerHomeUnverified") {
             CustomerHomeUnverified(Modifier.fillMaxSize().systemBarsPadding(), navController)
         }
