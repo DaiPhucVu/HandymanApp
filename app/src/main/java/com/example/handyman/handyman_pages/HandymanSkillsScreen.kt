@@ -51,14 +51,22 @@ fun HandymanSkillsScreen(navController: NavController, signupViewModel: Handyman
     var selectedTrade by remember { mutableStateOf("") }
     var otherTrade by remember { mutableStateOf("") }
     val trades = listOf(
-        "Electric and Plumbing",
         "A/C Repair Services",
         "Appliance Repair",
         "Cleaning Solution",
-        "Painting and Renovation",
-        "Pest Control",
-        "Electronics and Gadget Repair",
+        "Beauty and Wellness",
         "Shifting",
+        "Men's Care and Salon",
+        "Health and Care",
+        "Electronics and Gadget Repair",
+        "Electric and Plumbing",
+        "Pest Control",
+        "Driver Service",
+        "Car Care Services",
+        "Trips and Travel",
+        "Car Rental",
+        "Painting and Renovation",
+        "Emergency Service",
         "Other"
     )
 

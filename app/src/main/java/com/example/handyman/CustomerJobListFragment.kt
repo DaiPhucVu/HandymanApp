@@ -195,15 +195,7 @@ class CustomerJobListFragment : Fragment() {
                                             override fun onCancelled(error: DatabaseError) {}
                                         })
 
-                                    // Step 4: Add the job ID to the cancelledJobs list
-                                    FirebaseDatabase.getInstance()
-                                        .getReference("User")
-                                        .child(customerId)
-                                        .child("cancelledJobs")
-                                        .push()
-                                        .setValue(job.jobId)
-
-                                    // Step 5: Update the UI
+                                    // Step 4: Update the UI
                                     Toast.makeText(
                                         context,
                                         getString(R.string.job_cancelled_message),

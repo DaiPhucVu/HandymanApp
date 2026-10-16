@@ -523,6 +523,7 @@
     <string name="decline_btn">Decline</string>
     <string name="job_declined_message">Job declined.</string>
     <string name="failed_to_decline_job_format">Failed to decline job: %1$s</string>
+    <string name="assignment_changed_message">This assignment has changed. Refresh your jobs.</string>
 
     <!-- CustomerJobListAdapter -->
     <string name="please_assign_handyman_message">Please assign a handyman before updating status!</string>
