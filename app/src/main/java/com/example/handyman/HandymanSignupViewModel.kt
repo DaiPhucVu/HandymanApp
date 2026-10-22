@@ -43,6 +43,8 @@ class HandymanSignupViewModel : ViewModel() {
     var city by mutableStateOf("")
     var country by mutableStateOf("")
     var notes by mutableStateOf("")
+    var latitude by mutableStateOf(0.0)
+    var longitude by mutableStateOf(0.0)
 
     // Step: Phone
     var phoneNumber by mutableStateOf("")
@@ -70,6 +72,8 @@ class HandymanSignupViewModel : ViewModel() {
         city = ""
         country = ""
         notes = ""
+        latitude = 0.0
+        longitude = 0.0
         phoneNumber = ""
     }
 }

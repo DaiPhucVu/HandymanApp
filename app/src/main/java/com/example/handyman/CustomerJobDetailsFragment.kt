@@ -49,10 +49,6 @@ class CustomerJobDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<ImageView>(R.id.ivBack).setOnClickListener {
-            findNavController().navigateUp()
-        }
-
         val args = CustomerJobDetailsFragmentArgs.fromBundle(requireArguments())
 
         val customerId = args.customerId
@@ -69,6 +65,15 @@ class CustomerJobDetailsFragment : Fragment() {
         val paymentOption = args.paymentOption
         val assignedTo = args.assignedTo
         val jobStatus = args.jobStatus
+
+        view.findViewById<ImageView>(R.id.ivBack).setOnClickListener {
+            val navController = findNavController()
+            if (!navController.popBackStack(R.id.customerJobListFragment, false)) {
+                val action = CustomerJobDetailsFragmentDirections
+                    .actionCustomerJobDetailsFragmentToCustomerJobListFragment(customerId)
+                navController.navigate(action)
+            }
+        }
 
         val jobTitle = view.findViewById<TextView>(R.id.tvJobTitle)
         jobTitle.text = if (serviceName.isNotBlank()) localizedServiceCategoryName(requireContext(), serviceName) else getString(R.string.untitled_job_label)
@@ -205,6 +210,21 @@ class CustomerJobDetailsFragment : Fragment() {
                     .addOnFailureListener { photoScroll.visibility = View.GONE }
             }
             .addOnFailureListener { photoScroll.visibility = View.GONE }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        view?.findViewById<MapView>(R.id.mapView)?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        view?.findViewById<MapView>(R.id.mapView)?.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.findViewById<MapView>(R.id.mapView)?.onDetach()
     }
 
     private fun showEnlargedImage(imageUrl: String) {

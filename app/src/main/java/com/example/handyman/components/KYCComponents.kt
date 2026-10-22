@@ -174,10 +174,18 @@ fun takePhoto(
     context: Context,
     onPhotoCaptured: (Uri) -> Unit
 ) {
-    val photoFile = File(
-        context.cacheDir,
-        "KYC_ID_${System.currentTimeMillis()}.jpg"
-    )
+    val photoFile = try {
+        File(
+            context.cacheDir,
+            "KYC_ID_${System.currentTimeMillis()}.jpg"
+        ).apply {
+            if (exists()) delete()
+            createNewFile()
+        }
+    } catch (e: Exception) {
+        Log.e("CameraCapture", "Failed to create photo file", e)
+        return
+    }
 
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 

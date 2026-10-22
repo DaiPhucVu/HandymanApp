@@ -212,6 +212,7 @@
     <string name="pinned_location_format">Pinned: %1$s, %2$s</string>
     <string name="tap_map_to_pin_location">Tap on the map to pin your location</string>
     <string name="submit_address_btn">Submit address</string>
+    <string name="use_this_location_btn">Use this location</string>
     <string name="session_error_message">Session error. Please log in again.</string>
     <string name="failed_to_save_address_message">Failed to save address. Please try again.</string>
     <string name="area_neighborhood_label">Area/Neighborhood</string>

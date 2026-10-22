@@ -46,9 +46,7 @@ fun CustomerKYCLanding(modifier: Modifier = Modifier, navController: NavControll
                 modifier = Modifier
                     .size(24.dp)
                     .padding(end = 16.dp)
-                    .clickable {
-                        navController.navigate("customerHomeUnverified")
-                    }
+                    .clickable { navController.popBackStack() }
             )
             Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, fontWeight = FontWeight.Medium)
 

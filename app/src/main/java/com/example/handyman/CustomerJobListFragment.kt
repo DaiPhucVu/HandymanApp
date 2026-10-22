@@ -49,8 +49,7 @@ class CustomerJobListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         view.findViewById<View>(R.id.btnBack).setOnClickListener {
-            val action = CustomerJobListFragmentDirections.actionCustomerJobListFragmentToServiceCategoryFragment()
-            findNavController().navigate(action)
+            findNavController().navigateUp()
         }
 
         adapter = CustomerJobListAdapter(
@@ -371,7 +370,6 @@ class CustomerJobListFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        fetchJobsForCategory("allJobs")
         return view
     }
 

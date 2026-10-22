@@ -214,6 +214,7 @@
         <string name="pinned_location_format">চিহ্নিত: %1$s, %2$s</string>
         <string name="tap_map_to_pin_location">আপনার অবস্থান চিহ্নিত করতে মানচিত্রে ট্যাপ করুন</string>
         <string name="submit_address_btn">ঠিকানা জমা দিন</string>
+        <string name="use_this_location_btn">এই অবস্থান ব্যবহার করুন</string>
         <string name="session_error_message">সেশন ত্রুটি। অনুগ্রহ করে আবার লগইন করুন।</string>
         <string name="failed_to_save_address_message">ঠিকানা সংরক্ষণ করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
         <string name="area_neighborhood_label">এলাকা/মহল্লা</string>

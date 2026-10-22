@@ -110,7 +110,7 @@ class HandymanJobListDetailsFragment : Fragment() {
             if (!isAdded) return@addOnSuccessListener
             val firstName = snapshot.child("firstName").getValue(String::class.java)
             val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
-            val rating = (snapshot.child("averageRating").getValue(Double::class.java) ?: 0.0)
+            val rating = (snapshot.child("averageRating").value as? Number)?.toDouble() ?: 0.0
             val profileImageUrl = snapshot.child("profileImageUrl").getValue(String::class.java)
             
             if (firstName != null) {
@@ -148,8 +148,8 @@ class HandymanJobListDetailsFragment : Fragment() {
             if (!isAdded) return@addOnSuccessListener
             
             // Handle Map Coordinates first to use in fallback geocoding
-            var lat = snapshot.child("latitude").getValue(Double::class.java)
-            var lng = snapshot.child("longitude").getValue(Double::class.java)
+            var lat = (snapshot.child("latitude").value as? Number)?.toDouble()
+            var lng = (snapshot.child("longitude").value as? Number)?.toDouble()
 
             // If not in snapshot, fallback to arguments
             if (lat == null || lat == 0.0) lat = argLat.toDouble()
@@ -369,6 +369,21 @@ class HandymanJobListDetailsFragment : Fragment() {
                 // Handle error when listing files.
                 photoScroll.visibility = View.GONE
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        view?.findViewById<MapView>(R.id.mapView)?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        view?.findViewById<MapView>(R.id.mapView)?.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.findViewById<MapView>(R.id.mapView)?.onDetach()
     }
 
     private fun showEnlargedImage(imageUrl: String) {

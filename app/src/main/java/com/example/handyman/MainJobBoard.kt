@@ -42,7 +42,21 @@ class MainJobBoard : AppCompatActivity() {
                 })
         }
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navHostFragment = supportFragmentManager
+            .findFragmentByTag(NAV_HOST_TAG) as? NavHostFragment
+            ?: NavHostFragment().also { fragment ->
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment, NAV_HOST_TAG)
+                    .setPrimaryNavigationFragment(fragment)
+                    .commitNow()
+            }
+
+        if (supportFragmentManager.primaryNavigationFragment !== navHostFragment) {
+            supportFragmentManager.beginTransaction()
+                .setPrimaryNavigationFragment(navHostFragment)
+                .commitNow()
+        }
+
         val navGraph = navHostFragment.navController.navInflater.inflate(R.navigation.nav_graph)
 
         // Navigations
@@ -70,5 +84,9 @@ class MainJobBoard : AppCompatActivity() {
         intent.getStringExtra("customerId")?.let { bundle.putString("customerId", it) }
 
         navHostFragment.navController.setGraph(navGraph, bundle)
+    }
+
+    private companion object {
+        const val NAV_HOST_TAG = "main_job_board_nav_host"
     }
 }

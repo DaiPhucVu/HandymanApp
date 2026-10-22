@@ -87,7 +87,7 @@ fun HandymanKYCCaptureID(modifier: Modifier = Modifier, navController: NavContro
                 contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { navController.navigate("handymanKYCLanding") }
+                    .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.id_card_photo_title), fontSize = 20.sp, fontWeight = FontWeight.Medium)

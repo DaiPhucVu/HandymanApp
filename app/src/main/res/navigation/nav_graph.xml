@@ -26,7 +26,11 @@
         </action>
         <action
             android:id="@+id/action_serviceCategoryFragment_to_customerJobListFragment"
-            app:destination="@id/customerJobListFragment" >
+            app:destination="@id/customerJobListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="customerId"
                 app:argType="string"/>
@@ -203,7 +207,11 @@
             app:argType="string" />
         <action
             android:id="@+id/action_customerJobListFragment_to_customerJobDetailsFragment"
-            app:destination="@id/customerJobDetailsFragment">
+            app:destination="@id/customerJobDetailsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="customerId"
                 app:argType="string" />
@@ -359,6 +367,13 @@
         <action
             android:id="@+id/action_customerJobDetailsFragment_to_jobPostingFragment"
             app:destination="@id/jobPostingFragment" />
+        <action
+            android:id="@+id/action_customerJobDetailsFragment_to_customerJobListFragment"
+            app:destination="@id/customerJobListFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left" />
     </fragment>
 
     <fragment
@@ -368,7 +383,11 @@
         tools:layout="@layout/fragment_handyman_job_board" >
         <action
             android:id="@+id/action_handymanJobBoardFragment_to_handymanJobBoardDetailsFragment"
-            app:destination="@id/handymanJobBoardDetailsFragment">
+            app:destination="@id/handymanJobBoardDetailsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="customerId"
                 app:argType="string" />
@@ -431,7 +450,11 @@
         </action>
         <action
             android:id="@+id/action_handymanJobBoardFragment_to_handymanJobListFragment"
-            app:destination="@id/handymanJobListFragment">
+            app:destination="@id/handymanJobListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="handymanId"
                 app:argType="string"/>
@@ -575,7 +598,11 @@
             app:argType="string"/>
         <action
             android:id="@+id/action_handymanJobListFragment_to_handymanJobListDetailsFragment"
-            app:destination="@id/handymanJobListDetailsFragment">
+            app:destination="@id/handymanJobListDetailsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="customerId"
                 app:argType="string" />

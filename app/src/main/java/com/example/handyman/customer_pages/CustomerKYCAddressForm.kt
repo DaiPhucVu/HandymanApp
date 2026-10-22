@@ -26,6 +26,9 @@ import com.example.handyman.components.StepCircle
 import android.location.Geocoder
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.handyman.CustomerSignupViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,10 +64,28 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
     var mapViewRef by remember { mutableStateOf<MapView?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val geocoder = remember { Geocoder(context) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> mapViewRef?.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapViewRef?.onPause()
+                Lifecycle.Event.ON_DESTROY -> mapViewRef?.onDetach()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            mapViewRef?.onDetach()
+        }
+    }
 
     fun reverseGeocode(lat: Double, lng: Double) {
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                if (!Geocoder.isPresent()) return@launch
                 val results = geocoder.getFromLocation(lat, lng, 1)
                 if (!results.isNullOrEmpty()) {
                     val a = results[0]
@@ -91,6 +112,7 @@ fun CustomerKYCAddressForm(modifier: Modifier = Modifier, navController: NavCont
         if (query.isBlank()) return
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                if (!Geocoder.isPresent()) return@launch
                 val results = geocoder.getFromLocationName(query, 1)
                 if (!results.isNullOrEmpty()) {
                     val r = results[0]

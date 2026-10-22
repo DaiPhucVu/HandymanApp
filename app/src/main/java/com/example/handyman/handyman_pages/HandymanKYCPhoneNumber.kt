@@ -70,7 +70,7 @@ fun HandymanKYCPhoneNumber(modifier: Modifier = Modifier, navController: NavCont
                 contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { navController.navigate("handymanKYCAddressForm") }
+                    .clickable { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.account_verification_title), fontSize = 20.sp)

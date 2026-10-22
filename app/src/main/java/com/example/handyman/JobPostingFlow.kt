@@ -20,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -297,11 +300,31 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val geocoder = remember { Geocoder(context) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> mapViewRef?.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapViewRef?.onPause()
+                Lifecycle.Event.ON_DESTROY -> mapViewRef?.onDetach()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            mapViewRef?.onDetach()
+        }
+    }
 
     fun searchAddress(address: String, mapView: MapView) {
         if (address.isBlank()) return
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                if (!Geocoder.isPresent()) return@launch
                 val results = geocoder.getFromLocationName(address, 1)
                 if (results != null && results.isNotEmpty()) {
                     val location = results[0]
@@ -330,6 +353,7 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
     fun updateAddressFromLocation(lat: Double, lng: Double) {
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                if (!Geocoder.isPresent()) return@launch
                 val results = geocoder.getFromLocation(lat, lng, 1)
                 if (results != null && results.isNotEmpty()) {
                     val address = results[0].getAddressLine(0)
@@ -350,8 +374,6 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
         Spacer(modifier = Modifier.height(16.dp))
         Text(stringResource(R.string.where_do_you_need_help), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         
-        var mapViewRef by remember { mutableStateOf<MapView?>(null) }
-
         OutlinedTextField(
             value = viewModel.locationAddress,
             onValueChange = { viewModel.locationAddress = it },

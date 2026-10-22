@@ -136,8 +136,8 @@ class PaymentSuccessFragment : Fragment() {
         val handymanRef = database.child("Handyman").child(handymanId)
         handymanRef.runTransaction(object : Transaction.Handler {
             override fun doTransaction(mutableData: MutableData): Transaction.Result {
-                val currentRating = (mutableData.child("averageRating").getValue(Double::class.java) ?: 0.0)
-                val currentCount = (mutableData.child("reviewCount").getValue(Int::class.java) ?: 0)
+                val currentRating = (mutableData.child("averageRating").value as? Number)?.toDouble() ?: 0.0
+                val currentCount = (mutableData.child("reviewCount").value as? Number)?.toInt() ?: 0
                 
                 val newCount = currentCount + 1
                 val newAverage = ((currentRating * currentCount) + newRating.toDouble()) / newCount

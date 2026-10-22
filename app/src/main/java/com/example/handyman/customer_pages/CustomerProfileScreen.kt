@@ -70,9 +70,15 @@ fun CustomerProfileScreen(navController: NavController) {
                                 override fun onDataChange(reviewSnapshot: DataSnapshot) {
                                     val reviewList = mutableListOf<Review>()
                                     for (child in reviewSnapshot.children) {
-                                        val review = child.getValue(Review::class.java)
-                                        if (review != null && review.reviewerType == "handyman") {
-                                            reviewList.add(review)
+                                        try {
+                                            val review = child.getValue(Review::class.java)
+                                            if (review != null && review.reviewerType == "handyman") {
+                                                // Handle legacy rating types (Double/Long) safely
+                                                val safeRating = (child.child("rating").value as? Number)?.toFloat() ?: review.rating
+                                                reviewList.add(review.copy(rating = safeRating))
+                                            }
+                                        } catch (e: Exception) {
+                                            android.util.Log.e("CustomerProfile", "Error parsing review", e)
                                         }
                                     }
                                     reviews = reviewList.sortedByDescending { it.timestamp }

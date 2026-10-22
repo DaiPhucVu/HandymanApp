@@ -192,10 +192,34 @@ fun Navigation(modifier: Modifier = Modifier, startDestination: String = "landin
         composable("handymanKYCCaptureID") {
             HandymanKYCCaptureID(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
-        composable("handymanKYCAddressForm") {
+        composable(
+            route = "handymanKYCAddressForm",
+            exitTransition = {
+                if (targetState.destination.route == "handymanKycPhoneNumber") {
+                    ExitTransition.None
+                } else {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(350)
+                    )
+                }
+            }
+        ) {
             HandymanKYCAddressForm(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
-        composable("handymanKycPhoneNumber") {
+        composable(
+            route = "handymanKycPhoneNumber",
+            enterTransition = {
+                if (initialState.destination.route == "handymanKYCAddressForm") {
+                    EnterTransition.None
+                } else {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(350)
+                    )
+                }
+            }
+        ) {
             HandymanKYCPhoneNumber(Modifier.fillMaxSize().systemBarsPadding(), navController, handymanSignupViewModel)
         }
         composable("handymanKycCodeOTP/{verificationId}/{phoneNumber}") { backStackEntry ->

@@ -68,9 +68,15 @@ fun HandymanProfileScreen(navController: NavController) {
                             override fun onDataChange(reviewSnapshot: DataSnapshot) {
                                 val reviewList = mutableListOf<Review>()
                                 for (child in reviewSnapshot.children) {
-                                    val review = child.getValue(Review::class.java)
-                                    if (review != null && review.reviewerType == "customer") {
-                                        reviewList.add(review)
+                                    try {
+                                        val review = child.getValue(Review::class.java)
+                                        if (review != null && review.reviewerType == "customer") {
+                                            // Handle legacy rating types (Double/Long) safely
+                                            val safeRating = (child.child("rating").value as? Number)?.toFloat() ?: review.rating
+                                            reviewList.add(review.copy(rating = safeRating))
+                                        }
+                                    } catch (e: Exception) {
+                                        android.util.Log.e("HandymanProfile", "Error parsing review", e)
                                     }
                                 }
                                 reviews = reviewList.sortedByDescending { it.timestamp }
@@ -99,8 +105,8 @@ fun HandymanProfileScreen(navController: NavController) {
         val email = handymanData?.get("email") as? String ?: ""
         val trade = handymanData?.get("primaryTrade") as? String ?: stringResource(R.string.no_trade_set_label)
         val bio = handymanData?.get("bio") as? String ?: stringResource(R.string.no_bio_available_label)
-        val experience = handymanData?.get("experienceYears") as? String ?: "0"
-        val hourlyRate = handymanData?.get("hourlyRate") as? String ?: "0"
+        val experience = (handymanData?.get("experienceYears")?.toString()) ?: "0"
+        val hourlyRate = (handymanData?.get("hourlyRate")?.toString()) ?: "0"
         val city = handymanData?.get("city") as? String ?: stringResource(R.string.location_not_set_label)
         val photoUrl = handymanData?.get("profileImageUrl") as? String ?: ""
         

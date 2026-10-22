@@ -66,11 +66,7 @@ class HandymanJobBoardFragment : Fragment() {
             // Clear session
             SessionManager.clearSession(requireContext())
 
-            // Redirect to MainActivity
-            val intent = Intent(requireContext(), com.example.handyman.chatbox.MainActivity::class.java)
-            intent.putExtra("startDestination", "chooseAccountType")
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            startActivity(com.example.handyman.chatbox.MainActivity.logoutIntent(requireContext()))
         }
 
         recyclerView = view.findViewById(R.id.recyclerView)
@@ -151,8 +147,13 @@ class HandymanJobBoardFragment : Fragment() {
                                         null
                                     } ?: return@mapNotNull null
 
+                                    // Defensive coordinate casting if needed (Job data class handles it as Double? now)
+                                    val lat = (child.child("latitude").value as? Number)?.toDouble() ?: job.latitude
+                                    val lng = (child.child("longitude").value as? Number)?.toDouble() ?: job.longitude
+                                    val safeJob = job.copy(latitude = lat, longitude = lng)
+
                                     // 2) Filter out inactive jobs
-                                    if (job.jobStatus == "Inactive") return@mapNotNull null
+                                    if (safeJob.jobStatus == "Inactive") return@mapNotNull null
 
                                     // 3) Get job ID
                                     val jobId = child.key ?: return@mapNotNull null
@@ -165,7 +166,7 @@ class HandymanJobBoardFragment : Fragment() {
                                     if (jobId in cancelledJobs) return@mapNotNull null
 
                                     // 5) Return the job
-                                    job.copy(jobId = jobId)
+                                    safeJob.copy(jobId = jobId)
                                 }
 
                                 adapter.submitList(availableJobs)

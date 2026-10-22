@@ -35,8 +35,10 @@ class MainActivity : ComponentActivity() {
 
         handleIntent(intent)
 
-        val startDestination = intent.getStringExtra("startDestination") ?: "landingPage"
+        showNavigation(intent.getStringExtra(EXTRA_START_DESTINATION) ?: LANDING_PAGE)
+    }
 
+    private fun showNavigation(startDestination: String) {
         setContent {
             HandymanTheme {
                 // Language is chosen as part of "Get started" on the landing
@@ -51,7 +53,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         handleIntent(intent)
+        showNavigation(intent.getStringExtra(EXTRA_START_DESTINATION) ?: LANDING_PAGE)
     }
 
     private fun handleIntent(intent: Intent) {
@@ -89,6 +93,17 @@ class MainActivity : ComponentActivity() {
 
         val (year, month) = getCurrentYearMonth()
         updateSessionMetrics(durationMin, isBounce, year, month)
+    }
+
+    companion object {
+        const val EXTRA_START_DESTINATION = "startDestination"
+        const val ACCOUNT_TYPE_PAGE = "chooseAccountType"
+        private const val LANDING_PAGE = "landingPage"
+
+        fun logoutIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
+            putExtra(EXTRA_START_DESTINATION, ACCOUNT_TYPE_PAGE)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
     }
 
 }

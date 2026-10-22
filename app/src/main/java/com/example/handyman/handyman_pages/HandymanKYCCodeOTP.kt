@@ -171,6 +171,8 @@ fun HandymanKYCCodeOTP(
                         "country" to signupViewModel.country,
                         "postcode" to signupViewModel.postCode,
                         "notes" to signupViewModel.notes,
+                        "latitude" to signupViewModel.latitude,
+                        "longitude" to signupViewModel.longitude,
                         "verificationStatus" to "Verified",
                         "approvedBy" to "",
                         "createdAt" to timestamp,

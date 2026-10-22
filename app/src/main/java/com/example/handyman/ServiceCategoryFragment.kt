@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -14,6 +15,7 @@ import androidx.navigation.Navigation
 import com.example.handyman.utils.SessionManager
 import com.example.handyman.MainJobBoard
 import android.content.Intent
+import com.bumptech.glide.Glide
 
 
 
@@ -77,7 +79,12 @@ class ServiceCategoryFragment : Fragment() {
 
         adapter.submitList(serviceCategoryViewModel.categories)
 
-        val avatar = view.findViewById<View>(R.id.ivAvatar)
+        val avatar = view.findViewById<ImageView>(R.id.ivAvatar)
+        Glide.with(this)
+            .load(R.drawable.sample_handyman)
+            .override(320, 256)
+            .centerCrop()
+            .into(avatar)
         val tvGreeting = view.findViewById<View>(R.id.tvGreeting)
         val profileClickListener = View.OnClickListener {
             val action = ServiceCategoryFragmentDirections
@@ -108,11 +115,7 @@ class ServiceCategoryFragment : Fragment() {
             Log.d("Navigation:", "User clicks Logout")
 
 
-            // Redirect to MainActivity with startDestination=chooseAccountType
-            val intent = Intent(requireContext(), com.example.handyman.chatbox.MainActivity::class.java)
-            intent.putExtra("startDestination", "chooseAccountType")
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            startActivity(com.example.handyman.chatbox.MainActivity.logoutIntent(requireContext()))
 
         }
 
