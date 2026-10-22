@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -172,33 +171,6 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Bottom NavBar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = stringResource(R.string.cd_home),
-                    tint = Color(0xFF8A4DFF),
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = stringResource(R.string.cd_list),
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = stringResource(R.string.cd_chat),
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
         }
     }
 }

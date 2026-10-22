@@ -201,33 +201,6 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Bottom NavBar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = stringResource(R.string.cd_home),
-                    tint = Color(0xFF8A4DFF),
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = stringResource(R.string.cd_list),
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = stringResource(R.string.cd_chat),
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
         }
     }
 }

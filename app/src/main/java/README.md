@@ -10,12 +10,10 @@ app
 │       ├── chatbox
 │       │   ├── ui.composables
 │       │   │   ├── ChatClientActivity
-│       │   │   ├── ChatListingActivity
 │       │   │   └── MainActivity
 │       ├── components
 │       │   └── KYCComponents.kt
 │       ├── customer_pages
-│       │   ├── CustomerHome.kt
 │       │   ├── CustomerHomeKYCProcessing.kt
 │       │   ├── CustomerHomeUnverified.kt
 │       │   ├── CustomerKYCAddressForm.kt
