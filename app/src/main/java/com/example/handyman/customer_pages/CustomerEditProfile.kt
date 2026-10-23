@@ -1,0 +1,156 @@
+package com.example.handyman.customer_pages
+
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.handyman.R
+import com.example.handyman.utils.SessionManager
+import com.google.firebase.database.FirebaseDatabase
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomerEditProfile(navController: NavController) {
+    val context = LocalContext.current
+    val userId = SessionManager.getLoggedInUserId(context) ?: ""
+    val database = FirebaseDatabase.getInstance().getReference("User").child(userId)
+
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var bio by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        database.get().addOnSuccessListener { snapshot ->
+            firstName = snapshot.child("firstName").getValue(String::class.java) ?: ""
+            lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
+            bio = snapshot.child("bio").getValue(String::class.java) ?: ""
+            city = snapshot.child("city").getValue(String::class.java) ?: ""
+            phone = snapshot.child("phoneNumber").getValue(String::class.java) ?: ""
+            isLoading = false
+        }.addOnFailureListener {
+            isLoading = false
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.edit_profile_title), fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (!navController.popBackStack()) {
+                            (context as? android.app.Activity)?.finish()
+                        }
+                    }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        }
+    ) { padding ->
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(Color.White)
+                    .imePadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = { Text(stringResource(R.string.first_name_field_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                OutlinedTextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text(stringResource(R.string.last_name_field_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = city,
+                    onValueChange = { city = it },
+                    label = { Text(stringResource(R.string.city_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text(stringResource(R.string.phone_number_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = bio,
+                    onValueChange = { bio = it },
+                    label = { Text(stringResource(R.string.bio_label)) },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
+                    maxLines = 5
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    onClick = {
+                        val updates = mapOf(
+                            "firstName" to firstName,
+                            "lastName" to lastName,
+                            "city" to city,
+                            "phoneNumber" to phone,
+                            "bio" to bio
+                        )
+                        database.updateChildren(updates).addOnSuccessListener {
+                            Toast.makeText(context, context.getString(R.string.profile_updated_message), Toast.LENGTH_SHORT).show()
+                            navController.popBackStack()
+                        }.addOnFailureListener {
+                            Toast.makeText(context, context.getString(R.string.update_failed_message), Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB703)),
+                    shape = RoundedCornerShape(25.dp)
+                ) {
+                    Text(stringResource(R.string.save_changes_btn), color = Color.DarkGray, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 class JobPostingViewModel : ViewModel() {
     // Session Info
     var customerId by mutableStateOf("")
+    var jobId by mutableStateOf("")
 
     // Selected Service
     var serviceCategory by mutableStateOf("")
@@ -22,6 +23,7 @@ class JobPostingViewModel : ViewModel() {
 
     // Step 2: Location
     var locationAddress by mutableStateOf("")
+    var citySuburb by mutableStateOf("")
     var latitude by mutableStateOf(0.0)
     var longitude by mutableStateOf(0.0)
 
@@ -38,16 +40,21 @@ class JobPostingViewModel : ViewModel() {
     var isEditing by mutableStateOf(false)
 
     fun clearData() {
+        jobId = ""
         problemDesc = ""
         dateFrom = ""
         dateTo = ""
         timeFrom = ""
         timeTo = ""
         locationAddress = ""
+        citySuburb = ""
+        latitude = 0.0
+        longitude = 0.0
         isHappyToNegotiate = false
         salaryMin = ""
         salaryMax = ""
         paymentOption = ""
         imageUris = emptyList()
+        isEditing = false
     }
 }

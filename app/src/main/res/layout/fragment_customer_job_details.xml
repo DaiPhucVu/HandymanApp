@@ -14,13 +14,13 @@
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:src="@drawable/arrow_back"
-            android:contentDescription="Back"
-            android:padding="4dp"
+            android:contentDescription="@string/cd_back"
+            android:padding="12dp"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
@@ -29,7 +29,7 @@
             android:layout_toEndOf="@id/ivBack"
             android:layout_centerVertical="true"
             android:layout_marginStart="16dp"
-            android:text="Job Details"
+            android:text="@string/job_details_title"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -76,7 +76,7 @@
                     android:layout_toStartOf="@id/tvPrice"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="4dp"
-                    android:text="Wall repair"
+                    android:text=""
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -90,7 +90,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="10dp"
             android:ellipsize="end"
-            android:text="Leaks in the bathroom wall"
+            android:text=""
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp" />
 
@@ -151,7 +151,8 @@
             android:layout_below="@id/layoutTime"
             android:layout_alignParentStart="true"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/ivLocationIcon"
@@ -162,17 +163,73 @@
 
             <TextView
                 android:id="@+id/tvAddress"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Hawthorn, Melbourne, VIC"
+                android:layout_weight="1"
+                android:text="@string/location_loading"
                 android:textColor="@android:color/black"
                 android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/ivEditLocation"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="2dp"
+                android:src="@drawable/edit"
+                android:contentDescription="@string/cd_edit_location"
+                android:tint="#2D2E5E"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+        </LinearLayout>
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_below="@id/layoutLocation"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="4dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/layoutHandyman"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mapView"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/character_handyman" />
+
+            <TextView
+                android:id="@+id/tvHandymanName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/handyman_label_prefix"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnViewProfile"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/view_profile"
+                android:textAllCaps="false"
+                android:textColor="#8E24AA" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/layoutLocation"
+            android:layout_below="@id/layoutHandyman"
             android:layout_marginTop="10dp">
 
             <HorizontalScrollView
@@ -191,11 +248,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerQuotedHandymen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp" />
+
 
         </LinearLayout>
     </ScrollView>

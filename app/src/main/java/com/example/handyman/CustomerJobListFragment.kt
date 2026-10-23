@@ -1,15 +1,21 @@
 package com.example.handyman
 
+import android.util.Log
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.EditText
+import android.widget.RatingBar
 import android.widget.Spinner
 import android.widget.Toast
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,8 +24,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import androidx.navigation.fragment.navArgs
 import java.time.LocalDateTime
+import java.util.UUID
 import com.example.handyman.utils.getCurrentYearMonth
 import com.example.handyman.utils.incrementMetric
+import com.example.handyman.utils.localizedJobStatusLabel
 
 class CustomerJobListFragment : Fragment() {
     private var currentCategoryKey = "allJobs"
@@ -41,7 +49,7 @@ class CustomerJobListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         view.findViewById<View>(R.id.btnBack).setOnClickListener {
-            findNavController().popBackStack()
+            findNavController().navigateUp()
         }
 
         adapter = CustomerJobListAdapter(
@@ -74,7 +82,7 @@ class CustomerJobListFragment : Fragment() {
             },
             onEdit = { job ->
                 val customerRef = FirebaseDatabase.getInstance()
-                    .getReference("dummyCustomers")
+                    .getReference("User")
                     .child(customerId)
                     .child("notAssignedJobs")
 
@@ -85,47 +93,42 @@ class CustomerJobListFragment : Fragment() {
                             if (!snapshot.exists()) {
                                 Toast.makeText(
                                     context,
-                                    "Only jobs that are not yet assigned can be edited.",
+                                    getString(R.string.only_not_yet_assigned_can_be_edited_message),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return
                             }
 
-                            // Proceed with edit navigation
-                            val urisArray: Array<Uri> = job.imageUris
-                                .map { Uri.parse(it) }
-                                .toTypedArray()
+                            val viewModel: JobPostingViewModel = ViewModelProvider(requireActivity())[JobPostingViewModel::class.java]
+                            viewModel.isEditing = true
+                            viewModel.jobId = job.jobId
+                            viewModel.customerId = customerId
+                            viewModel.serviceCategory = job.jobCat
+                            viewModel.problemDesc = job.jobDesc
+                            viewModel.dateFrom = job.jobDateFrom
+                            viewModel.dateTo = job.jobDateTo
+                            viewModel.timeFrom = job.jobTimeFrom
+                            viewModel.timeTo = job.jobTimeTo
+                            viewModel.locationAddress = job.jobLocation
+                            viewModel.latitude = job.latitude ?: 0.0
+                            viewModel.longitude = job.longitude ?: 0.0
+                            viewModel.salaryMin = job.jobSalaryFrom
+                            viewModel.salaryMax = job.jobSalaryTo
+                            viewModel.paymentOption = job.jobPaymentOption
+                            viewModel.imageUris = job.imageUris.map { Uri.parse(it) }
 
-                            val action =
-                                CustomerJobListFragmentDirections
-                                    .actionCustomerJobListFragmentToJobEditFragment(
-                                        customerId     = customerId,
-                                        jobId          = job.jobId,
-                                        serviceCategory= job.jobCat,
-                                        problemDesc    = job.jobDesc,
-                                        dateFrom       = job.jobDateFrom,
-                                        dateTo         = job.jobDateTo,
-                                        timeFrom       = job.jobTimeFrom,
-                                        timeTo         = job.jobTimeTo,
-                                        location       = job.jobLocation,
-                                        salaryFrom     = job.jobSalaryFrom,
-                                        salaryTo       = job.jobSalaryTo,
-                                        paymentOption  = job.jobPaymentOption,
-                                        imageUris      = urisArray,
-                                        assignedTo     = job.assignedTo,
-                                        jobStatus      = job.jobStatus
-                                    )
+                            val action = CustomerJobListFragmentDirections.actionCustomerJobListFragmentToJobPostingFragment(serviceCategory = job.jobCat)
                             findNavController().navigate(action)
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(context, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.database_error_format, error.message), Toast.LENGTH_SHORT).show()
                         }
                     })
             },
             onDelete = fun(job: Job) {
                 val customerRef = FirebaseDatabase.getInstance()
-                    .getReference("dummyCustomers")
+                    .getReference("User")
                     .child(customerId)
                     .child("notAssignedJobs")
 
@@ -136,34 +139,34 @@ class CustomerJobListFragment : Fragment() {
                             if (!customerSnapshot.exists()) {
                                 Toast.makeText(
                                     context,
-                                    "Cannot cancel.",
+                                    getString(R.string.cannot_cancel_message),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return
                             }
 
                             AlertDialog.Builder(requireContext())
-                                .setTitle("Delete job?")
-                                .setMessage("Are you sure you want to delete this job?")
-                                .setPositiveButton("Yes") { _, _ ->
+                                .setTitle(R.string.delete_job_title)
+                                .setMessage(R.string.delete_job_confirm_message)
+                                .setPositiveButton(R.string.yes_btn) { _, _ ->
 
                                     // Step 1: Set job status to "Inactive"
                                     val jobRef = FirebaseDatabase.getInstance()
-                                        .getReference("DummyJob")
+                                        .getReference("Job")
                                         .child(job.jobId)
 
                                     jobRef.child("jobStatus").setValue("Inactive")
                                         .addOnSuccessListener {
                                             Toast.makeText(
                                                 context,
-                                                "Job marked as inactive",
+                                                getString(R.string.job_marked_inactive_message),
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         }
                                         .addOnFailureListener { e ->
                                             Toast.makeText(
                                                 context,
-                                                "Failed to update job status: ${e.message}",
+                                                getString(R.string.failed_to_update_job_status_format, e.message),
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
@@ -171,7 +174,7 @@ class CustomerJobListFragment : Fragment() {
                                     // Step 2: Remove the job ID from notAssignedJobs and allJobs in customer
                                     customerSnapshot.children.forEach { it.ref.removeValue() }
                                     FirebaseDatabase.getInstance()
-                                        .getReference("dummyCustomers")
+                                        .getReference("User")
                                         .child(customerId)
                                         .child("allJobs")
                                         .orderByValue().equalTo(job.jobId)
@@ -181,7 +184,7 @@ class CustomerJobListFragment : Fragment() {
 
                                                 // Step 3: Add the job ID to the cancelledJobs list
                                                 FirebaseDatabase.getInstance()
-                                                    .getReference("dummyCustomers")
+                                                    .getReference("User")
                                                     .child(customerId)
                                                     .child("cancelledJobs")
                                                     .push()
@@ -191,76 +194,22 @@ class CustomerJobListFragment : Fragment() {
                                             override fun onCancelled(error: DatabaseError) {}
                                         })
 
-                                    // Step 4: Remove all quoted handymen from quotedHandymen list
-                                    val quotesRef = jobRef.child("quotedHandymen")
-                                    quotesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-                                            val handymenList = mutableListOf<String>()
-                                            snapshot.children.forEach { child ->
-                                                val handymanId = child.value.toString()
-                                                handymenList.add(handymanId)
-                                                // Properly remove each quoted handyman
-                                                child.ref.removeValue()
-                                            }
-
-                                            // Step 5: Remove the job ID from each handyman's quotedJobs and allJobs list
-                                            handymenList.forEach { handymanId ->
-                                                val handymanRef = FirebaseDatabase.getInstance()
-                                                    .getReference("dummyHandymen")
-                                                    .child(handymanId)
-
-                                                // Iterate through both quotedJobs and allJobs lists
-                                                listOf("quotedJobs", "allJobs").forEach { listType ->
-                                                    handymanRef.child(listType)
-                                                        .orderByValue().equalTo(job.jobId)
-                                                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                                                            override fun onDataChange(handymanSnapshot: DataSnapshot) {
-                                                                if (handymanSnapshot.exists()) {
-                                                                    handymanSnapshot.children.forEach { it.ref.removeValue() }
-                                                                }
-                                                            }
-
-                                                            override fun onCancelled(error: DatabaseError) {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "Error removing job from $listType: ${error.message}",
-                                                                    Toast.LENGTH_LONG
-                                                                ).show()
-                                                            }
-                                                        })
-                                                }
-                                            }
-
-                                            // Step 6: Update the UI
-                                            Toast.makeText(
-                                                context,
-                                                "Job has been cancelled.",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-
-                                            // Update the list after deletion
-//                                            val newList = adapter.currentList.filter { it.jobId != job.jobId }
-//                                            adapter.submitList(newList)
-                                            fetchJobsForCategory(currentCategoryKey)
-                                        }
-
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Toast.makeText(
-                                                context,
-                                                "Failed to remove quoted handymen: ${error.message}",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-                                    })
+                                    // Step 4: Update the UI
+                                    Toast.makeText(
+                                        context,
+                                        getString(R.string.job_cancelled_message),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    fetchJobsForCategory(currentCategoryKey)
                                 }
-                                .setNegativeButton("No", null)
+                                .setNegativeButton(R.string.no_btn, null)
                                 .show()
                         }
 
                         override fun onCancelled(error: DatabaseError) {
                             Toast.makeText(
                                 context,
-                                "Error checking job existence: ${error.message}",
+                                getString(R.string.error_checking_job_existence_format, error.message),
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -277,21 +226,22 @@ class CustomerJobListFragment : Fragment() {
                 }
 
                 if (nextStatuses.isEmpty()) {
-                    Toast.makeText(context, "No further updates available", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.no_further_updates_message), Toast.LENGTH_SHORT).show()
                     return
                 }
 
                 // now show the dialog with only the valid choices
+                val displayStatuses = nextStatuses.map { localizedJobStatusLabel(requireContext(), it) }.toTypedArray()
                 var chosen = 0
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Update status")
-                    .setSingleChoiceItems(nextStatuses, 0) { _, which ->
+                    .setTitle(R.string.update_status_dialog_title)
+                    .setSingleChoiceItems(displayStatuses, 0) { _, which ->
                         chosen = which
                     }
-                    .setPositiveButton("OK") { _, _ ->
+                    .setPositiveButton(R.string.ok_btn) { _, _ ->
                         val newStatus = nextStatuses[chosen]
                         val jobRef = FirebaseDatabase.getInstance()
-                            .getReference("DummyJob")
+                            .getReference("Job")
                             .child(job.jobId)
 
                         jobRef.child("jobStatusCustomer")
@@ -299,7 +249,7 @@ class CustomerJobListFragment : Fragment() {
                             .addOnSuccessListener {
                                 Toast.makeText(
                                     context,
-                                    "Status updated to $newStatus",
+                                    getString(R.string.status_updated_to_format, localizedJobStatusLabel(requireContext(), newStatus)),
                                     Toast.LENGTH_SHORT
                                 ).show()
 
@@ -341,12 +291,12 @@ class CustomerJobListFragment : Fragment() {
                                                 }
 
                                                 val custRef = FirebaseDatabase.getInstance()
-                                                    .getReference("dummyCustomers")
+                                                    .getReference("User")
                                                     .child(customerId)
                                                 moveJobId(custRef, custFrom, toList, job.jobId)
 
                                                 val hmRef = FirebaseDatabase.getInstance()
-                                                    .getReference("dummyHandymen")
+                                                    .getReference("Handyman")
                                                     .child(job.assignedTo)
                                                 moveJobId(hmRef, hmFrom, toList, job.jobId)
 
@@ -359,18 +309,18 @@ class CustomerJobListFragment : Fragment() {
                             .addOnFailureListener { e ->
                                 Toast.makeText(
                                     context,
-                                    "Failed to update status: ${e.message}",
+                                    getString(R.string.failed_to_update_status_format, e.message),
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.cancel, null)
                     .show()
             },
 
             onProceedToPayment = { job ->
                 if (job.jobStatus != "Done") {
-                    Toast.makeText(context, "Job is not marked as Done yet.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.job_not_marked_done_message), Toast.LENGTH_SHORT).show()
                     return@CustomerJobListAdapter
                 }
 
@@ -380,6 +330,10 @@ class CustomerJobListFragment : Fragment() {
                         jobId = job.jobId
                     )
                 findNavController().navigate(action)
+            },
+
+            onLeaveReview = { job ->
+                showHandymanReviewDialog(job)
             }
         )
         recyclerView.adapter = adapter
@@ -389,23 +343,111 @@ class CustomerJobListFragment : Fragment() {
             override fun onItemSelected(
                 parent: AdapterView<*>, v: View?, pos: Int, id: Long
             ) {
-                val display = parent.getItemAtPosition(pos) as String
-                currentCategoryKey = when (display) {
-                    "Assigned"      -> "assignedJobs"
-                    "Not assigned"  -> "notAssignedJobs"
-                    "All"           -> "allJobs"
-                    "In-progress"   -> "inProgressJobs"
-                    "Done"          -> "completedJobs"
-                    "Cancelled"     -> "cancelledJobs"
-                    else            -> return
+                // Position-based, not string-based: the spinner's displayed text is
+                // localized via @array/job_statuses_customer, so comparing it against
+                // English literals here would silently break in Bangla. Order must
+                // match that array exactly: All, Not assigned, Assigned, In-progress,
+                // Done, Cancelled.
+                currentCategoryKey = when (pos) {
+                    0 -> "allJobs"
+                    1 -> "notAssignedJobs"
+                    2 -> "assignedJobs"
+                    3 -> "inProgressJobs"
+                    4 -> "completedJobs"
+                    5 -> "cancelledJobs"
+                    else -> return
                 }
                 fetchJobsForCategory(currentCategoryKey)
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        fetchJobsForCategory("allJobs")
         return view
+    }
+
+    private fun showHandymanReviewDialog(job: Job) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_customer_review, null)
+        val ratingBar = dialogView.findViewById<RatingBar>(R.id.ratingBar)
+        val etComment = dialogView.findViewById<EditText>(R.id.etComment)
+        val tvTitle = dialogView.findViewById<TextView>(R.id.tvReviewTitle)
+        
+        tvTitle.text = getString(R.string.how_was_experience_handyman_message)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.review_handyman_title)
+            .setView(dialogView)
+            .setPositiveButton(R.string.submit_btn) { _, _ ->
+                val rating = ratingBar.rating
+                val comment = etComment.text.toString()
+
+                if (rating == 0f) {
+                    Toast.makeText(context, getString(R.string.please_provide_rating_message), Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val reviewId = UUID.randomUUID().toString()
+                val review = Review(
+                    reviewId = reviewId,
+                    jobId = job.jobId,
+                    customerId = customerId,
+                    handymanId = job.assignedTo,
+                    rating = rating,
+                    comment = comment,
+                    timestamp = java.time.LocalDateTime.now().toString(),
+                    reviewerType = "customer"
+                )
+
+                FirebaseDatabase.getInstance().getReference("Reviews").child(reviewId)
+                    .setValue(review)
+                    .addOnSuccessListener {
+                        updateAverageRating(job.assignedTo, "Handyman")
+                        // Mark job as reviewed by customer
+                        FirebaseDatabase.getInstance().getReference("Job")
+                            .child(job.jobId)
+                            .child("isReviewedByCustomer")
+                            .setValue(true)
+                        
+                        Toast.makeText(context, getString(R.string.review_submitted_message), Toast.LENGTH_SHORT).show()
+                        fetchJobsForCategory(currentCategoryKey)
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(context, getString(R.string.review_failed_format, e.message), Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun updateAverageRating(userId: String, userType: String) {
+        val reviewsRef = FirebaseDatabase.getInstance().getReference("Reviews")
+        val idField = if (userType == "Handyman") "handymanId" else "customerId"
+        val reviewerType = if (userType == "Handyman") "customer" else "handyman"
+
+        reviewsRef.orderByChild(idField).equalTo(userId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    var totalRating = 0f
+                    var count = 0
+                    for (child in snapshot.children) {
+                        val review = child.getValue(Review::class.java)
+                        if (review != null && review.reviewerType == reviewerType) {
+                            totalRating += review.rating
+                            count++
+                        }
+                    }
+
+                    if (count > 0) {
+                        val average = totalRating / count
+                        val userRef = FirebaseDatabase.getInstance().getReference(userType).child(userId)
+                        val updates = mapOf(
+                            "averageRating" to average,
+                            "reviewCount" to count
+                        )
+                        userRef.updateChildren(updates)
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 
     private fun moveJobId(
@@ -430,25 +472,35 @@ class CustomerJobListFragment : Fragment() {
 
     private fun fetchJobsForCategory(category: String) {
         val listRef = FirebaseDatabase.getInstance()
-            .getReference("dummyCustomers")
+            .getReference("User")
             .child(customerId)
             .child(category)
+
+        Log.d("CustomerJobList", "Fetching jobs for customer: $customerId, category: $category")
 
         listRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(listSnap: DataSnapshot) {
                 val jobIds = listSnap.children
                     .mapNotNull { it.getValue(String::class.java) }
+                
+                Log.d("CustomerJobList", "Found ${jobIds.size} job IDs: $jobIds")
                 fetchJobsByIds(jobIds)
             }
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Error loading $category", Toast.LENGTH_SHORT).show()
+                Log.e("CustomerJobList", "Error loading $category: ${error.message}")
+                Toast.makeText(context, getString(R.string.error_loading_jobs_message), Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun fetchJobsByIds(jobIds: List<String>) {
+        if (jobIds.isEmpty()) {
+            adapter.submitList(emptyList())
+            return
+        }
+
         FirebaseDatabase.getInstance()
-            .getReference("DummyJob")
+            .getReference("Job")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val jobs = snapshot.children.mapNotNull { jobSnap ->
@@ -457,10 +509,13 @@ class CustomerJobListFragment : Fragment() {
                         val parsed = jobSnap.getValue(Job::class.java) ?: return@mapNotNull null
                         parsed.copy(jobId = key)
                     }
+                    Log.d("CustomerJobList", "Fetched ${jobs.size} jobs from Job")
                     adapter.hideStatus = currentCategoryKey == "cancelledJobs"
                     adapter.submitList(jobs)
                 }
-                override fun onCancelled(error: DatabaseError) {}
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("CustomerJobList", "Error loading Job data: ${error.message}")
+                }
             })
     }
 }

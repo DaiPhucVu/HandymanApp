@@ -1,5 +1,8 @@
 package com.example.handyman
 
+import android.content.Context
+import com.example.handyman.utils.LocaleHelper
+
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +10,10 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.handyman.utils.SessionManager
 
 class MainJobBoard : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.job_board_main)
@@ -17,12 +24,51 @@ class MainJobBoard : AppCompatActivity() {
         val userType = intent.getStringExtra("user_type")
         Log.d("Navigation", "$userType")
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        if (userType != null) {
+            val currentEmail = SessionManager.getLoggedInEmail(this)
+            val table = if (userType == "customer") "User" else "Handyman"
+            val userRef = com.google.firebase.database.FirebaseDatabase.getInstance().getReference(table)
+            userRef.orderByChild("email").equalTo(currentEmail)
+                .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                    override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                        for (child in snapshot.children) {
+                            val city = child.child("city").getValue(String::class.java) ?: ""
+                            if (city.isNotEmpty()) {
+                                SessionManager.saveLoggedInCity(this@MainJobBoard, city)
+                            }
+                        }
+                    }
+                    override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+                })
+        }
+
+        val navHostFragment = supportFragmentManager
+            .findFragmentByTag(NAV_HOST_TAG) as? NavHostFragment
+            ?: NavHostFragment().also { fragment ->
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment, NAV_HOST_TAG)
+                    .setPrimaryNavigationFragment(fragment)
+                    .commitNow()
+            }
+
+        if (supportFragmentManager.primaryNavigationFragment !== navHostFragment) {
+            supportFragmentManager.beginTransaction()
+                .setPrimaryNavigationFragment(navHostFragment)
+                .commitNow()
+        }
+
         val navGraph = navHostFragment.navController.navInflater.inflate(R.navigation.nav_graph)
 
         // Navigations
         val startDestination = when(userType) {
-            "customer" -> R.id.serviceCategoryFragment
+            "customer" -> {
+                val targetFragment = intent.getStringExtra("target_fragment")
+                when (targetFragment) {
+                    "customerJobList" -> R.id.customerJobListFragment
+                    "paymentSuccess" -> R.id.paymentSuccessFragment
+                    else -> R.id.serviceCategoryFragment
+                }
+            }
             "handyman" -> R.id.handymanJobBoardFragment
 
             else -> {
@@ -32,6 +78,15 @@ class MainJobBoard : AppCompatActivity() {
         }
 
         navGraph.setStartDestination(startDestination)
-        navHostFragment.navController.graph = navGraph
+
+        val bundle = Bundle()
+        intent.getStringExtra("jobId")?.let { bundle.putString("jobId", it) }
+        intent.getStringExtra("customerId")?.let { bundle.putString("customerId", it) }
+
+        navHostFragment.navController.setGraph(navGraph, bundle)
+    }
+
+    private companion object {
+        const val NAV_HOST_TAG = "main_job_board_nav_host"
     }
 }

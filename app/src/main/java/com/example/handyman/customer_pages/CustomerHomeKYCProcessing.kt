@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +54,7 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
     Box(modifier = modifier.fillMaxSize()) {
         // Top right logout
         Text(
-            "Log out",
+            stringResource(R.string.log_out_link),
             color = Color(0xFF30386D),
             fontSize = 18.sp,
             modifier = Modifier
@@ -78,17 +78,17 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.dp),
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.cd_profile),
                     modifier = Modifier
                         .size(60.dp)
                         .padding(end = 8.dp)
                 )
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hello, $firstName $lastName.", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.hello_name_format, firstName, lastName), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Unverified",
+                            text = stringResource(R.string.unverified_badge),
                             color = Color(0xFFE8A317),
                             fontSize = 12.sp,
                             modifier = Modifier
@@ -99,22 +99,22 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.bytesize_location),
-                            contentDescription = "Location",
+                            contentDescription = stringResource(R.string.cd_location),
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Unverified address", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = stringResource(R.string.unverified_address_label), fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            Text("KYC Application\nUnder Review", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.kyc_application_under_review_title), fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Your identity verification is being processed.\nWe will let you know when you are ready to use our service.",
+                stringResource(R.string.kyc_processing_hint),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -123,7 +123,7 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
 
             Image(
                 painter = painterResource(id = R.drawable.document_icon_yellow),
-                contentDescription = "KYC Document Icon",
+                contentDescription = stringResource(R.string.cd_kyc_document_icon),
                 modifier = Modifier.size(100.dp).align(Alignment.CenterHorizontally)
             )
 
@@ -136,16 +136,16 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Application Details", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.application_details_title), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Identity Verification", fontSize = 14.sp)
+                        Text(stringResource(R.string.identity_verification_label), fontSize = 14.sp)
                         Text(
-                            text = if (idApprovedStatus.isEmpty()) "Pending" else idApprovedStatus.replaceFirstChar { it.uppercase() },
+                            text = if (idApprovedStatus.isEmpty()) stringResource(R.string.pending_status) else idApprovedStatus.replaceFirstChar { it.uppercase() },
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = when (idApprovedStatus.lowercase()) {
@@ -166,38 +166,11 @@ fun CustomerHomeKYCProcessing(modifier: Modifier = Modifier, navController: NavC
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(50)
             ) {
-                Text("Refresh Status", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(stringResource(R.string.refresh_status_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Bottom NavBar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = "Home",
-                    tint = Color(0xFF8A4DFF),
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = "List",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = "Chat",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
         }
     }
 }

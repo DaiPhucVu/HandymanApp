@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <string name="app_name">Handyman</string>
+        <string name="ac_repair_services">এসি মেরামত সেবা</string>
+        <string name="appliance_repair">যন্ত্রপাতি মেরামত</string>
+        <string name="cleaning_solution">পরিষ্কার সেবা</string>
+        <string name="beauty_and_wellness">সৌন্দর্য ও সুস্থতা</string>
+        <string name="shifting">শিফটিং</string>
+        <string name="men_care_and_salon">পুরুষদের যত্ন ও সেলুন</string>
+        <string name="health_and_care">স্বাস্থ্য ও যত্ন</string>
+        <string name="electronics_and_gadgets_repair">ইলেকট্রনিক্স ও গ্যাজেট মেরামত</string>
+        <string name="electric_and_plumbing">ইলেকট্রিক ও প্লাম্বিং</string>
+        <string name="pest_control">পোকামাকড় নিয়ন্ত্রণ</string>
+        <string name="driver_service">ড্রাইভার সেবা</string>
+        <string name="car_care_services">গাড়ির যত্ন সেবা</string>
+        <string name="trips_and_travels">ভ্রমণ ও ট্যুর</string>
+        <string name="car_rental">গাড়ি ভাড়া</string>
+        <string name="painting_and_renovation">রং ও সংস্কার</string>
+        <string name="emergency_services">জরুরি সেবা</string>
+        <string name="add_photo_hint">ছবি আমাদের হ্যান্ডিম্যানদের আপনাকে আরও ভালোভাবে সাহায্য করতে প্রস্তুত হতে সহায়তা করে!</string>
+        <string name="confirm_request">অনুরোধ নিশ্চিত করুন</string>
+        <string-array name="location_array">
+            <item>একটি অবস্থান নির্বাচন করুন</item>
+            <item>CBD</item>
+            <item>Camberwell</item>
+            <item>Richmond</item>
+            <item>Hawthorn</item>
+            <item>Docklands</item>
+        </string-array>
+        <string-array name="job_statuses_customer">
+            <item>সব</item>
+            <item>নির্ধারিত হয়নি</item>
+            <item>নির্ধারিত</item>
+            <item>চলমান</item>
+            <item>সম্পন্ন</item>
+            <item>বাতিল</item>
+        </string-array>
+        <string-array name="job_statuses_handyman">
+            <item>সব</item>
+            <item>মুলতুবি</item>
+            <item>গৃহীত</item>
+            <item>চলমান</item>
+            <item>সম্পন্ন</item>
+            <item>বাতিল</item>
+        </string-array>
+
+        <!-- Content descriptions -->
+        <string name="cd_back">পেছনে</string>
+        <string name="cd_edit">সম্পাদনা</string>
+        <string name="cd_delete">মুছুন</string>
+        <string name="cd_logout">লগআউট</string>
+        <string name="cd_support">সহায়তা</string>
+        <string name="cd_edit_location">অবস্থান সম্পাদনা</string>
+        <string name="cd_enlarged_job_photo">বড় করা কাজের ছবি</string>
+        <string name="cd_close">বন্ধ করুন</string>
+
+        <!-- Shared labels / buttons -->
+        <string name="job_details_title">কাজের বিবরণ</string>
+        <string name="view_profile">প্রোফাইল দেখুন</string>
+        <string name="view_details">বিস্তারিত দেখুন</string>
+        <string name="update_status">অবস্থা আপডেট করুন</string>
+        <string name="message_label">বার্তা</string>
+        <string name="btn_return">ফিরে যান</string>
+        <string name="apply_for_job_button">এই কাজের জন্য আবেদন করুন</string>
+        <string name="applied_label">আবেদন করা হয়েছে</string>
+        <string name="job_no_longer_available_label">কাজটি আর উপলব্ধ নেই</string>
+        <string name="application_submitted_message">আপনার আবেদন জমা দেওয়া হয়েছে!</string>
+        <string name="application_failed_message">আবেদন জমা দিতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।</string>
+        <string name="cancel">বাতিল করুন</string>
+        <string name="location_loading">অবস্থান...</string>
+        <string name="verified_badge">যাচাইকৃত</string>
+        <string name="accept">গ্রহণ করুন</string>
+        <string name="decline">প্রত্যাখ্যান করুন</string>
+        <string name="review_customer">গ্রাহক পর্যালোচনা করুন</string>
+        <string name="proceed_with_payment">পেমেন্টের সাথে এগিয়ে যান</string>
+        <string name="leave_review">পর্যালোচনা দিন</string>
+        <string name="proceed_to_payment">পেমেন্টে এগিয়ে যান</string>
+
+        <!-- Customer review dialog -->
+        <string name="how_was_your_experience">আপনার অভিজ্ঞতা কেমন ছিল?</string>
+        <string name="write_comment_hint">একটি মন্তব্য লিখুন (ঐচ্ছিক)</string>
+
+        <!-- Payment input dialog -->
+        <string name="enter_payment_amount">পেমেন্টের পরিমাণ লিখুন</string>
+        <string name="amount_in_bdt_hint">BDT-তে পরিমাণ</string>
+
+        <!-- Customer support form -->
+        <string name="customer_support_title">গ্রাহক সহায়তা</string>
+        <string name="full_name_label">পুরো নাম</string>
+        <string name="enter_your_name_hint">আপনার নাম লিখুন</string>
+        <string name="email_address_label">ইমেইল ঠিকানা</string>
+        <string name="enter_your_email_hint">আপনার ইমেইল লিখুন</string>
+        <string name="category_label">বিভাগ</string>
+        <string name="subject_label">বিষয়</string>
+        <string name="enter_subject_hint">বিষয় লিখুন</string>
+        <string name="type_message_hint">এখানে আপনার বার্তা লিখুন...</string>
+        <string name="submit_request">অনুরোধ জমা দিন</string>
+
+        <!-- Job list headers -->
+        <string name="my_job_requests">আমার কাজের অনুরোধ</string>
+        <string name="my_assigned_jobs">আমার নির্ধারিত কাজ</string>
+        <string name="your_jobs">আপনার কাজ</string>
+        <string name="ready_for_new_tasks">নতুন কাজের জন্য প্রস্তুত?</string>
+        <string name="handyman_label_prefix">"হ্যান্ডিম্যান: "</string>
+
+        <!-- Payment screen -->
+        <string name="payment_title">পেমেন্ট</string>
+        <string name="job_title_label">কাজের শিরোনাম</string>
+        <string name="job_description_label">কাজের বিবরণ</string>
+        <string name="total_amount_label">মোট পরিমাণ</string>
+        <string name="select_payment_method">পেমেন্ট পদ্ধতি নির্বাচন করুন</string>
+        <string name="pay_with_bkash">bKash দিয়ে পেমেন্ট করুন</string>
+        <string name="pay_with_cash">নগদে পেমেন্ট করুন</string>
+
+        <!-- Job posting / editing form -->
+        <string name="describe_your_problem">আপনার সমস্যা বর্ণনা করুন</string>
+        <string name="describe_problem_hint">যেমন. আমার বাথরুমে পানি লিক হচ্ছে</string>
+        <string name="start_date_label">শুরুর তারিখ</string>
+        <string name="date_hint">dd/mm/yyyy</string>
+        <string name="end_date_label">শেষের তারিখ</string>
+        <string name="start_time_label">শুরুর সময়</string>
+        <string name="start_time_hint">10:00</string>
+        <string name="end_time_label">শেষের সময়</string>
+        <string name="end_time_hint">17:00</string>
+        <string name="location_label">অবস্থান</string>
+        <string name="or_pick_on_map">অথবা মানচিত্রে নির্বাচন করুন:</string>
+        <string name="salary_label">বেতন</string>
+        <string name="happy_to_negotiate">আমি আলোচনা করতে রাজি</string>
+        <string name="bdt_currency">BDT</string>
+        <string name="salary_min_hint">সর্বনিম্ন</string>
+        <string name="salary_max_hint">সর্বোচ্চ</string>
+        <string name="range_dash">—</string>
+        <string name="per_day">প্রতি দিন</string>
+        <string name="job_completed">কাজ সম্পন্ন</string>
+        <string name="attach_photos">ছবি সংযুক্ত করুন</string>
+        <string name="update_btn">আপডেট</string>
+
+        <!-- Job request done -->
+        <string name="job_booking_complete">কাজের বুকিং সম্পন্ন!</string>
+        <string name="return_home">হোমে ফিরে যান</string>
+
+        <!-- Order summary -->
+        <string name="submit_job_request">অনুরোধ জমা দিন</string>
+        <string name="posting_your_job">আপনার কাজ পোস্ট করা হচ্ছে...</string>
+
+        <!-- Service category / dashboard -->
+        <string name="all_jobs">সব কাজ</string>
+        <string name="welcome_back">আবার স্বাগতম!</string>
+
+
+        <!-- Payment success -->
+        <string name="payment_successful">পেমেন্ট সফল হয়েছে!</string>
+        <string name="job_completed_message">আপনার কাজ সম্পন্ন হয়েছে।</string>
+        <string name="download_invoice">চালান ডাউনলোড করুন</string>
+        <string name="how_was_the_service">সেবা কেমন ছিল?</string>
+        <string name="share_experience_hint">আপনার অভিজ্ঞতা শেয়ার করুন (ঐচ্ছিক)</string>
+        <string name="submit_review">পর্যালোচনা জমা দিন</string>
+
+        <!-- Job posting flow (Compose) -->
+        <string name="continue_btn">চালিয়ে যান</string>
+        <string name="where_do_you_need_help">আপনার কোথায় সাহায্য প্রয়োজন?</string>
+        <string name="enter_your_address_label">আপনার ঠিকানা লিখুন</string>
+        <string name="cd_search">অনুসন্ধান</string>
+        <string name="take_photo">ছবি তুলুন</string>
+        <string name="cd_gallery">গ্যালারি</string>
+        <string name="from_gallery">গ্যালারি থেকে</string>
+        <string name="selected_photos">নির্বাচিত ছবি</string>
+        <string name="no_photos_added_yet">এখনও কোনো ছবি যোগ করা হয়নি</string>
+        <string name="cd_remove">সরান</string>
+        <string name="ok_btn">ঠিক আছে</string>
+        <string name="confirmed_title">নিশ্চিত করা হয়েছে</string>
+        <string name="job_request_submitted_message">আপনার কাজের অনুরোধ সফলভাবে জমা দেওয়া হয়েছে।</string>
+        <string name="missing_details_title">তথ্য অনুপস্থিত</string>
+        <string name="min_bdt_label">সর্বনিম্ন BDT</string>
+        <string name="max_bdt_label">সর্বোচ্চ BDT</string>
+        <string name="payment_frequency_label">পেমেন্টের সময়সূচি</string>
+        <string name="selected_location_format">নির্বাচিত: %1$s, %2$s</string>
+        <string name="tap_map_to_pinpoint">আপনার অবস্থান চিহ্নিত করতে মানচিত্রে ট্যাপ করুন</string>
+        <string name="photos_label">ছবি</string>
+        <string name="negotiable_label">আলোচনাযোগ্য</string>
+        <string name="salary_range_format">%1$s - %2$s BDT (%3$s)</string>
+        <string name="photos_attached_format">%1$d টি ছবি সংযুক্ত</string>
+        <string name="please_complete_format">অনুগ্রহ করে সম্পন্ন করুন: %1$s।</string>
+        <string name="failed_to_post_job_format">কাজ পোস্ট করতে ব্যর্থ: %1$s</string>
+        <string name="review_service_title">সেবা</string>
+        <string name="review_description_timing_title">বিবরণ ও সময়</string>
+        <string name="field_service_category">সেবার বিভাগ</string>
+        <string name="field_problem_description">সমস্যার বিবরণ</string>
+        <string name="field_start_date">শুরুর তারিখ</string>
+        <string name="field_end_date">শেষের তারিখ</string>
+        <string name="field_start_time">শুরুর সময়</string>
+        <string name="field_end_time">শেষের সময়</string>
+        <string name="field_location">অবস্থান</string>
+        <string name="field_minimum_salary">সর্বনিম্ন বেতন</string>
+        <string name="field_maximum_salary">সর্বোচ্চ বেতন</string>
+        <string name="field_payment_frequency">পেমেন্ট ফ্রিকোয়েন্সি</string>
+
+        <!-- KYC address form (customer + handyman, Compose) -->
+        <string name="account_verification_title">অ্যাকাউন্ট যাচাইকরণ</string>
+        <string name="confirm_your_address_title">আপনার ঠিকানা নিশ্চিত করুন</string>
+        <string name="confirm_address_subtitle">আপনি কোথায় থাকেন তা আমাদের জানান যাতে আমরা আমাদের চমৎকার সেবা সরাসরি আপনার বাড়িতে পৌঁছে দিতে পারি।</string>
+        <string name="house_number_label">বাড়ি নম্বর</string>
+        <string name="street_label">রাস্তা</string>
+        <string name="neighborhood_label">এলাকা</string>
+        <string name="post_code_label">পোস্ট কোড</string>
+        <string name="division_label">বিভাগ</string>
+        <string name="district_label">জেলা</string>
+        <string name="thana_label">থানা</string>
+        <string name="city_label">শহর</string>
+        <string name="country_label">দেশ</string>
+        <string name="additional_note_optional_label">অতিরিক্ত নোট (ঐচ্ছিক)</string>
+        <string name="pin_location_on_map_label">মানচিত্রে আপনার অবস্থান চিহ্নিত করুন</string>
+        <string name="find_on_map_btn">মানচিত্রে খুঁজুন</string>
+        <string name="pinned_location_format">চিহ্নিত: %1$s, %2$s</string>
+        <string name="tap_map_to_pin_location">আপনার অবস্থান চিহ্নিত করতে মানচিত্রে ট্যাপ করুন</string>
+        <string name="submit_address_btn">ঠিকানা জমা দিন</string>
+        <string name="use_this_location_btn">এই অবস্থান ব্যবহার করুন</string>
+        <string name="session_error_message">সেশন ত্রুটি। অনুগ্রহ করে আবার লগইন করুন।</string>
+        <string name="failed_to_save_address_message">ঠিকানা সংরক্ষণ করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
+        <string name="area_neighborhood_label">এলাকা/মহল্লা</string>
+
+        <!-- Handyman skills screen (Compose) -->
+        <string name="professional_skills_title">পেশাগত দক্ষতা</string>
+        <string name="tell_us_about_expertise_title">আপনার দক্ষতা সম্পর্কে আমাদের বলুন</string>
+        <string name="profile_visibility_hint">এই তথ্য আপনার প্রোফাইলে দেখানো হবে যাতে গ্রাহকরা আপনাকে খুঁজে পেতে পারে।</string>
+        <string name="primary_trade_label">প্রধান পেশা</string>
+        <string name="select_main_trade_label">আপনার প্রধান পেশা নির্বাচন করুন</string>
+        <string name="specify_your_trade_label">আপনার পেশা উল্লেখ করুন</string>
+        <string name="years_of_experience_label">অভিজ্ঞতার বছর</string>
+        <string name="expected_hourly_rate_label">প্রত্যাশিত ঘণ্টা প্রতি হার (৳)</string>
+        <string name="short_bio_label">সংক্ষিপ্ত বায়ো / দক্ষতার বিবরণ</string>
+        <string name="failed_to_save_skills_message">দক্ষতা সংরক্ষণ করতে ব্যর্থ হয়েছে</string>
+        <string name="continue_to_verification_btn">যাচাইকরণে এগিয়ে যান</string>
+        <string name="electronics_and_gadget_repair_trade">ইলেকট্রনিক্স ও গ্যাজেট মেরামত</string>
+        <string name="other_label">অন্যান্য</string>
+
+        <!-- KYC capture ID (customer + handyman, Compose) -->
+        <string name="select_id_photo_title">আইডি ছবি নির্বাচন করুন</string>
+        <string name="choose_id_photo_source_message">আপনার গ্যালারি থেকে আপনার আইডির একটি ছবি বেছে নিন অথবা নতুন একটি তুলুন।</string>
+        <string name="camera_btn">ক্যামেরা</string>
+        <string name="id_card_photo_title">আইডি কার্ডের ছবি</string>
+        <string name="photo_id_card_title">আইডি কার্ডের ছবি</string>
+        <string name="review_id_card_hint">অনুগ্রহ করে আপনার আইডি কার্ডের ছবি পর্যালোচনা করে জমা দিন।</string>
+        <string name="cd_selected_id">নির্বাচিত আইডি</string>
+        <string name="cd_default_id">ডিফল্ট আইডি</string>
+        <string name="cd_capture">ছবি তুলুন</string>
+        <string name="submit_id_card_btn">আইডি কার্ড জমা দিন</string>
+        <string name="try_again_btn">আবার চেষ্টা করুন</string>
+        <string name="place_id_card_hint">অনুগ্রহ করে আপনার জাতীয় পরিচয়পত্র ফ্রেমের ভিতরে রাখুন।</string>
+        <string name="cd_upload_placeholder">আপলোড প্লেসহোল্ডার</string>
+
+        <!-- Signup (customer + handyman, Compose) -->
+        <string name="create_account_title">অ্যাকাউন্ট তৈরি করুন</string>
+        <string name="cd_customer_graphic">গ্রাহকের ছবি</string>
+        <string name="first_name_label">নামের প্রথম অংশ</string>
+        <string name="last_name_label">নামের শেষ অংশ</string>
+        <string name="email_label">ইমেইল</string>
+        <string name="password_label">পাসওয়ার্ড</string>
+        <string name="confirm_password_label">পাসওয়ার্ড নিশ্চিত করুন</string>
+        <string name="sign_up_btn">সাইন আপ</string>
+        <string name="already_have_account_message">ইতিমধ্যে একটি অ্যাকাউন্ট আছে?</string>
+        <string name="log_in_link">লগ ইন করুন</string>
+        <string name="account_created_success_message">অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে</string>
+        <string name="error_creating_account_message">অ্যাকাউন্ট তৈরি করতে ত্রুটি হয়েছে</string>
+        <string name="join_our_crew_title">আমাদের দলে যোগ দিন</string>
+        <string name="cd_handyman_illustration">হ্যান্ডিম্যান ছবি</string>
+        <string name="repeat_password_label">পাসওয়ার্ড পুনরায় লিখুন</string>
+        <string name="failed_to_sign_up_format">সাইন আপ ব্যর্থ হয়েছে: %1$s</string>
+
+        <!-- Edit profile (customer + handyman, Compose) -->
+        <string name="edit_profile_title">প্রোফাইল সম্পাদনা</string>
+        <string name="first_name_field_label">নামের প্রথম অংশ</string>
+        <string name="last_name_field_label">নামের শেষ অংশ</string>
+        <string name="phone_number_label">ফোন নম্বর</string>
+        <string name="bio_label">বায়ো</string>
+        <string name="save_changes_btn">পরিবর্তন সংরক্ষণ করুন</string>
+        <string name="profile_updated_message">প্রোফাইল আপডেট হয়েছে</string>
+        <string name="update_failed_message">আপডেট ব্যর্থ হয়েছে</string>
+        <string name="hourly_rate_label">ঘণ্টা প্রতি হার (৳)</string>
+        <string name="profile_updated_success_message">প্রোফাইল সফলভাবে আপডেট হয়েছে</string>
+        <string name="failed_to_update_profile_message">প্রোফাইল আপডেট করতে ব্যর্থ হয়েছে</string>
+
+        <!-- Login (customer + handyman, Compose) -->
+        <string name="log_in_title">লগ ইন</string>
+        <string name="login_btn">লগইন</string>
+        <string name="dont_have_account_message">অ্যাকাউন্ট নেই?</string>
+        <string name="login_failed_default_message">লগইন ব্যর্থ হয়েছে</string>
+        <string name="customer_profile_not_found_message">গ্রাহকের প্রোফাইল পাওয়া যায়নি</string>
+        <string name="profile_load_failed_format">প্রোফাইল লোড ব্যর্থ হয়েছে: %1$s</string>
+        <string name="user_not_found_message">ব্যবহারকারী পাওয়া যায়নি</string>
+        <string name="incorrect_password_message">ভুল পাসওয়ার্ড</string>
+        <string name="login_migration_failed_format">লগইন মাইগ্রেশন ব্যর্থ হয়েছে: %1$s</string>
+        <string name="login_failed_format">লগইন ব্যর্থ হয়েছে: %1$s</string>
+        <string name="log_in_caps_title">লগ ইন</string>
+        <string name="email_placeholder">ইমেইল</string>
+        <string name="password_placeholder_min8">কমপক্ষে ৮টি অক্ষর</string>
+        <string name="forgot_password_link">পাসওয়ার্ড ভুলে গেছেন?</string>
+        <string name="handyman_profile_not_found_message">হ্যান্ডিম্যানের প্রোফাইল পাওয়া যায়নি</string>
+        <string name="handyman_account_not_found_message">হ্যান্ডিম্যানের অ্যাকাউন্ট পাওয়া যায়নি</string>
+
+        <!-- KYC phone number (customer + handyman, Compose) -->
+        <string name="verify_phone_title">আপনার ফোন নম্বর যাচাই করুন</string>
+        <string name="otp_hint">আপনার মোবাইল নম্বর যাচাই করতে একটি ওয়ান-টাইম-পাসকোড (OTP) নিন</string>
+        <string name="mobile_label">মোবাইল</string>
+        <string name="phone_number_placeholder">01712345678</string>
+        <string name="country_code_label">কান্ট্রি কোড</string>
+        <string name="error_activity_not_found_message">ত্রুটি: অ্যাক্টিভিটি পাওয়া যায়নি</string>
+        <string name="verification_failed_format">যাচাইকরণ ব্যর্থ হয়েছে: %1$s</string>
+        <string name="get_otp_btn">OTP পান</string>
+
+        <!-- KYC OTP code (customer + handyman, Compose) -->
+        <string name="enter_otp_hint">আপনার মোবাইল নম্বরে পাঠানো ৬-সংখ্যার কোডটি লিখুন।</string>
+        <string name="otp_code_label">OTP কোড</string>
+        <string name="six_digit_code_placeholder">৬-সংখ্যার কোড</string>
+        <string name="verify_btn">যাচাই করুন</string>
+        <string name="user_record_not_found_message">ডাটাবেসে ব্যবহারকারীর রেকর্ড পাওয়া যায়নি।</string>
+        <string name="database_update_failed_message">ডাটাবেস আপডেট ব্যর্থ হয়েছে</string>
+        <string name="verification_failed_retry_message">যাচাইকরণ ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
+        <string name="verification_failed_message">যাচাইকরণ ব্যর্থ হয়েছে।</string>
+        <string name="handyman_record_not_found_message">হ্যান্ডিম্যানের রেকর্ড পাওয়া যায়নি।</string>
+
+        <!-- KYC landing (customer + handyman, Compose) -->
+        <string name="logout_link">লগআউট</string>
+        <string name="verify_identity_title">চলুন আপনার পরিচয় যাচাই করি</string>
+        <string name="verify_identity_hint">অ্যাপ্লিকেশনটি ব্যবহার করার আগে আপনাকে আপনার পরিচয় যাচাই করতে হবে। আপনার তথ্য এনক্রিপ্ট করে নিরাপদে সংরক্ষণ করা হবে</string>
+        <string name="cd_id_card_icon">আইডি কার্ড আইকন</string>
+        <string name="upload_id_btn">আইডি আপলোড করুন</string>
+
+        <!-- KYC processing / home status (customer + handyman, Compose) -->
+        <string name="log_out_link">লগ আউট</string>
+        <string name="cd_profile">প্রোফাইল</string>
+        <string name="hello_name_format">হ্যালো, %1$s %2$s।</string>
+        <string name="unverified_badge">অযাচাইকৃত</string>
+        <string name="cd_location">অবস্থান</string>
+        <string name="unverified_address_label">অযাচাইকৃত ঠিকানা</string>
+        <string name="kyc_application_under_review_title">KYC আবেদন\nপর্যালোচনাধীন</string>
+        <string name="kyc_processing_hint">আপনার পরিচয় যাচাইকরণ প্রক্রিয়াধীন রয়েছে।\nআপনি আমাদের সেবা ব্যবহার করতে প্রস্তুত হলে আমরা আপনাকে জানাব।</string>
+        <string name="cd_kyc_document_icon">KYC ডকুমেন্ট আইকন</string>
+        <string name="application_details_title">আবেদনের বিবরণ</string>
+        <string name="identity_verification_label">পরিচয় যাচাইকরণ</string>
+        <string name="pending_status">মুলতুবি</string>
+        <string name="refresh_status_btn">অবস্থা রিফ্রেশ করুন</string>
+        <string name="cd_home">হোম</string>
+        <string name="cd_list">তালিকা</string>
+        <string name="cd_chat">চ্যাট</string>
+        <string name="kyc_processing_hint_handyman">আপনার পরিচয় যাচাইকরণ প্রক্রিয়াধীন রয়েছে।\nআপনি সেবা দেওয়ার জন্য প্রস্তুত হলে আমরা আপনাকে জানাব।</string>
+        <string name="professional_certificate_label">পেশাগত সার্টিফিকেট</string>
+        <string name="not_provided_status">প্রদান করা হয়নি</string>
+
+        <!-- Profile picture upload (customer + handyman, Compose) -->
+        <string name="select_profile_picture_title">প্রোফাইল ছবি নির্বাচন করুন</string>
+        <string name="choose_profile_photo_source_message">আপনার গ্যালারি থেকে একটি ছবি বেছে নিন অথবা নতুন একটি তুলুন।</string>
+        <string name="final_step_title">শেষ ধাপ!</string>
+        <string name="add_profile_picture_hint">একটি প্রোফাইল ছবি যোগ করুন যাতে হ্যান্ডিম্যানরা আপনাকে চিনতে পারে। একটি বন্ধুত্বপূর্ণ মুখ বিশ্বাস তৈরি করে!</string>
+        <string name="cd_profile_picture">প্রোফাইল ছবি</string>
+        <string name="upload_photo_label">ছবি আপলোড করুন</string>
+        <string name="skip_for_now_btn">এখন বাদ দিন</string>
+        <string name="profile_updated_exclaim_message">প্রোফাইল আপডেট হয়েছে!</string>
+        <string name="user_search_failed_message">ব্যবহারকারী অনুসন্ধান ব্যর্থ হয়েছে</string>
+        <string name="upload_failed_format">আপলোড ব্যর্থ হয়েছে: %1$s</string>
+        <string name="finish_and_start_btn">শেষ করুন এবং শুরু করুন</string>
+        <string name="add_profile_picture_hint_handyman">একটি প্রোফাইল ছবি যোগ করুন যাতে গ্রাহকরা আপনাকে চিনতে পারে। একটি বন্ধুত্বপূর্ণ মুখ বিশ্বাস তৈরি করে!</string>
+        <string name="finish_and_start_working_btn">শেষ করুন এবং কাজ শুরু করুন</string>
+
+        <!-- Profile screen (customer + handyman, Compose) -->
+        <string name="user_profile_not_found_message">ব্যবহারকারীর প্রোফাইল পাওয়া যায়নি</string>
+        <string name="invalid_user_id_message">অবৈধ ব্যবহারকারী আইডি</string>
+        <string name="location_not_set_label">অবস্থান নির্ধারিত নয়</string>
+        <string name="phone_not_set_label">কোনো ফোন নম্বর নেই</string>
+        <string name="no_bio_available_label">কোনো বায়ো উপলব্ধ নেই।</string>
+        <string name="cd_default_profile_picture">ডিফল্ট প্রোফাইল ছবি</string>
+        <string name="rating_count_format">রেটিং (%1$d)</string>
+        <string name="no_rating_label">কোনো রেটিং নেই</string>
+        <string name="about_me_title">আমার সম্পর্কে</string>
+        <string name="handyman_reviews_title">হ্যান্ডিম্যান পর্যালোচনা</string>
+        <string name="update_information_btn">তথ্য আপডেট করুন</string>
+        <string name="handyman_fallback_name">হ্যান্ডিম্যান</string>
+        <string name="no_trade_set_label">কোনো পেশা নির্ধারিত নয়</string>
+        <string name="experience_label">অভিজ্ঞতা</string>
+        <string name="years_short_format">%1$s বছর</string>
+        <string name="rate_label">হার</string>
+        <string name="rate_per_hour_format">৳%1$s/ঘণ্টা</string>
+        <string name="customer_reviews_title">গ্রাহক পর্যালোচনা</string>
+        <string name="edit_profile_btn">প্রোফাইল সম্পাদনা</string>
+        <string name="complete_verification_btn">যাচাইকরণ সম্পন্ন করুন</string>
+        <string name="customer_fallback_name">গ্রাহক</string>
+
+        <!-- Choose account type (Compose) -->
+        <string name="get_started_title">শুরু করুন</string>
+        <string name="cd_profix_logo">ProFix লোগো</string>
+        <string name="select_account_type_hint">আপনার অ্যাকাউন্টের ধরন নির্বাচন করুন</string>
+        <string name="im_a_label">আমি একজন</string>
+        <string name="customer_role_label">গ্রাহক</string>
+        <string name="handyman_role_label">হ্যান্ডিম্যান</string>
+        <string name="cd_back_to_language_selection">ভাষা নির্বাচনে ফিরে যান</string>
+
+        <!-- Landing page (Compose) -->
+        <string name="welcome_to_label">স্বাগতম</string>
+        <string name="cd_hands_holding_tools">হাতে যন্ত্রপাতি ধরা</string>
+        <string name="get_things_done_hint">আমাদের বিশেষজ্ঞদের মাধ্যমে\nসঠিকভাবে কাজ সম্পন্ন করুন</string>
+        <string name="technicians_label">টেকনিশিয়ান</string>
+
+        <!-- Customer home (Compose) -->
+        <string name="cd_location_icon">অবস্থান আইকন</string>
+        <string name="search_services_placeholder">আপনি কোন সেবা খুঁজছেন?</string>
+        <string name="services_title">সেবাসমূহ</string>
+        <string name="service_fixture_replacement">ফিক্সচার প্রতিস্থাপন</string>
+        <string name="service_plumbing">প্লাম্বিং</string>
+        <string name="service_smart_home">স্মার্ট হোম</string>
+        <string name="service_appliance_repair_lower">যন্ত্রপাতি মেরামত</string>
+        <string name="service_painting">রং করা</string>
+        <string name="service_floor_repair">মেঝে মেরামত</string>
+        <string name="service_wall_repair">দেয়াল মেরামত</string>
+        <string name="service_small_appliance_repair">ছোট যন্ত্রপাতি মেরামত</string>
+
+        <!-- Home unverified (customer + handyman, Compose) -->
+        <string name="welcome_name_format">স্বাগতম, %1$s!</string>
+        <string name="verify_unlock_hint">আপনার অ্যাকাউন্ট যাচাই করুন এবং আমাদের বিশ্বস্ত হ্যান্ডিম্যান সেবায় প্রবেশাধিকার আনলক করুন।</string>
+        <string name="cd_illustration">চিত্র</string>
+        <string name="start_verification_btn">যাচাইকরণ শুরু করুন</string>
+        <string name="check_status_btn">অবস্থা পরীক্ষা করুন</string>
+
+        <!-- KYC submitted (customer + handyman, Compose) -->
+        <string name="cd_document">নথি</string>
+        <string name="kyc_application_submitted_title">KYC আবেদন জমা দেওয়া হয়েছে</string>
+        <string name="kyc_submitted_hint">আপনার পরিচয় যাচাইকরণ প্রক্রিয়াধীন\nরয়েছে। আপনি কখন আমাদের সেবা\nব্যবহার করতে পারবেন তা আমরা জানাব!</string>
+        <string name="cd_document_icon_kyc">নথির আইকন</string>
+        <string name="kyc_submitted_hint_handyman">আপনার পরিচয় যাচাইকরণ প্রক্রিয়াধীন\nরয়েছে। আপনি কখন সেবা দেওয়ার জন্য\nপ্রস্তুত হবেন তা আমরা জানাব!</string>
+        <string name="account_created_title">অ্যাকাউন্ট তৈরি হয়েছে!</string>
+        <string name="account_created_hint">অভিনন্দন! আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। আপনি এখন সেবার অনুরোধ করা শুরু করতে পারেন।</string>
+
+        <!-- Handyman KYC certificates / NID (Compose) -->
+        <string name="national_id_title">জাতীয় পরিচয়পত্র</string>
+        <string name="national_id_hint">আপনার জাতীয় পরিচয়পত্র (NID) নম্বর লিখুন যাতে আমরা আপনার পরিচয় যাচাই করতে পারি। কোনো ছবি প্রয়োজন নেই — শুধু আপনার কার্ডের নম্বরটি দিন।</string>
+        <string name="nid_number_label">NID নম্বর</string>
+        <string name="nid_placeholder">যেমন. 1234567890</string>
+        <string name="nid_length_error_format">একটি NID নম্বর ১০, ১৩ অথবা ১৭ সংখ্যার হয়। আপনি %1$d সংখ্যা লিখেছেন।</string>
+        <string name="nid_length_hint">১০, ১৩ অথবা ১৭ সংখ্যা, আপনার NID কার্ডে মুদ্রিত অনুযায়ী।</string>
+        <string name="submit_btn">জমা দিন</string>
+        <string name="skip_this_step_link">এই ধাপ বাদ দিন</string>
+
+        <!-- Payment success fragment (legacy View) -->
+        <string name="please_select_rating_message">অনুগ্রহ করে একটি রেটিং নির্বাচন করুন</string>
+        <string name="error_handyman_id_not_found_message">ত্রুটি: হ্যান্ডিম্যান আইডি পাওয়া যায়নি</string>
+        <string name="job_id_not_found_message">কাজের আইডি পাওয়া যায়নি</string>
+        <string name="your_invoice_title">আপনার চালান</string>
+        <string name="close_btn">বন্ধ করুন</string>
+        <string name="copy_to_clipboard_btn">ক্লিপবোর্ডে কপি করুন</string>
+        <string name="invoice_clip_label">চালান</string>
+        <string name="invoice_copied_message">চালান ক্লিপবোর্ডে কপি করা হয়েছে</string>
+        <string name="failed_to_fetch_invoice_message">চালানের বিবরণ আনতে ব্যর্থ হয়েছে</string>
+        <string name="thank_you_for_review_message">আপনার পর্যালোচনার জন্য ধন্যবাদ!</string>
+        <string name="failed_to_submit_review_message">পর্যালোচনা জমা দিতে ব্যর্থ হয়েছে</string>
+        <string name="invoice_content_format">--- চালান ---\nকাজ: %1$s\nতারিখ: %2$s\nঅবস্থান: %3$s\nপরিশোধিত পরিমাণ: BDT %4$s\nপেমেন্ট পদ্ধতি: %5$s\nঅবস্থা: পরিশোধিত\n---------------\nProfix ব্যবহার করার জন্য ধন্যবাদ!</string>
+
+        <!-- Service category home screen (legacy View, ServiceCategoryFragment) -->
+        <string name="service_category_title">আপনার কী সাহায্য প্রয়োজন?</string>
+        <string name="service_category_subtitle">অনুরোধ শুরু করতে একটি কাজের বিভাগ বেছে নিন</string>
+        <string name="hello_name_only_format">হ্যালো, %1$s</string>
+        <string name="trips_and_travel_category">ভ্রমণ ও ট্যুর</string>
+        <string name="emergency_service_category">জরুরি সেবা</string>
+        <string name="date_range_format">%1$s থেকে %2$s</string>
+
+        <!-- Job status labels (legacy View layer) -->
+        <string name="status_pending">মুলতুবি</string>
+        <string name="status_accepted">গৃহীত</string>
+        <string name="status_assigned">নির্ধারিত</string>
+        <string name="status_not_assigned">নির্ধারিত হয়নি</string>
+        <string name="status_in_progress">চলমান</string>
+        <string name="status_done">সম্পন্ন</string>
+        <string name="status_cancelled">বাতিল</string>
+        <string name="status_all">সব</string>
+        <string name="status_payment_done">পেমেন্ট: সম্পন্ন</string>
+
+        <!-- Shared salary/date/time/location display formats (legacy View layer) -->
+        <string name="paid_bdt_format">পরিশোধিত: BDT %1$s</string>
+        <string name="bdt_range_per_day_format">BDT %1$s-%2$s/দিন</string>
+        <string name="bdt_range_format">BDT %1$s-%2$s</string>
+        <string name="to_be_negotiated_message">আলোচনা সাপেক্ষে</string>
+        <string name="range_dash_format">%1$s — %2$s</string>
+        <string name="approximate_location_format">%1$s (আনুমানিক)</string>
+        <string name="approximate_location_label">আনুমানিক অবস্থান</string>
+        <string name="location_not_specified_label">অবস্থান উল্লেখ করা হয়নি</string>
+        <string name="salary_range_paymentoption_format">BDT %1$s - %2$s (%3$s)</string>
+        <string name="untitled_job_label">শিরোনামহীন কাজ</string>
+        <string name="loading_ellipsis_label">লোড হচ্ছে…</string>
+        <string name="no_rating_yet_label">এখনও কোনো রেটিং নেই</string>
+        <string name="cd_job_location_marker">কাজের অবস্থান</string>
+
+        <!-- CustomerJobListFragment -->
+        <string name="only_not_yet_assigned_can_be_edited_message">শুধুমাত্র নির্ধারিত না হওয়া কাজগুলো সম্পাদনা করা যায়।</string>
+        <string name="database_error_format">ডাটাবেস ত্রুটি: %1$s</string>
+        <string name="cannot_cancel_message">বাতিল করা যাবে না।</string>
+        <string name="delete_job_title">কাজ মুছবেন?</string>
+        <string name="delete_job_confirm_message">আপনি কি নিশ্চিত যে এই কাজটি মুছতে চান?</string>
+        <string name="yes_btn">হ্যাঁ</string>
+        <string name="job_marked_inactive_message">কাজটি নিষ্ক্রিয় হিসেবে চিহ্নিত করা হয়েছে</string>
+        <string name="failed_to_update_job_status_format">কাজের অবস্থা আপডেট করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="job_cancelled_message">কাজটি বাতিল করা হয়েছে।</string>
+        <string name="no_btn">না</string>
+        <string name="error_checking_job_existence_format">কাজের অস্তিত্ব যাচাই করতে ত্রুটি: %1$s</string>
+        <string name="no_further_updates_message">আর কোনো আপডেট উপলব্ধ নেই</string>
+        <string name="update_status_dialog_title">অবস্থা আপডেট করুন</string>
+        <string name="status_updated_to_format">অবস্থা %1$s এ আপডেট হয়েছে</string>
+        <string name="failed_to_update_status_format">অবস্থা আপডেট করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="job_not_marked_done_message">কাজটি এখনও সম্পন্ন হিসেবে চিহ্নিত করা হয়নি।</string>
+        <string name="how_was_experience_handyman_message">এই হ্যান্ডিম্যানের সাথে আপনার অভিজ্ঞতা কেমন ছিল?</string>
+        <string name="review_handyman_title">হ্যান্ডিম্যান পর্যালোচনা</string>
+        <string name="please_provide_rating_message">অনুগ্রহ করে একটি রেটিং দিন</string>
+        <string name="review_submitted_message">পর্যালোচনা জমা দেওয়া হয়েছে!</string>
+        <string name="review_failed_format">ব্যর্থ হয়েছে: %1$s</string>
+        <string name="error_loading_jobs_message">কাজ লোড করতে ত্রুটি</string>
+
+        <!-- HandymanJobListFragment -->
+        <string name="removal_not_permitted_message">নির্ধারিত কাজ অপসারণের অনুমতি নেই।</string>
+        <string name="waiting_for_customer_update_format">গ্রাহকও %1$s এ আপডেট করার অপেক্ষায়</string>
+        <string name="how_was_experience_customer_message">এই গ্রাহকের সাথে আপনার অভিজ্ঞতা কেমন ছিল?</string>
+        <string name="failed_to_submit_review_format">পর্যালোচনা জমা দিতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="enter_amount_bdt_hint">BDT-তে পরিমাণ লিখুন</string>
+        <string name="enter_final_payment_title">চূড়ান্ত পেমেন্ট লিখুন</string>
+        <string name="payment_recorded_format">পেমেন্ট রেকর্ড করা হয়েছে: BDT %1$s</string>
+        <string name="job_accepted_message">কাজ গৃহীত হয়েছে।</string>
+        <string name="failed_to_accept_job_format">কাজ গ্রহণ করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="decline_job_title">কাজ প্রত্যাখ্যান করবেন?</string>
+        <string name="decline_job_message">এটি কাজের নির্ধারণ বাতিল করবে এবং এটি খোলা কাজের তালিকায় ফিরিয়ে দেবে।</string>
+        <string name="decline_btn">প্রত্যাখ্যান</string>
+        <string name="job_declined_message">কাজ প্রত্যাখ্যান করা হয়েছে।</string>
+        <string name="failed_to_decline_job_format">কাজ প্রত্যাখ্যান করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="assignment_changed_message">অ্যাসাইনমেন্টটি পরিবর্তিত হয়েছে। কাজগুলো রিফ্রেশ করুন।</string>
+
+        <!-- CustomerJobListAdapter -->
+        <string name="please_assign_handyman_message">অবস্থা আপডেট করার আগে একজন হ্যান্ডিম্যান নির্ধারণ করুন!</string>
+        <string name="job_already_done_message">কাজ ইতিমধ্যে সম্পন্ন হয়েছে!</string>
+
+        <!-- HandymanJobListAdapter -->
+        <string name="job_not_assigned_to_you_message">এই কাজটি এখনও আপনাকে দেওয়া হয়নি!</string>
+        <string name="job_assigned_to_other_message">এই কাজটি অন্য একজন হ্যান্ডিম্যানকে দেওয়া হয়েছে।</string>
+
+        <!-- CustomerJobPaymentFragment -->
+        <string name="handyman_no_amount_set_message">হ্যান্ডিম্যান এখনও কোনো অনুরোধকৃত পরিমাণ নির্ধারণ করেননি।</string>
+        <string name="cannot_proceed_no_amount_message">হ্যান্ডিম্যান পরিমাণ নির্ধারণ না করা পর্যন্ত আপনি এগিয়ে যেতে পারবেন না।</string>
+        <string name="requested_amount_format">অনুরোধকৃত পরিমাণ: BDT %1$s</string>
+        <string name="failed_to_load_job_message">কাজের তথ্য লোড করতে ব্যর্থ হয়েছে।</string>
+        <string name="pay_with_cash_title">নগদে পেমেন্ট করুন</string>
+        <string name="enter_cash_amount_hint">নগদে পরিশোধ করার পরিমাণ লিখুন</string>
+        <string name="cash_payment_title">নগদ পেমেন্ট</string>
+        <string name="pay_btn">পরিশোধ করুন</string>
+        <string name="enter_payment_amount_message">অনুগ্রহ করে পেমেন্টের পরিমাণ লিখুন।</string>
+        <string name="amount_must_match_format">পরিমাণ অবশ্যই BDT %1$s এর সাথে মিলতে হবে</string>
+        <string name="payment_recorded_dot_message">পেমেন্ট রেকর্ড করা হয়েছে।</string>
+        <string name="payment_failed_retry_message">পেমেন্ট ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
+        <string name="no_amount_set_message">এখনও কোনো পরিমাণ নির্ধারণ করা হয়নি।</string>
+        <string name="pay_with_bkash_title">bKash দিয়ে পেমেন্ট করুন</string>
+        <string name="bkash_checkout_message_format">আপনাকে BDT %1$s এর জন্য নিরাপদ bKash চেকআউটে নিয়ে যাওয়া হবে।\n\nএগিয়ে যেতে চালিয়ে যান-এ ট্যাপ করুন।</string>
+        <string name="preparing_checkout_message">নিরাপদ চেকআউট প্রস্তুত করা হচ্ছে…</string>
+        <string name="invalid_amount_message">অবৈধ পরিমাণ।</string>
+        <string name="could_not_start_payment_format">পেমেন্ট শুরু করা যায়নি: %1$s</string>
+        <string name="bkash_confirmed_message">bKash পেমেন্ট নিশ্চিত হয়েছে।</string>
+        <string name="payment_failed_cancelled_message">পেমেন্ট ব্যর্থ হয়েছে অথবা বাতিল হয়েছে।</string>
+
+        <!-- HandymanJobListDetailsFragment -->
+        <string name="loading_location_message">অবস্থান লোড হচ্ছে…</string>
+
+        <!-- JobEditFragment -->
+        <string name="please_describe_problem_message">অনুগ্রহ করে আপনার সমস্যা বর্ণনা করুন</string>
+        <string name="please_select_start_date_message">অনুগ্রহ করে একটি শুরুর তারিখ নির্বাচন করুন</string>
+        <string name="please_select_end_date_message">অনুগ্রহ করে একটি শেষের তারিখ নির্বাচন করুন</string>
+        <string name="please_select_start_time_message">অনুগ্রহ করে একটি শুরুর সময় নির্বাচন করুন</string>
+        <string name="please_select_end_time_message">অনুগ্রহ করে একটি শেষের সময় নির্বাচন করুন</string>
+        <string name="please_select_salary_range_message">অনুগ্রহ করে একটি উপযুক্ত বেতনের পরিসীমা নির্বাচন করুন</string>
+        <string name="please_select_payment_option_message">অনুগ্রহ করে বেতন পরিশোধের একটি বিকল্প নির্বাচন করুন</string>
+        <string name="please_choose_salary_message">অনুগ্রহ করে একটি বেতন নির্বাচন করুন</string>
+        <string name="please_select_location_message">অনুগ্রহ করে একটি অবস্থান নির্বাচন করুন</string>
+        <string name="details_saved_message">বিবরণ সংরক্ষণ করা হয়েছে</string>
+        <string name="failed_to_save_format">সংরক্ষণ করতে ব্যর্থ হয়েছে: %1$s</string>
+
+        <!-- JobRequestDoneFragment -->
+        <string name="booking_confirmed_format">বুকিং নিশ্চিত হয়েছে\n%1$s তারিখে</string>
+
+        <!-- OrderSummaryFragment -->
+        <string name="image_upload_failed_format">ছবি #%1$d ব্যর্থ হয়েছে: %2$s</string>
+        <string name="some_image_uploads_failed_message">একটি বা একাধিক ছবি আপলোড ব্যর্থ হয়েছে</string>
+
+        <!-- SupportForm -->
+        <string name="support_category_technical_issue">প্রযুক্তিগত সমস্যা</string>
+        <string name="support_category_billing_payments">বিলিং ও পেমেন্ট</string>
+        <string name="support_category_account_management">অ্যাকাউন্ট ব্যবস্থাপনা</string>
+        <string name="support_category_feature_request">ফিচার অনুরোধ</string>
+        <string name="support_category_general_inquiry">সাধারণ জিজ্ঞাসা</string>
+        <string name="support_request_submitted_message">সহায়তার অনুরোধ জমা দেওয়া হয়েছে!</string>
+        <string name="failed_to_submit_support_request_message">সহায়তার অনুরোধ জমা দিতে ব্যর্থ হয়েছে।</string>
+
+        <!-- FormValidator -->
+        <string name="please_fill_all_fields_message">অনুগ্রহ করে সমস্ত ক্ষেত্র পূরণ করুন।</string>
+        <string name="please_enter_valid_email_message">অনুগ্রহ করে একটি বৈধ ইমেইল লিখুন।</string>
+        <string name="unknown_job_label">অজানা কাজ</string>
+        <string name="failed_to_create_chat_format">চ্যাট তৈরি করতে ব্যর্থ হয়েছে: %1$s</string>
+
+        <!-- Field validation messages (P69-51) -->
+        <string name="error_first_name_required">নামের প্রথম অংশ লিখুন</string>
+        <string name="error_last_name_required">নামের শেষ অংশ লিখুন</string>
+        <string name="error_email_invalid">একটি বৈধ ইমেইল ঠিকানা লিখুন, যেমন name@example.com</string>
+        <string name="error_password_too_short">পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে</string>
+        <string name="error_passwords_do_not_match">পাসওয়ার্ড দুটি মিলছে না</string>
+        <!-- Example kept in ASCII digits: the phone field only accepts those. -->
+        <string name="error_phone_invalid">এই কান্ট্রি কোডের জন্য একটি সঠিক ফোন নম্বর লিখুন</string>
+        <string name="error_phone_invalid_bd">একটি সঠিক বাংলাদেশি নম্বর লিখুন, যেমন 01712345678</string>
+        <string name="error_country_code_invalid">একটি সঠিক কান্ট্রি কোড লিখুন (১-৩ সংখ্যা)</string>
+        <string name="error_phone_not_valid">এই ফোন নম্বরটি সঠিক নয়। অনুগ্রহ করে যাচাই করে আবার চেষ্টা করুন।</string>
+        <string name="error_too_many_attempts">অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ অপেক্ষা করে আবার চেষ্টা করুন।</string>
+        <string name="error_phone_send_failed">কোড পাঠানো যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
+</resources>

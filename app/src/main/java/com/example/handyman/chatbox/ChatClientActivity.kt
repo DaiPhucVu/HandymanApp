@@ -1,5 +1,8 @@
 package com.example.handyman.chatbox
 
+import android.content.Context
+import com.example.handyman.utils.LocaleHelper
+
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -7,11 +10,14 @@ import androidx.activity.compose.setContent
 import com.example.handyman.chatbox.ui.composables.ChatClientScreen
 import com.example.handyman.ui.theme.HandymanTheme
 import com.example.handyman.utils.SessionManager
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatClientActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

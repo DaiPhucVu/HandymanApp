@@ -10,12 +10,10 @@ app
 │       ├── chatbox
 │       │   ├── ui.composables
 │       │   │   ├── ChatClientActivity
-│       │   │   ├── ChatListingActivity
 │       │   │   └── MainActivity
 │       ├── components
 │       │   └── KYCComponents.kt
 │       ├── customer_pages
-│       │   ├── CustomerHome.kt
 │       │   ├── CustomerHomeKYCProcessing.kt
 │       │   ├── CustomerHomeUnverified.kt
 │       │   ├── CustomerKYCAddressForm.kt
@@ -69,7 +67,6 @@ app
 │       ├── Navigation.kt
 │       ├── OrderSummaryFragment
 │       ├── PaymentSuccessFragment
-│       ├── QuotedHandymenAdapter
 │       ├── ServiceCategory
 │       ├── ServiceCategoryAdapter
 │       ├── ServiceCategoryDiff
@@ -99,7 +96,6 @@ app
 │   │   ├── handyman_job_list_item.xml
 │   │   ├── job_board_main.xml
 │   │   ├── photo_thumbnail.xml
-│   │   ├── quoted_handymen_item.xml
 │   │   └── service_category_item.xml
 │   ├── mipmap
 │   ├── navigation

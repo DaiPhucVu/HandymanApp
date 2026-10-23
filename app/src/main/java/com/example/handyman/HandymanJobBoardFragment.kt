@@ -21,30 +21,52 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.example.handyman.MainJobBoard
-import com.example.handyman.ChooseAccountType
 import android.content.Intent
+import android.widget.Button
+import android.widget.TextView
 
 class HandymanJobBoardFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: HandymanJobBoardAdapter
-    val handymanID = "handyman8"
+    private lateinit var handymanID: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        handymanID = SessionManager.getLoggedInUserId(requireContext()) ?: ""
         val view = inflater.inflate(R.layout.fragment_handyman_job_board, container, false)
+
+        val tvGreeting = view.findViewById<TextView>(R.id.tvGreeting)
+        val userName = SessionManager.getLoggedInUserName(requireContext())
+        tvGreeting.text = getString(R.string.hello_name_only_format, userName)
+
+        val tvLocation = view.findViewById<TextView>(R.id.tvLocation)
+        val currentCity = SessionManager.getLoggedInCity(requireContext())
+        if (currentCity.isNotEmpty()) {
+            tvLocation.text = currentCity
+        }
+
+        // Listen for city updates from Firebase
+        val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanID)
+        handymanRef.child("city").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val city = snapshot.getValue(String::class.java)
+                if (!city.isNullOrEmpty()) {
+                    tvLocation.text = city
+                    SessionManager.saveLoggedInCity(requireContext(), city)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
 
         val logoutIcon = view.findViewById<View>(R.id.ivLogout)
         logoutIcon.setOnClickListener {
             // Clear session
-            SessionManager.clearSessionXML(requireContext())
+            SessionManager.clearSession(requireContext())
 
-            // Redirect to ChooseAccountTypeActivity
-            val intent = Intent(requireContext(), ChooseAccountTypeActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            startActivity(com.example.handyman.chatbox.MainActivity.logoutIntent(requireContext()))
         }
 
         recyclerView = view.findViewById(R.id.recyclerView)
@@ -68,74 +90,25 @@ class HandymanJobBoardFragment : Fragment() {
                         paymentOption = job.jobPaymentOption,
                         imageUris = null,
                         assignedTo = job.assignedTo,
-                        jobStatus = job.jobStatus
+                        jobStatus = job.jobStatus,
+                        latitude = job.latitude?.toFloat() ?: 0f,
+                        longitude = job.longitude?.toFloat() ?: 0f
                     )
                 findNavController().navigate(action)
-            },
-            onQuoteJob = { job, quoteJobBttn ->
-                val jobQuotesRef = FirebaseDatabase.getInstance()
-                    .getReference("DummyJob")
-                    .child(job.jobId)
-                    .child("quotedHandymen")
-
-                jobQuotesRef.push()
-                    .setValue(handymanID)
-                    .addOnSuccessListener {
-                        val handymanRef = FirebaseDatabase.getInstance()
-                            .getReference("dummyHandymen")
-                            .child(handymanID)
-
-                        handymanRef.child("quotedJobs")
-                            .push()
-                            .setValue(job.jobId)
-                            .addOnSuccessListener {
-                                handymanRef.child("allJobs")
-                                    .push()
-                                    .setValue(job.jobId)
-                                    .addOnSuccessListener {
-                                        quoteJobBttn.isEnabled = false
-                                        quoteJobBttn.text = "Quoted"
-                                        ViewCompat.setBackgroundTintList(
-                                            quoteJobBttn,
-                                            ColorStateList.valueOf(Color.parseColor("#FFCCCCCC"))
-                                        )
-                                        Toast.makeText(
-                                            context,
-                                            "Job quoted successfully",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                    .addOnFailureListener { e3 ->
-                                        Toast.makeText(
-                                            context,
-                                            "Quoted, but failed to add to allJobs: ${e3.message}",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                            }
-                            .addOnFailureListener { e2 ->
-                                Toast.makeText(
-                                    context,
-                                    "Quoted handyman, but failed to record in quotedJobs: ${e2.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                    }
-                    .addOnFailureListener { e1 ->
-                        Toast.makeText(
-                            context,
-                            "Failed to quote job: ${e1.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
             }
         )
         recyclerView.adapter = adapter
 
         val avatar = view.findViewById<View>(R.id.ivAvatar)
         avatar.setOnClickListener {
+            val intent = Intent(requireContext(), HandymanProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        val btnYourJobs = view.findViewById<Button>(R.id.btnYourJobs)
+        btnYourJobs.setOnClickListener {
             val action = HandymanJobBoardFragmentDirections.actionHandymanJobBoardFragmentToHandymanJobListFragment(handymanID)
-            Navigation.findNavController(view).navigate(action)
+            findNavController().navigate(action)
         }
 
         return view
@@ -151,7 +124,7 @@ class HandymanJobBoardFragment : Fragment() {
         val rootRef = db.reference
 
         // Step 1: Load cancelledJobs list for the current handyman
-        rootRef.child("dummyHandymen")
+        rootRef.child("Handyman")
             .child(handymanID)
             .child("cancelledJobs")
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -161,15 +134,26 @@ class HandymanJobBoardFragment : Fragment() {
                         .toSet()
 
                     // Step 2: Now load all jobs
-                    rootRef.child("DummyJob")
+                    rootRef.child("Job")
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val availableJobs = snapshot.children.mapNotNull { child ->
                                     // 1) Deserialize the Job object
-                                    val job = child.getValue(Job::class.java) ?: return@mapNotNull null
+                                    // One malformed job record must not crash the whole board
+                                    val job = try {
+                                        child.getValue(Job::class.java)
+                                    } catch (e: Exception) {
+                                        Log.e("HandymanJobBoard", "Skipping unreadable job ${child.key}", e)
+                                        null
+                                    } ?: return@mapNotNull null
+
+                                    // Defensive coordinate casting if needed (Job data class handles it as Double? now)
+                                    val lat = (child.child("latitude").value as? Number)?.toDouble() ?: job.latitude
+                                    val lng = (child.child("longitude").value as? Number)?.toDouble() ?: job.longitude
+                                    val safeJob = job.copy(latitude = lat, longitude = lng)
 
                                     // 2) Filter out inactive jobs
-                                    if (job.jobStatus == "Inactive") return@mapNotNull null
+                                    if (safeJob.jobStatus == "Inactive") return@mapNotNull null
 
                                     // 3) Get job ID
                                     val jobId = child.key ?: return@mapNotNull null
@@ -181,17 +165,8 @@ class HandymanJobBoardFragment : Fragment() {
                                     // 4) Skip if cancelled
                                     if (jobId in cancelledJobs) return@mapNotNull null
 
-                                    // 5) Check quotedHandymen
-                                    val quoted = child
-                                        .child("quotedHandymen")
-                                        .children
-                                        .mapNotNull { it.getValue(String::class.java) }
-
-                                    // 6) Skip if already quoted
-                                    if (handymanID in quoted) return@mapNotNull null
-
-                                    // 7) Return the job
-                                    job.copy(jobId = jobId)
+                                    // 5) Return the job
+                                    safeJob.copy(jobId = jobId)
                                 }
 
                                 adapter.submitList(availableJobs)
@@ -202,7 +177,7 @@ class HandymanJobBoardFragment : Fragment() {
                                 context?.let {
                                     Toast.makeText(
                                         it,
-                                        "Error loading jobs: ${error.message}",
+                                        getString(R.string.error_loading_jobs_message),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -215,7 +190,7 @@ class HandymanJobBoardFragment : Fragment() {
                     context?.let {
                         Toast.makeText(
                             it,
-                            "Error loading cancelled jobs: ${error.message}",
+                            getString(R.string.error_loading_jobs_message),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

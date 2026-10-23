@@ -6,13 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.location.Geocoder
+import java.util.Locale
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.handyman.utils.localizedPaymentOptionName
+import com.example.handyman.utils.localizedServiceCategoryName
 
 
 class HandymanJobBoardAdapter(
-    private val onViewDetails: (Job) -> Unit,
-    private val onQuoteJob: (Job, Button) -> Unit
+    private val onViewDetails: (Job) -> Unit
 ) : ListAdapter<Job, HandymanJobBoardAdapter.ViewHolder>(HandymanJobBoardDiff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,32 +36,54 @@ class HandymanJobBoardAdapter(
         private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
         private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
         private val tvLocation: TextView = itemView.findViewById(R.id.tvAddress)
-        private val quoteJobBttn: Button = itemView.findViewById(R.id.btnQuote)
         private val detailsBttn: Button = itemView.findViewById(R.id.btnViewDetails)
 
         fun bind(item: Job) {
-            // Bind your Job data to the views
-            tvJobTitle.text = item.jobCat
-            tvJobDesc.text = item.jobDesc
-            if (item.jobSalaryFrom != "" && item.jobSalaryTo != "") {
-                if (item.jobPaymentOption == "Per Day") {
-                    tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
-                } else {
-                    tvSalary.text = "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}"
-                }
-            } else {
-                tvSalary.text = "To be negotiated"
-            }
-            if (item.jobDateFrom == item.jobDateTo) {
-                tvDate.text = "${item.jobDateFrom}"
-            } else {
-                tvDate.text = "${item.jobDateFrom} — ${item.jobDateTo}"
-            }
-            tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            tvLocation.text = "${item.jobLocation}, Melbourne, VIC"
+            val context = itemView.context
+            // Bind real data to views
+            tvJobTitle.text = if (item.jobCat.isNotEmpty()) localizedServiceCategoryName(context, item.jobCat) else (item.title ?: context.getString(R.string.untitled_job_label))
+            tvJobDesc.text = item.jobDesc.ifEmpty { item.description ?: "" }
 
-            quoteJobBttn.setOnClickListener {
-                onQuoteJob(item, quoteJobBttn)
+            // Salary display logic
+            tvSalary.text = if (item.jobSalaryFrom.isEmpty() && item.jobSalaryTo.isEmpty()) {
+                context.getString(R.string.negotiable_label)
+            } else {
+                context.getString(R.string.salary_range_paymentoption_format, item.jobSalaryFrom, item.jobSalaryTo, localizedPaymentOptionName(context, item.jobPaymentOption))
+            }
+
+            tvDate.text = context.getString(R.string.range_dash_format, item.jobDateFrom, item.jobDateTo)
+            tvTime.text = context.getString(R.string.range_dash_format, item.jobTimeFrom, item.jobTimeTo)
+
+            // Location with fallback - Show approximate location for privacy
+            if (!item.citySuburb.isNullOrBlank()) {
+                tvLocation.text = context.getString(R.string.approximate_location_format, item.citySuburb)
+            } else {
+                tvLocation.text = context.getString(R.string.approximate_location_label)
+                
+                // Fallback geocoding for the list view
+                if (item.latitude != null && item.longitude != null && item.latitude != 0.0 && item.longitude != 0.0) {
+                    val expectedTitle = item.title ?: localizedServiceCategoryName(context, item.jobCat)
+                    Thread {
+                        try {
+                            val geocoder = Geocoder(context, Locale.getDefault())
+                            val addresses = geocoder.getFromLocation(item.latitude, item.longitude, 1)
+                            if (!addresses.isNullOrEmpty()) {
+                                val address = addresses[0]
+                                val city = address.locality ?: address.subLocality ?: address.subAdminArea ?: address.adminArea
+                                if (city != null) {
+                                    itemView.post {
+                                        // Re-check if this ViewHolder is still showing the same job
+                                        if (tvJobTitle.text == expectedTitle) {
+                                            tvLocation.text = context.getString(R.string.approximate_location_format, city)
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            // Ignore geocoding errors in the list
+                        }
+                    }.start()
+                }
             }
 
             detailsBttn.setOnClickListener {

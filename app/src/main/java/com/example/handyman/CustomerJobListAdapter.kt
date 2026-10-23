@@ -9,12 +9,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.handyman.utils.localizedJobStatusLabel
+import com.example.handyman.utils.localizedServiceCategoryName
 
 class CustomerJobListAdapter(
     private val onViewDetails: (Job) -> Unit,
     private val onEdit: (Job) -> Unit,
     private val onDelete: (Job) -> Unit,
     private val onUpdate: (Job) -> Unit,
+    private val onLeaveReview: (Job) -> Unit,
     val onProceedToPayment: (Job) -> Unit,
     var hideStatus: Boolean = false
 ) : ListAdapter<Job, CustomerJobListAdapter.ViewHolder>(CustomerJobListDiff) {
@@ -43,53 +46,44 @@ class CustomerJobListAdapter(
         private val updateBttn: Button = itemView.findViewById(R.id.btnUpdate)
         private val status: TextView = itemView.findViewById(R.id.tvStatus)
         private val btnProceedToPayment: Button = itemView.findViewById(R.id.btnProceedToPayment)
+        private val btnLeaveReview: Button = itemView.findViewById(R.id.btnLeaveReview)
 
 
         fun bind(item: Job) {
-            // Bind your Job data to the views
-            tvJobTitle.text = item.jobCat
-            tvJobDesc.text = item.jobDesc
+            val context = itemView.context
+            tvJobTitle.text = if (!item.jobCat.isNullOrBlank()) localizedServiceCategoryName(context, item.jobCat) else (item.title ?: context.getString(R.string.untitled_job_label))
+            tvJobDesc.text = if (!item.jobDesc.isNullOrBlank()) item.jobDesc else (item.description ?: "")
             if (item.paymentStatus == "done" && !item.custpay.isNullOrBlank()) {
-                tvSalary.text = "Paid: BDT ${item.custpay}"
+                tvSalary.text = context.getString(R.string.paid_bdt_format, item.custpay)
             } else if (item.jobSalaryFrom.isNotBlank() && item.jobSalaryTo.isNotBlank()) {
                 tvSalary.text = if (item.jobPaymentOption == "Per Day")
-                    "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}/day"
+                    context.getString(R.string.bdt_range_per_day_format, item.jobSalaryFrom, item.jobSalaryTo)
                 else
-                    "BDT ${item.jobSalaryFrom}-${item.jobSalaryTo}"
+                    context.getString(R.string.bdt_range_format, item.jobSalaryFrom, item.jobSalaryTo)
             } else {
-                tvSalary.text = "To be negotiated"
+                tvSalary.text = context.getString(R.string.to_be_negotiated_message)
             }
 
             tvDate.text = if (item.jobDateFrom == item.jobDateTo)
                 item.jobDateFrom
             else
-                "${item.jobDateFrom} — ${item.jobDateTo}"
+                context.getString(R.string.range_dash_format, item.jobDateFrom, item.jobDateTo)
 
-            tvTime.text = "${item.jobTimeFrom} — ${item.jobTimeTo}"
-            tvLocation.text = "${item.jobLocation}, Melbourne, VIC"
-
-            // Determine status
-            val displayStatus = when {
-                item.assignedTo.isBlank() -> "Not assigned"
-                item.jobStatusCustomer.isNullOrBlank() || item.jobStatusHandyman.isNullOrBlank() ->
-                    "Assigned"
-                else -> item.jobStatusCustomer!!
-            }
-//            status.text = displayStatus
-//
-//            when (displayStatus) {
-//                "Not assigned" -> status.setBackgroundResource(R.drawable.status_not_assigned)
-//                "Assigned"     -> status.setBackgroundResource(R.drawable.status_assigned)
-//                "In-progress"  -> status.setBackgroundResource(R.drawable.status_in_progress)
-//                "Done"         -> status.setBackgroundResource(R.drawable.status_done)
-//            }
+            tvTime.text = context.getString(R.string.range_dash_format, item.jobTimeFrom, item.jobTimeTo)
+            tvLocation.text = if (!item.jobLocation.isNullOrBlank()) item.jobLocation else (item.location ?: "")
 
             if (hideStatus) {
                 status.visibility = View.GONE
                 status.text = ""
             } else {
                 status.visibility = View.VISIBLE
-                status.text = displayStatus
+                val displayStatus = when {
+                    item.assignedTo.isBlank() -> "Not assigned"
+                    item.jobStatusCustomer.isNullOrBlank() || item.jobStatusHandyman.isNullOrBlank() ->
+                        "Assigned"
+                    else -> item.jobStatusCustomer!!
+                }
+                status.text = localizedJobStatusLabel(context, displayStatus)
 
                 when (displayStatus) {
                     "Not assigned" -> status.setBackgroundResource(R.drawable.status_not_assigned)
@@ -98,19 +92,27 @@ class CustomerJobListAdapter(
                     "Done"         -> status.setBackgroundResource(R.drawable.status_done)
                 }
             }
+
             if (item.paymentStatus == "done") {
                 updateBttn.visibility = View.GONE
                 btnProceedToPayment.visibility = View.GONE
-                status.text = "Payment: Done"
+                btnLeaveReview.visibility = if (item.isReviewedByCustomer) View.GONE else View.VISIBLE
+                status.text = context.getString(R.string.status_payment_done)
                 status.setBackgroundResource(R.drawable.status_done)
             } else {
                 updateBttn.visibility = View.VISIBLE
-                btnProceedToPayment.visibility = View.VISIBLE
+                btnLeaveReview.visibility = View.GONE
+                if (item.jobStatus == "Done") {
+                    btnProceedToPayment.visibility = View.VISIBLE
+                } else {
+                    btnProceedToPayment.visibility = View.GONE
+                }
             }
 
             detailsBttn.setOnClickListener { onViewDetails(item) }
             edit.setOnClickListener    { onEdit(item) }
             delete.setOnClickListener  { onDelete(item) }
+            btnLeaveReview.setOnClickListener { onLeaveReview(item) }
 
             // Disable update until someone is assigned
             if (item.assignedTo.isBlank()) {
@@ -119,7 +121,7 @@ class CustomerJobListAdapter(
                 updateBttn.setOnClickListener {
                     Toast.makeText(
                         itemView.context,
-                        "Please assign a handyman before updating status!",
+                        context.getString(R.string.please_assign_handyman_message),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -134,7 +136,7 @@ class CustomerJobListAdapter(
                     updateBttn.setOnClickListener {
                         Toast.makeText(
                             itemView.context,
-                            "Job is already done!",
+                            context.getString(R.string.job_already_done_message),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

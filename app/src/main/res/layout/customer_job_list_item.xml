@@ -34,7 +34,7 @@
                 android:layout_height="28dp"
                 android:layout_marginEnd="16dp"
                 android:src="@drawable/edit"
-                android:contentDescription="Edit"
+                android:contentDescription="@string/cd_edit"
                 android:padding="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
 
@@ -43,7 +43,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/cancel"
-                android:contentDescription="Delete"
+                android:contentDescription="@string/cd_delete"
                 android:padding="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
         </LinearLayout>
@@ -196,50 +196,69 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/layoutLocation"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnUpdate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/update_status"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/holo_blue_light"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="8dp"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="4dp"/>
+
+                <Button
+                    android:id="@+id/btnViewDetails"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/view_details"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/holo_blue_light"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="8dp"
+                    android:textSize="13sp"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
 
             <Button
-                android:id="@+id/btnUpdate"
-                android:layout_width="0dp"
+                android:id="@+id/btnLeaveReview"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Update Status"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:backgroundTint="@android:color/holo_blue_light"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:textSize="14sp"
-                android:layout_marginEnd="6dp"/>
-
-            <Button
-                android:id="@+id/btnViewDetails"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="View Details"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:backgroundTint="@android:color/holo_blue_light"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:textSize="14sp"
-                android:layout_marginStart="6dp"/>
-            <Button
-                android:id="@+id/btnProceedToPayment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Proceed to Payment"
+                android:layout_marginTop="8dp"
+                android:text="@string/leave_review"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@android:color/holo_orange_dark"
-                android:paddingHorizontal="20dp"
+                android:paddingHorizontal="4dp"
                 android:paddingVertical="8dp"
                 android:textSize="14sp"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="6dp"/>
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/btnProceedToPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/proceed_to_payment"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:backgroundTint="@android:color/holo_orange_dark"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="8dp"
+                android:textSize="14sp"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

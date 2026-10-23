@@ -30,7 +30,7 @@
             android:id="@+id/tvDescribeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Describe your problem"
+            android:text="@string/describe_your_problem"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:layout_marginBottom="8dp"/>
@@ -39,7 +39,7 @@
             android:id="@+id/etDescribeProblem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="ex. I have water leaks in the bathroom"
+            android:hint="@string/describe_problem_hint"
             android:layout_marginBottom="16dp"
             android:background="@drawable/rectangle_box"
             android:gravity="top"
@@ -65,7 +65,7 @@
                     android:id="@+id/tvDateFromLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Start Date"
+                    android:text="@string/start_date_label"
                     android:textSize="16sp"
                     android:textColor="@android:color/black"
                     android:layout_marginBottom="4dp"/>
@@ -74,7 +74,7 @@
                     android:id="@+id/etDateFrom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="dd/mm/yyyy"
+                    android:hint="@string/date_hint"
                     android:background="@drawable/rounded_box"
                     android:textSize="15sp"
                     android:drawablePadding="8dp"
@@ -98,7 +98,7 @@
                     android:id="@+id/tvDateToLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="End Date"
+                    android:text="@string/end_date_label"
                     android:textSize="16sp"
                     android:textColor="@android:color/black"
                     android:layout_marginBottom="4dp"/>
@@ -107,7 +107,7 @@
                     android:id="@+id/etDateTo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="dd/mm/yyyy"
+                    android:hint="@string/date_hint"
                     android:background="@drawable/rounded_box"
                     android:textSize="15sp"
                     android:drawablePadding="8dp"
@@ -139,7 +139,7 @@
                     android:id="@+id/tvTimeFromLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Start Time"
+                    android:text="@string/start_time_label"
                     android:textSize="16sp"
                     android:textColor="@android:color/black"
                     android:layout_marginBottom="4dp"/>
@@ -148,7 +148,7 @@
                     android:id="@+id/etTimeFrom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="10:00"
+                    android:hint="@string/start_time_hint"
                     android:background="@drawable/rounded_box"
                     android:textSize="15sp"
                     android:padding="8dp"
@@ -169,7 +169,7 @@
                     android:id="@+id/tvTimeToLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="End Time"
+                    android:text="@string/end_time_label"
                     android:textSize="16sp"
                     android:textColor="@android:color/black"
                     android:layout_marginBottom="4dp"/>
@@ -178,7 +178,7 @@
                     android:id="@+id/etTimeTo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="17:00"
+                    android:hint="@string/end_time_hint"
                     android:background="@drawable/rounded_box"
                     android:textSize="15sp"
                     android:padding="8dp"
@@ -199,7 +199,7 @@
                 android:id="@+id/locationDropbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Location"
+                android:text="@string/location_label"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="10dp"/>
@@ -223,7 +223,7 @@
                 android:id="@+id/tvSalary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Salary"
+                android:text="@string/salary_label"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="6dp"/>
@@ -240,7 +240,7 @@
                     android:id="@+id/checkboxExample"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="I'm happy to negotiate"
+                    android:text="@string/happy_to_negotiate"
                     android:padding="8dp"/>
 
                 <LinearLayout
@@ -253,7 +253,7 @@
                         android:id="@+id/tvCurrency"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BDT"
+                        android:text="@string/bdt_currency"
                         android:textSize="15sp"
                         android:textColor="@android:color/black"
                         android:gravity="center_vertical"
@@ -264,7 +264,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Min"
+                        android:hint="@string/salary_min_hint"
                         android:background="?android:attr/editTextBackground"
                         android:textSize="15sp"
                         android:drawablePadding="8dp"
@@ -276,7 +276,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="—"
+                        android:text="@string/range_dash"
                         android:textSize="15sp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginHorizontal="8dp"/>
@@ -286,7 +286,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Max"
+                        android:hint="@string/salary_max_hint"
                         android:background="?android:attr/editTextBackground"
                         android:textSize="15sp"
                         android:drawablePadding="8dp"
@@ -306,13 +306,13 @@
                             android:id="@+id/radioOption1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Per Day" />
+                            android:text="@string/per_day" />
 
                         <RadioButton
                             android:id="@+id/radioOption2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Job Completed" />
+                            android:text="@string/job_completed" />
                     </RadioGroup>
                 </LinearLayout>
             </LinearLayout>
@@ -333,7 +333,7 @@
                     android:id="@+id/tvAttachPhotosLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Attach photos"
+                    android:text="@string/attach_photos"
                     android:textSize="17sp"
                     android:textColor="@android:color/black"
                     android:layout_marginBottom="8dp"/>
@@ -430,7 +430,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:layout_weight="1"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:layout_marginBottom="24dp"
                 android:layout_marginEnd="10dp"
                 android:backgroundTint="@android:color/holo_blue_light"
@@ -442,7 +442,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:layout_weight="1"
-                android:text="Update"
+                android:text="@string/update_btn"
                 android:layout_marginBottom="24dp"
                 android:layout_marginStart="10dp"
                 android:backgroundTint="@android:color/holo_blue_light"

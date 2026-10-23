@@ -10,16 +10,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.handyman.R
 import com.example.handyman.components.StepCircle
 import com.example.handyman.components.DividerLine
+import com.example.handyman.utils.SessionManager
 
 @Composable
 fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavController) {
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -35,15 +39,27 @@ fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavControll
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
                     .size(24.dp)
                     .padding(end = 16.dp)
-                    .clickable {
-                        navController.navigate("handymanHomeUnverified")
-                    }
+                    .clickable { navController.popBackStack() }
             )
-            Text("Account verification", fontSize = 20.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, fontWeight = FontWeight.Medium)
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = stringResource(R.string.logout_link),
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {
+                    SessionManager.clearSession(context)
+                    navController.navigate("chooseAccountType") {
+                        popUpTo(0)
+                    }
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -66,10 +82,10 @@ fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavControll
         Spacer(modifier = Modifier.height(48.dp))
 
         // Header Texts
-        Text("Let’s verify your identity", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.verify_identity_title), fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "You are required to verify your identity before you can use the application. Your information will be encrypted and stored securely",
+            text = stringResource(R.string.verify_identity_hint),
             fontSize = 14.sp,
             color = Color.Gray
         )
@@ -79,7 +95,7 @@ fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavControll
         // ID Card Illustration
         Image(
             painter = painterResource(id = R.drawable.id_card_icon_handyman), // Replace with actual drawable ID
-            contentDescription = "ID Card Icon",
+            contentDescription = stringResource(R.string.cd_id_card_icon),
             modifier = Modifier
                 .size(120.dp)
                 .align(Alignment.CenterHorizontally)
@@ -90,7 +106,7 @@ fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavControll
         // Upload Button
         Button(
             onClick = {
-                navController.navigate("handymanKycCaptureID")
+                navController.navigate("handymanKYCCaptureID")
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -98,7 +114,7 @@ fun HandymanKYCLanding(modifier: Modifier = Modifier, navController: NavControll
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367)) // Match deep navy in your image
         ) {
-            Text("Upload ID", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.upload_id_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }

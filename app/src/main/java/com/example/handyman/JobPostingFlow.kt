@@ -1,5 +1,6 @@
 package com.example.handyman
 
+import android.content.Context
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.net.Uri
@@ -16,74 +17,182 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.database.FirebaseDatabase
 import com.example.handyman.utils.SessionManager
+import com.example.handyman.utils.localizedServiceCategoryName
 import android.widget.Toast
-import com.example.handyman.components.DividerLine
-import com.example.handyman.components.StepCircle
 import java.util.*
 import coil.compose.AsyncImage
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.android.gms.tasks.Tasks
 import java.time.LocalDateTime
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
+import java.io.File
+import android.location.Geocoder
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clipToBounds
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 @Composable
-fun JobPostingProgressBar(currentStep: Int) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+fun JobPostingProgressBar(currentStep: Int, onStepSelected: (Int) -> Unit = {}) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .padding(vertical = 8.dp)
+            .clipToBounds()
     ) {
-        StepCircle(stepNumber = 1, isActive = currentStep >= 1)
-        DividerLine()
-        StepCircle(stepNumber = 2, isActive = currentStep >= 2)
-        DividerLine()
-        StepCircle(stepNumber = 3, isActive = currentStep >= 3)
-        DividerLine()
-        StepCircle(stepNumber = 4, isActive = currentStep >= 4)
-        DividerLine()
-        StepCircle(stepNumber = 5, isActive = currentStep >= 5)
-    }
-}
-
-@Composable
-fun JobPostingTopBar(navController: NavController, title: String, onBack: () -> Unit = { navController.popBackStack() }) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Icon(
-            painter = painterResource(id = R.drawable.arrow_back),
-            contentDescription = "Back",
-            modifier = Modifier.size(24.dp).clickable { onBack() }
+        val dotSize = 32.dp
+        val slotWidth = maxWidth / 5
+        val activeOffset by animateDpAsState(
+            targetValue = slotWidth * (currentStep - 1) + ((slotWidth - dotSize) / 2),
+            animationSpec = tween(300),
+            label = "jobPostingStepDot"
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+        repeat(4) { index ->
+            Box(
+                modifier = Modifier
+                    .offset(
+                        x = slotWidth * index + (slotWidth / 2) + (dotSize / 2),
+                        y = 23.dp
+                    )
+                    .width(slotWidth - dotSize)
+                    .height(1.dp)
+                    .background(Color(0xFFFFB703))
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .offset(x = activeOffset)
+                .size(dotSize)
+                .background(Color(0xFFFFB703), CircleShape)
+                .align(Alignment.CenterStart)
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dotSize)
+                .align(Alignment.Center),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            (1..5).forEach { step ->
+                val isStepEnabled = step <= currentStep
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clickable(enabled = isStepEnabled) { onStepSelected(step) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = step.toString(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = when {
+                            step == currentStep -> Color.White
+                            isStepEnabled -> Color(0xFFFFB703)
+                            else -> Color(0xFFB8B8B8)
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPostingViewModel) {
+fun JobPostingTopBar(
+    navController: NavController,
+    title: String,
+    navigationIcon: Int = R.drawable.arrow_back,
+    navigationContentDescription: String = stringResource(R.string.cd_back),
+    onBack: () -> Unit = { navController.popBackStack() }
+) {
+    Box(modifier = Modifier.fillMaxWidth().height(32.dp)) {
+        Icon(
+            painter = painterResource(id = navigationIcon),
+            contentDescription = navigationContentDescription,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .size(24.dp)
+                .clickable { onBack() }
+        )
+        Text(
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+private fun missingJobPostingFields(viewModel: JobPostingViewModel, context: Context): List<String> {
+    val missing = mutableListOf<String>()
+    if (viewModel.serviceCategory.isBlank()) missing += context.getString(R.string.field_service_category)
+    if (viewModel.problemDesc.isBlank()) missing += context.getString(R.string.field_problem_description)
+    if (viewModel.dateFrom.isBlank()) missing += context.getString(R.string.field_start_date)
+    if (viewModel.dateTo.isBlank()) missing += context.getString(R.string.field_end_date)
+    if (viewModel.timeFrom.isBlank()) missing += context.getString(R.string.field_start_time)
+    if (viewModel.timeTo.isBlank()) missing += context.getString(R.string.field_end_time)
+    if (viewModel.locationAddress.isBlank()) missing += context.getString(R.string.field_location)
+    if (!viewModel.isHappyToNegotiate) {
+        if (viewModel.salaryMin.isBlank()) missing += context.getString(R.string.field_minimum_salary)
+        if (viewModel.salaryMax.isBlank()) missing += context.getString(R.string.field_maximum_salary)
+    }
+    if (viewModel.paymentOption.isBlank()) missing += context.getString(R.string.field_payment_frequency)
+    return missing
+}
+
+@Composable
+fun JobPostingDescriptionScreen(
+    navController: NavController,
+    viewModel: JobPostingViewModel
+) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
+    Column(modifier = Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Describe your problem")
-        JobPostingProgressBar(currentStep = 1)
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Describe your problem", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.describe_your_problem), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
             value = viewModel.problemDesc,
-            onValueChange = { viewModel.problemDesc = it },
-            placeholder = { Text("ex. I have water leaks in the bathroom") },
-            modifier = Modifier.fillMaxWidth().height(150.dp),
+            onValueChange = {
+                viewModel.problemDesc = it
+            },
+            placeholder = { Text(stringResource(R.string.describe_problem_hint)) },
+            modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
             shape = RoundedCornerShape(12.dp)
         )
 
@@ -95,7 +204,7 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
                 OutlinedTextField(
                     value = viewModel.dateFrom,
                     onValueChange = {},
-                    label = { Text("Start Date") },
+                    label = { Text(stringResource(R.string.start_date_label)) },
                     readOnly = true,
                     modifier = Modifier.fillMaxWidth().clickable {
                         DatePickerDialog(context, { _, y, m, d ->
@@ -103,14 +212,15 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
                         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
             Box(modifier = Modifier.weight(1f)) {
                 OutlinedTextField(
                     value = viewModel.dateTo,
                     onValueChange = {},
-                    label = { Text("End Date") },
+                    label = { Text(stringResource(R.string.end_date_label)) },
                     readOnly = true,
                     modifier = Modifier.fillMaxWidth().clickable {
                         DatePickerDialog(context, { _, y, m, d ->
@@ -118,7 +228,8 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
                         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
         }
@@ -131,7 +242,7 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
                 OutlinedTextField(
                     value = viewModel.timeFrom,
                     onValueChange = {},
-                    label = { Text("Start Time") },
+                    label = { Text(stringResource(R.string.start_time_label)) },
                     readOnly = true,
                     modifier = Modifier.fillMaxWidth().clickable {
                         TimePickerDialog(context, { _, h, min ->
@@ -139,14 +250,15 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
                         }, 10, 0, true).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
             Box(modifier = Modifier.weight(1f)) {
                 OutlinedTextField(
                     value = viewModel.timeTo,
                     onValueChange = {},
-                    label = { Text("End Time") },
+                    label = { Text(stringResource(R.string.end_time_label)) },
                     readOnly = true,
                     modifier = Modifier.fillMaxWidth().clickable {
                         TimePickerDialog(context, { _, h, min ->
@@ -154,7 +266,8 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
                         }, 17, 0, true).show()
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray)
+                    colors = OutlinedTextFieldDefaults.colors(disabledTextColor = Color.Black, disabledBorderColor = Color.Gray, disabledLabelColor = Color.Gray),
+                    singleLine = true
                 )
             }
         }
@@ -176,7 +289,7 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367)),
             enabled = viewModel.problemDesc.isNotBlank() && viewModel.dateFrom.isNotBlank() && viewModel.dateTo.isNotBlank()
         ) {
-            Text("Continue", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.continue_btn), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
         Spacer(modifier = Modifier.height(24.dp))
     }
@@ -184,35 +297,173 @@ fun JobPostingDescriptionScreen(navController: NavController, viewModel: JobPost
 
 @Composable
 fun JobPostingLocationScreen(navController: NavController, viewModel: JobPostingViewModel) {
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp)) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Location")
-        JobPostingProgressBar(currentStep = 2)
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val geocoder = remember { Geocoder(context) }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
+    var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> mapViewRef?.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapViewRef?.onPause()
+                Lifecycle.Event.ON_DESTROY -> mapViewRef?.onDetach()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            mapViewRef?.onDetach()
+        }
+    }
+
+    fun searchAddress(address: String, mapView: MapView) {
+        if (address.isBlank()) return
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                if (!Geocoder.isPresent()) return@launch
+                val results = geocoder.getFromLocationName(address, 1)
+                if (results != null && results.isNotEmpty()) {
+                    val location = results[0]
+                    val city = location.locality ?: location.subLocality ?: location.subAdminArea ?: location.adminArea ?: ""
+                    withContext(Dispatchers.Main) {
+                        viewModel.latitude = location.latitude
+                        viewModel.longitude = location.longitude
+                        viewModel.citySuburb = city
+                        val p = GeoPoint(location.latitude, location.longitude)
+                        mapView.controller.animateTo(p)
+                        mapView.controller.setZoom(16.0)
+                        
+                        val existingMarker = mapView.overlays.filterIsInstance<Marker>().firstOrNull()
+                            ?: Marker(mapView).also { mapView.overlays.add(it) }
+                        existingMarker.position = p
+                        existingMarker.title = "Selected Location"
+                        mapView.invalidate()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun updateAddressFromLocation(lat: Double, lng: Double) {
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                if (!Geocoder.isPresent()) return@launch
+                val results = geocoder.getFromLocation(lat, lng, 1)
+                if (results != null && results.isNotEmpty()) {
+                    val address = results[0].getAddressLine(0)
+                    val loc = results[0]
+                    val city = loc.locality ?: loc.subLocality ?: loc.subAdminArea ?: loc.adminArea ?: ""
+                    withContext(Dispatchers.Main) {
+                        viewModel.locationAddress = address
+                        viewModel.citySuburb = city
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Where do you need help?", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.where_do_you_need_help), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         
         OutlinedTextField(
             value = viewModel.locationAddress,
             onValueChange = { viewModel.locationAddress = it },
-            label = { Text("Enter your address") },
+            label = { Text(stringResource(R.string.enter_your_address_label)) },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            trailingIcon = {
+                IconButton(onClick = { mapViewRef?.let { searchAddress(viewModel.locationAddress, it) } }) {
+                    Icon(painter = painterResource(id = R.drawable.search_icon), contentDescription = stringResource(R.string.cd_search), tint = Color.Gray)
+                }
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = {
+                mapViewRef?.let { searchAddress(viewModel.locationAddress, it) }
+            }),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
         
-        // Map Placeholder
-        Box(
-            modifier = Modifier.fillMaxWidth().height(300.dp).background(Color(0xFFEEEEEE), RoundedCornerShape(12.dp)).border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(painter = painterResource(id = R.drawable.location), contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.Gray)
-                Text("Map of Bangladesh will be here", color = Color.Gray)
-                Text("(Pinpoint feature coming soon)", fontSize = 12.sp, color = Color.Gray)
+        // OpenStreetMap Implementation
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(350.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp)),
+            factory = { ctx ->
+                MapView(ctx).apply {
+                    mapViewRef = this
+                    setMultiTouchControls(true)
+                    controller.setZoom(14.0)
+                    
+                    // Initial center
+                    val startPoint = if (viewModel.latitude != 0.0) 
+                        GeoPoint(viewModel.latitude, viewModel.longitude)
+                        else GeoPoint(23.6850, 90.3563) // Dhaka
+                    controller.setCenter(startPoint)
+
+                    val marker = Marker(this)
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    if (viewModel.latitude != 0.0) {
+                        marker.position = startPoint
+                        overlays.add(marker)
+                    }
+                    
+                    val mapEventsReceiver = object : MapEventsReceiver {
+                        override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                            viewModel.latitude = p.latitude
+                            viewModel.longitude = p.longitude
+                            updateAddressFromLocation(p.latitude, p.longitude)
+                            
+                            marker.position = p
+                            marker.title = "Selected Location"
+                            if (!overlays.contains(marker)) {
+                                overlays.add(marker)
+                            }
+                            invalidate()
+                            return true
+                        }
+
+                        override fun longPressHelper(p: GeoPoint): Boolean = false
+                    }
+
+                    overlays.add(MapEventsOverlay(mapEventsReceiver))
+
+                    addMapListener(object : MapListener {
+                        override fun onScroll(event: ScrollEvent?): Boolean {
+                            // Update marker/address when user finishes scrolling
+                            // For simplicity, we can do it on zoom or scroll completion
+                            return false
+                        }
+
+                        override fun onZoom(event: ZoomEvent?): Boolean = false
+                    })
+                }
+            },
+            update = { mapView ->
+                // Ensure marker stays synced if viewModel changes from elsewhere
             }
-        }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = if (viewModel.latitude != 0.0)
+                stringResource(R.string.selected_location_format, String.format("%.4f", viewModel.latitude), String.format("%.4f", viewModel.longitude))
+                else stringResource(R.string.tap_map_to_pinpoint),
+            fontSize = 12.sp,
+            color = if (viewModel.latitude != 0.0) Color(0xFF2F3367) else Color.Gray
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -231,7 +482,7 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367)),
             enabled = viewModel.locationAddress.isNotBlank()
         ) {
-            Text("Continue", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.continue_btn), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
         Spacer(modifier = Modifier.height(24.dp))
     }
@@ -239,16 +490,12 @@ fun JobPostingLocationScreen(navController: NavController, viewModel: JobPosting
 
 @Composable
 fun JobPostingSalaryScreen(navController: NavController, viewModel: JobPostingViewModel) {
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp)) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Salary Requirements")
-        JobPostingProgressBar(currentStep = 3)
-
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { viewModel.isHappyToNegotiate = !viewModel.isHappyToNegotiate }) {
             Checkbox(checked = viewModel.isHappyToNegotiate, onCheckedChange = { viewModel.isHappyToNegotiate = it })
-            Text("I'm happy to negotiate", fontSize = 16.sp)
+            Text(stringResource(R.string.happy_to_negotiate), fontSize = 16.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -258,29 +505,31 @@ fun JobPostingSalaryScreen(navController: NavController, viewModel: JobPostingVi
                 OutlinedTextField(
                     value = viewModel.salaryMin,
                     onValueChange = { viewModel.salaryMin = it },
-                    label = { Text("Min BDT") },
+                    label = { Text(stringResource(R.string.min_bdt_label)) },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = viewModel.salaryMax,
                     onValueChange = { viewModel.salaryMax = it },
-                    label = { Text("Max BDT") },
+                    label = { Text(stringResource(R.string.max_bdt_label)) },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        Text("Payment Frequency", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        
+        Text(stringResource(R.string.payment_frequency_label), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = viewModel.paymentOption == "Per Day", onClick = { viewModel.paymentOption = "Per Day" })
-            Text("Per Day", modifier = Modifier.clickable { viewModel.paymentOption = "Per Day" })
+            Text(stringResource(R.string.per_day), modifier = Modifier.clickable { viewModel.paymentOption = "Per Day" })
             Spacer(modifier = Modifier.width(24.dp))
             RadioButton(selected = viewModel.paymentOption == "Job Completed", onClick = { viewModel.paymentOption = "Job Completed" })
-            Text("Job Completed", modifier = Modifier.clickable { viewModel.paymentOption = "Job Completed" })
+            Text(stringResource(R.string.job_completed), modifier = Modifier.clickable { viewModel.paymentOption = "Job Completed" })
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -299,7 +548,7 @@ fun JobPostingSalaryScreen(navController: NavController, viewModel: JobPostingVi
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367))
         ) {
-            Text("Continue", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.continue_btn), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
         Spacer(modifier = Modifier.height(24.dp))
     }
@@ -322,11 +571,7 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp)) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Add Photos")
-        JobPostingProgressBar(currentStep = 4)
-
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(
@@ -358,12 +603,12 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.camera),
-                        contentDescription = "Take Photo",
+                        contentDescription = stringResource(R.string.take_photo),
                         modifier = Modifier.size(40.dp),
                         tint = Color(0xFF2F3367)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Take Photo", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.take_photo), fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 }
             }
 
@@ -382,12 +627,12 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.folder),
-                        contentDescription = "Gallery",
+                        contentDescription = stringResource(R.string.cd_gallery),
                         modifier = Modifier.size(40.dp),
                         tint = Color(0xFF2F3367)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("From Gallery", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.from_gallery), fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -395,7 +640,7 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
         Spacer(modifier = Modifier.height(24.dp))
 
         if (viewModel.imageUris.isNotEmpty()) {
-            Text("Selected Photos", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.selected_photos), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                 columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(3),
@@ -421,14 +666,14 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
                             },
                             modifier = Modifier.align(Alignment.TopEnd).size(24.dp).background(Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)
                         ) {
-                            Icon(painter = painterResource(id = R.drawable.cancel), contentDescription = "Remove", modifier = Modifier.size(16.dp), tint = Color.Red)
+                            Icon(painter = painterResource(id = R.drawable.cancel), contentDescription = stringResource(R.string.cd_remove), modifier = Modifier.size(16.dp), tint = Color.Red)
                         }
                     }
                 }
             }
         } else {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                Text("No photos added yet", color = Color.Gray)
+                Text(stringResource(R.string.no_photos_added_yet), color = Color.Gray)
             }
         }
 
@@ -448,7 +693,7 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367))
         ) {
-            Text("Continue", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.continue_btn), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
         Spacer(modifier = Modifier.height(24.dp))
     }
@@ -458,19 +703,21 @@ fun JobPostingPhotoScreen(navController: NavController, viewModel: JobPostingVie
 fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingViewModel) {
     var showPopup by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
+    var validationMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
     // Reset editing state when entering review
-    LaunchedEffect(Unit) {
-        viewModel.isEditing = false
-    }
+    // LaunchedEffect(Unit) {
+    //     viewModel.isEditing = false
+    // }
 
     fun submitJobToFirebase() {
         isSubmitting = true
         val database = FirebaseDatabase.getInstance()
         val dbRef = database.reference
         
-        val jobId = UUID.randomUUID().toString()
+        val isEditing = viewModel.jobId.isNotBlank()
+        val jobId = if (isEditing) viewModel.jobId else UUID.randomUUID().toString()
         val customerId = viewModel.customerId.ifBlank { SessionManager.currentUserID ?: SessionManager.getLoggedInUserId(context) }
         
         val job = Job(
@@ -484,6 +731,9 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             jobTimeFrom = viewModel.timeFrom,
             jobTimeTo = viewModel.timeTo,
             jobLocation = viewModel.locationAddress,
+            citySuburb = viewModel.citySuburb,
+            latitude = viewModel.latitude,
+            longitude = viewModel.longitude,
             jobSalaryFrom = viewModel.salaryMin,
             jobSalaryTo = viewModel.salaryMax,
             jobPaymentOption = viewModel.paymentOption,
@@ -491,13 +741,15 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             imageUris = viewModel.imageUris.map { it.toString() }
         )
 
-        val userPath = "dummyCustomers/$customerId"
+        val userPath = "User/$customerId"
         
-        val updates = hashMapOf<String, Any>(
-            "/DummyJob/$jobId" to job,
-            "$userPath/allJobs/${dbRef.child(userPath).child("allJobs").push().key!!}" to jobId,
-            "$userPath/notAssignedJobs/${dbRef.child(userPath).child("notAssignedJobs").push().key!!}" to jobId
-        )
+        val updates = hashMapOf<String, Any>()
+        updates["/Job/$jobId"] = job
+        
+        if (!isEditing) {
+            updates["$userPath/allJobs/${dbRef.child(userPath).child("allJobs").push().key!!}"] = jobId
+            updates["$userPath/notAssignedJobs/${dbRef.child(userPath).child("notAssignedJobs").push().key!!}"] = jobId
+        }
 
         dbRef.updateChildren(updates)
             .addOnSuccessListener {
@@ -523,42 +775,54 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             }
             .addOnFailureListener {
                 isSubmitting = false
-                Toast.makeText(context, "Failed to post job: ${it.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.failed_to_post_job_format, it.message), Toast.LENGTH_LONG).show()
             }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding().padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
-        Spacer(modifier = Modifier.height(16.dp))
-        JobPostingTopBar(navController, "Review & Confirm")
-        JobPostingProgressBar(currentStep = 5)
-
+    Column(modifier = Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        ReviewSection(title = "Service", content = viewModel.serviceCategory, onEdit = { 
+        val localizedPaymentOption = when (viewModel.paymentOption) {
+            "Per Day" -> stringResource(R.string.per_day)
+            "Job Completed" -> stringResource(R.string.job_completed)
+            else -> viewModel.paymentOption
+        }
+        val pleaseCompleteFormat = stringResource(R.string.please_complete_format)
+
+        ReviewSection(title = stringResource(R.string.review_service_title), content = localizedServiceCategoryName(viewModel.serviceCategory), onEdit = {
             viewModel.isEditing = true
-            navController.navigate("customerHome") 
+            navController.navigate("customerHome")
         })
-        ReviewSection(title = "Description & Timing", content = viewModel.problemDesc + "\n" + viewModel.dateFrom + " to " + viewModel.dateTo, onEdit = { 
+        ReviewSection(title = stringResource(R.string.review_description_timing_title), content = viewModel.problemDesc + "\n" + stringResource(R.string.date_range_format, viewModel.dateFrom, viewModel.dateTo), onEdit = {
             viewModel.isEditing = true
-            navController.navigate("jobPostingDescription") 
+            navController.navigate("jobPostingDescription")
         })
-        ReviewSection(title = "Location", content = viewModel.locationAddress, onEdit = { 
+        ReviewSection(title = stringResource(R.string.location_label), content = viewModel.locationAddress, onEdit = {
             viewModel.isEditing = true
-            navController.navigate("jobPostingLocation") 
+            navController.navigate("jobPostingLocation")
         })
-        ReviewSection(title = "Salary", content = if(viewModel.isHappyToNegotiate) "Negotiable" else "${viewModel.salaryMin} - ${viewModel.salaryMax} BDT (${viewModel.paymentOption})", onEdit = { 
+        ReviewSection(title = stringResource(R.string.salary_label), content = if(viewModel.isHappyToNegotiate) stringResource(R.string.negotiable_label) else stringResource(R.string.salary_range_format, viewModel.salaryMin, viewModel.salaryMax, localizedPaymentOption), onEdit = {
             viewModel.isEditing = true
-            navController.navigate("jobPostingSalary") 
+            navController.navigate("jobPostingSalary")
         })
-        ReviewSection(title = "Photos", content = "${viewModel.imageUris.size} photos attached", onEdit = { 
+        ReviewSection(title = stringResource(R.string.photos_label), content = stringResource(R.string.photos_attached_format, viewModel.imageUris.size), onEdit = {
             viewModel.isEditing = true
-            navController.navigate("jobPostingPhotos") 
+            navController.navigate("jobPostingPhotos")
         })
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { if (!isSubmitting) submitJobToFirebase() },
+            onClick = {
+                if (!isSubmitting) {
+                    val missingFields = missingJobPostingFields(viewModel, context)
+                    if (missingFields.isNotEmpty()) {
+                        validationMessage = String.format(pleaseCompleteFormat, missingFields.joinToString(", "))
+                    } else {
+                        submitJobToFirebase()
+                    }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2F3367)),
@@ -567,7 +831,7 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
             if (isSubmitting) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
             } else {
-                Text("Confirm Request", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(stringResource(R.string.confirm_request), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
@@ -577,13 +841,27 @@ fun JobPostingReviewScreen(navController: NavController, viewModel: JobPostingVi
         AlertDialog(
             onDismissRequest = { showPopup = false },
             confirmButton = {
-                Button(onClick = { 
+                Button(onClick = {
                     showPopup = false
-                    navController.navigate("customerHome") // Or wherever after confirmation
-                }) { Text("OK") }
+                    // Navigate to all jobs page (CustomerJobListFragment)
+                    navController.navigate("allJobsList")
+                }) { Text(stringResource(R.string.ok_btn)) }
             },
-            title = { Text("Confirmed") },
-            text = { Text("Your job request has been successfully submitted.") }
+            title = { Text(stringResource(R.string.confirmed_title)) },
+            text = { Text(stringResource(R.string.job_request_submitted_message)) }
+        )
+    }
+
+    validationMessage?.let { message ->
+        AlertDialog(
+            onDismissRequest = { validationMessage = null },
+            confirmButton = {
+                Button(onClick = { validationMessage = null }) {
+                    Text(stringResource(R.string.ok_btn))
+                }
+            },
+            title = { Text(stringResource(R.string.missing_details_title)) },
+            text = { Text(message) }
         )
     }
 }
@@ -593,7 +871,7 @@ fun ReviewSection(title: String, content: String, onEdit: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).border(1.dp, Color(0xFFEEEEEE), RoundedCornerShape(8.dp)).padding(12.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text("Edit", color = Color(0xFF7D56F3), modifier = Modifier.clickable { onEdit() })
+            Text(stringResource(R.string.cd_edit), color = Color(0xFF7D56F3), modifier = Modifier.clickable { onEdit() })
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(content, fontSize = 14.sp, color = Color.Gray)

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,12 +21,16 @@ import androidx.navigation.NavController
 import com.google.firebase.database.*
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
     var firstName by remember { mutableStateOf("...") }
     var lastName by remember { mutableStateOf("") }
+    var profileImageUrl by remember { mutableStateOf<String?>(null) }
 
     val currentEmail = SessionManager.getLoggedInEmail(context)
 
@@ -38,6 +43,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 for (child in snapshot.children) {
                     firstName = child.child("firstName").getValue(String::class.java) ?: ""
                     lastName = child.child("lastName").getValue(String::class.java) ?: ""
+                    profileImageUrl = child.child("profileImageUrl").getValue(String::class.java)
                 }
             }
 
@@ -52,24 +58,39 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Top right logout
-        Text(
-            "Log out",
-            color = Color(0xFF30386D),
-            fontSize = 18.sp,
+        // Top right logout and Profile
+        Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 24.dp, end = 24.dp)
-                .clickable {
-                    // Clear session
-                    SessionManager.clearSession(context)
-                    // Navigate to login, removing the back stack
-                    navController.navigate("chooseAccountType") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
+                .padding(top = 24.dp, end = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Profile",
+                color = Color(0xFF30386D),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate("customerProfile")
                     }
-                }
-        )
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                "Log out",
+                color = Color(0xFF30386D),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .clickable {
+                        // Clear session
+                        SessionManager.clearSession(context)
+                        // Navigate to login, removing the back stack
+                        navController.navigate("chooseAccountType") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+            )
+        }
 
 
         Column(
@@ -80,24 +101,41 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
 
             Spacer(modifier = Modifier.height(16.dp))
             // Header Section
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.dp),
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(60.dp)
-                        .padding(end = 8.dp)
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { navController.navigate("customerProfile") }
+            ) {
+                if (profileImageUrl != null && profileImageUrl!!.isNotEmpty()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(profileImageUrl),
+                        contentDescription = stringResource(R.string.cd_profile_picture),
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .clickable { navController.navigate("customerProfile") }
+                            .padding(end = 8.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.character_customer),
+                        contentDescription = stringResource(R.string.cd_profile_picture),
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clickable { navController.navigate("customerProfile") }
+                            .padding(end = 8.dp)
+                    )
+                }
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "Hello, $firstName $lastName.",
+                            stringResource(R.string.hello_name_format, firstName, lastName),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Unverified",
+                            text = stringResource(R.string.unverified_badge),
                             color = Color(0xFFE8A317),
                             fontSize = 12.sp,
                             modifier = Modifier
@@ -108,12 +146,12 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.bytesize_location),
-                            contentDescription = "Location",
+                            contentDescription = stringResource(R.string.cd_location),
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Unverified address", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = stringResource(R.string.unverified_address_label), fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
@@ -121,10 +159,10 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             Spacer(modifier = Modifier.height(24.dp))
 
             // Welcome Message
-            Text("Welcome, $firstName!", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.welcome_name_format, firstName), fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Verify your account and unlock access to our trusted Handymen services.",
+                stringResource(R.string.verify_unlock_hint),
                 fontSize = 16.sp,
                 color = Color.Gray,
             )
@@ -134,7 +172,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
             // Illustration
             Image(
                 painter = painterResource(id = R.drawable.group_405), // Handyman illustration
-                contentDescription = "Illustration",
+                contentDescription = stringResource(R.string.cd_illustration),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
@@ -154,7 +192,7 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
                 shape = RoundedCornerShape(50)
             ) {
                 Text(
-                    "Start verification",
+                    stringResource(R.string.start_verification_btn),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray
@@ -163,33 +201,6 @@ fun CustomerHomeUnverified(modifier: Modifier = Modifier, navController: NavCont
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Bottom NavBar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = "Home",
-                    tint = Color(0xFF8A4DFF),
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = "List",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = "Chat",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
         }
     }
 }

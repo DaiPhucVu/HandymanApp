@@ -1,33 +1,29 @@
 package com.example.handyman.handyman_pages
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.handyman.HandymanSignupViewModel
 import com.example.handyman.R
-import com.google.firebase.database.FirebaseDatabase
-import com.example.handyman.utils.SessionManager
-import java.text.SimpleDateFormat
-import java.util.*
-import com.example.handyman.utils.getCurrentYearMonth
-import com.example.handyman.utils.incrementMetric
 
 @Composable
-fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
-    val context = LocalContext.current
+fun HandymanSignup(modifier: Modifier = Modifier, navController: NavController, signupViewModel: HandymanSignupViewModel) {
+    val scrollState = rememberScrollState()
 
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -38,6 +34,9 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
+    var firstNameTouched by remember { mutableStateOf(false) }
+    var lastNameTouched by remember { mutableStateOf(false) }
+
     val isValid = firstName.isNotBlank()
             && lastName.isNotBlank()
             && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -47,34 +46,41 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .systemBarsPadding()
+            .verticalScroll(scrollState)
+            .imePadding()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row (
+        // Box, not a Row with SpaceEvenly: SpaceEvenly distributes the back
+        // arrow and the title across the width, which pushes the title off
+        // centre and leaves the arrow floating. Aligning them independently
+        // pins the arrow left and centres the title on the screen.
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+                .height(56.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .size(32.dp)
                     .clickable { navController.popBackStack() }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text("Join our crew", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                stringResource(R.string.join_our_crew_title),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
         Image(
             painter = painterResource(id = R.drawable.character_handyman),
-            contentDescription = "Handyman Illustration",
+            contentDescription = stringResource(R.string.cd_handyman_illustration),
             modifier = Modifier.size(140.dp)
         )
 
@@ -82,24 +88,30 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
 
         OutlinedTextField(
             value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("First name") },
+            onValueChange = { firstName = it; firstNameTouched = true },
+            label = { Text(stringResource(R.string.first_name_label)) },
             singleLine = true,
+            isError = firstNameTouched && firstName.isBlank(),
+            supportingText = { if (firstNameTouched && firstName.isBlank()) Text(stringResource(R.string.error_first_name_required)) },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Last name") },
+            onValueChange = { lastName = it; lastNameTouched = true },
+            label = { Text(stringResource(R.string.last_name_label)) },
             singleLine = true,
+            isError = lastNameTouched && lastName.isBlank(),
+            supportingText = { if (lastNameTouched && lastName.isBlank()) Text(stringResource(R.string.error_last_name_required)) },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email_label)) },
+            isError = email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches(),
+            supportingText = { if (email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) Text(stringResource(R.string.error_email_invalid)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
@@ -108,7 +120,7 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password_label)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -124,13 +136,15 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = password.isNotBlank() && password.length < 8,
+            supportingText = { if (password.isNotBlank() && password.length < 8) Text(stringResource(R.string.error_password_too_short)) }
         )
 
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Repeat password") },
+            label = { Text(stringResource(R.string.repeat_password_label)) },
             visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -146,55 +160,22 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = confirmPassword.isNotBlank() && confirmPassword != password,
+            supportingText = { if (confirmPassword.isNotBlank() && confirmPassword != password) Text(stringResource(R.string.error_passwords_do_not_match)) }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
-                val handymanId = UUID.randomUUID().toString()
-                val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(Date())
-
-                val handymanData = mapOf(
-                    "handymanId" to handymanId,
-                    "firstName" to firstName,
-                    "lastName" to lastName,
-                    "email" to email,
-                    "password" to password,
-                    "isPhoneVerified" to false,
-                    "photoIdCard" to "",
-                    "certificates" to "",
-                    "houseNumber" to "",
-                    "street" to "",
-                    "area" to "",
-                    "division" to "",
-                    "district" to "",
-                    "thana" to "",
-                    "city" to "",
-                    "country" to "",
-                    "postcode" to "",
-                    "notes" to "",
-                    "verificationStatus" to "",
-                    "approvedBy" to "",
-                    "createdAt" to timestamp,
-                    "updatedAt" to timestamp
-                )
-
-                val ref = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanId)
-                ref.setValue(handymanData)
-                    .addOnSuccessListener {
-                        val (year, month) = getCurrentYearMonth()
-                        incrementMetric("serviceAnalytics/2025/$year/$month/newHandymen")
-                        incrementMetric("serviceAnalytics/2025/$year/$month/newUsers")
-
-                        SessionManager.saveSession(context, email, handymanId, firstName)
-                        Toast.makeText(context, "Account created successfully", Toast.LENGTH_LONG).show()
-                        navController.navigate("handymanKYCLanding")
-                    }
-                    .addOnFailureListener { error ->
-                        Toast.makeText(context, "Failed to sign up: ${error.message}", Toast.LENGTH_LONG).show()
-                    }
+                // Account is not created yet — just hold the details until phone
+                // verification succeeds at the end of the KYC flow.
+                signupViewModel.firstName = firstName
+                signupViewModel.lastName = lastName
+                signupViewModel.email = email
+                signupViewModel.password = password
+                navController.navigate("handymanSkills")
             },
             enabled = isValid,
             modifier = Modifier
@@ -205,14 +186,14 @@ fun HandymanSignup(modifier: Modifier = Modifier,navController: NavController) {
             ),
             shape = MaterialTheme.shapes.large
         ) {
-            Text("Sign Up", fontSize = 18.sp, color = Color.White)
+            Text(stringResource(R.string.sign_up_btn), fontSize = 18.sp, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text("Already have account? ?", fontSize = 14.sp)
+        Text(stringResource(R.string.already_have_account_message), fontSize = 14.sp)
         Text(
-            "Log in",
+            stringResource(R.string.log_in_link),
             color = Color(0xFF2D2E5E),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.clickable { navController.navigate("handymanLogin") }

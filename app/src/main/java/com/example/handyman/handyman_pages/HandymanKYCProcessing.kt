@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,8 +22,6 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
 import com.google.firebase.database.*
-import android.content.Intent
-import com.example.handyman.MainJobBoard
 
 @Composable
 fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavController) {
@@ -34,6 +34,15 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
 
     val currentEmail = SessionManager.getLoggedInEmail(context)
     var refreshTrigger by remember { mutableStateOf(0) }
+    var isRefreshing by remember { mutableStateOf(false) }
+
+    LaunchedEffect(refreshTrigger) {
+        if (refreshTrigger > 0) {
+            isRefreshing = true
+            delay(2000)
+            isRefreshing = false
+        }
+    }
 
     LaunchedEffect(currentEmail, refreshTrigger) {
         val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman")
@@ -49,14 +58,31 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                     idApprovedStatus = child.child("idApprovedStatus").getValue(String::class.java) ?: ""
                     certificateApprovedStatus = child.child("certificateApprovedStatus").getValue(String::class.java) ?: ""
 
-                    Log.d("KYC_CHECK", "REFRESHED STATUS: [$status]")
+                    val photoIdCard = child.child("photoIdCard").getValue(String::class.java)
+                    // This step now collects an NID number instead of certificate
+                    // uploads. `certificates` is still read so handymen who
+                    // completed the old photo-upload flow are not sent back through it.
+                    val nid = child.child("nid").getValue(String::class.java)
+                    val legacyCertificates = child.child("certificates").getValue(String::class.java)
+                    val professionalCertificate = child.child("professionalCertificate").getValue(String::class.java)
+
+                    Log.d("KYC_CHECK", "REFRESHED STATUS: [$status], ID: $photoIdCard, NID: $nid, OldCert: $professionalCertificate")
+
+                    if (photoIdCard.isNullOrBlank()) {
+                        navController.navigate("handymanKYCLanding") {
+                            popUpTo("handymanHomeKYCProcessing") { inclusive = true }
+                        }
+                    } else if (nid.isNullOrBlank() && legacyCertificates.isNullOrBlank() && professionalCertificate != "skipped") {
+                        // Only redirect if NOT skipped and NOT uploaded
+                        navController.navigate("handymanKYCCertificates") {
+                            popUpTo("handymanHomeKYCProcessing") { inclusive = true }
+                        }
+                    }
 
                     if (status.trim().equals("approved", ignoreCase = true)) {
-                        val intent = Intent(context, MainJobBoard::class.java).apply {
-                            putExtra("user_type", "handyman")
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        navController.navigate("handymanApprovedSplash") {
+                            popUpTo(0)
                         }
-                        context.startActivity(intent)
                     }
                 }
             }
@@ -70,7 +96,7 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
     Box(modifier = modifier.fillMaxSize()) {
         // Top right logout
         Text(
-            "Log out",
+            stringResource(R.string.log_out_link),
             color = Color(0xFF30386D),
             fontSize = 18.sp,
             modifier = Modifier
@@ -94,14 +120,14 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.dp),
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.cd_profile),
                     modifier = Modifier
                         .size(60.dp)
                         .padding(end = 8.dp)
                 )
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hello, $firstName $lastName.", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.hello_name_format, firstName, lastName), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = verificationStatus,
@@ -115,22 +141,22 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.bytesize_location),
-                            contentDescription = "Location",
+                            contentDescription = stringResource(R.string.cd_location),
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Unverified address", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = stringResource(R.string.unverified_address_label), fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            Text("KYC Application\nUnder Review", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.kyc_application_under_review_title), fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Your identity verification is being processed.\nWe will let you know when you are ready to serve.",
+                stringResource(R.string.kyc_processing_hint_handyman),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -139,7 +165,7 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
 
             Image(
                 painter = painterResource(id = R.drawable.document_icon_yellow),
-                contentDescription = "KYC Document Icon",
+                contentDescription = stringResource(R.string.cd_kyc_document_icon),
                 modifier = Modifier
                     .size(100.dp)
                     .align(Alignment.CenterHorizontally)
@@ -154,16 +180,16 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Application Details", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.application_details_title), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Identity Verification", fontSize = 14.sp)
+                        Text(stringResource(R.string.identity_verification_label), fontSize = 14.sp)
                         Text(
-                            text = if (idApprovedStatus.isEmpty()) "Pending" else idApprovedStatus.replaceFirstChar { it.uppercase() },
+                            text = if (idApprovedStatus.isEmpty()) stringResource(R.string.pending_status) else idApprovedStatus.replaceFirstChar { it.uppercase() },
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = when (idApprovedStatus.lowercase()) {
@@ -182,13 +208,18 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Professional Certificate", fontSize = 14.sp)
+                        Text(stringResource(R.string.professional_certificate_label), fontSize = 14.sp)
                         Text(
-                            text = if (certificateApprovedStatus.isEmpty()) "Pending" else certificateApprovedStatus.replaceFirstChar { it.uppercase() },
+                            text = when {
+                                certificateApprovedStatus == "not_provided" -> stringResource(R.string.not_provided_status)
+                                certificateApprovedStatus.isEmpty() -> stringResource(R.string.pending_status)
+                                else -> certificateApprovedStatus.replaceFirstChar { it.uppercase() }
+                            },
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = when (certificateApprovedStatus.lowercase()) {
                                 "approved" -> Color(0xFF4CAF50)
+                                "not_provided" -> Color.Gray
                                 "declined", "rejected" -> Color(0xFFF44336)
                                 else -> Color(0xFFE8A317)
                             }
@@ -201,42 +232,33 @@ fun HandymanKYCProcessing(modifier: Modifier = Modifier, navController: NavContr
 
             Button(
                 onClick = { refreshTrigger++ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8A317)),
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(50)
-            ) {
-                Text("Refresh Status", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Bottom NavBar
-            Row(
+                enabled = !isRefreshing,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isRefreshing) Color.Gray else Color(0xFFE8A317),
+                    disabledContainerColor = Color.Gray
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                shape = RoundedCornerShape(50)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = "Home",
-                    tint = Color(0xFF8A4DFF),
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.list_icon),
-                    contentDescription = "List",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.chat_icon),
-                    contentDescription = "Chat",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
+                if (isRefreshing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        stringResource(R.string.refresh_status_btn),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

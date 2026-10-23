@@ -2,6 +2,7 @@ package com.example.handyman.customer_pages
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,12 +22,13 @@ import androidx.navigation.NavController
 import com.example.handyman.R
 
 @Composable
-fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavController) {
+fun CustomerKYCSuccess(navController: NavController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF20794B))
+            .systemBarsPadding()
             .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -36,12 +39,21 @@ fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavControll
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
-                modifier = Modifier.size(24.dp),
+                contentDescription = stringResource(R.string.cd_back),
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        val intent = android.content.Intent(context, com.example.handyman.MainJobBoard::class.java).apply {
+                            putExtra("user_type", "customer")
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        }
+                        context.startActivity(intent)
+                        (context as? android.app.Activity)?.finish()
+                    },
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Account verification", fontSize = 20.sp, color = Color.White)
+            Text(stringResource(R.string.account_verification_title), fontSize = 20.sp, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(64.dp))
@@ -49,17 +61,17 @@ fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavControll
         // Success Icon
         Image(
             painter = painterResource(id = R.drawable.verified_icon),
-            contentDescription = "Verified",
+            contentDescription = stringResource(R.string.verified_badge),
             modifier = Modifier.size(120.dp)
         )
 
         Spacer(modifier = Modifier.height(48.dp))
 
         // Success Text
-        Text("Account Created!", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(stringResource(R.string.account_created_title), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Congratulations! Your account has been successfully created. You can now start requesting services.",
+            stringResource(R.string.account_created_hint),
             fontSize = 14.sp,
             color = Color.White,
             lineHeight = 20.sp,
@@ -73,8 +85,10 @@ fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavControll
             onClick = {
                 val intent = android.content.Intent(context, com.example.handyman.MainJobBoard::class.java).apply {
                     putExtra("user_type", "customer")
+                    addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
                 context.startActivity(intent)
+                (context as? android.app.Activity)?.finish()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,7 +96,7 @@ fun CustomerKYCSuccess(modifier: Modifier = Modifier, navController: NavControll
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB703))
         ) {
-            Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B1B1B))
+            Text(stringResource(R.string.continue_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B1B1B))
         }
     }
 }

@@ -1,10 +1,13 @@
 package com.example.handyman.handyman_pages
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
@@ -19,6 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.handyman.R
 import com.example.handyman.utils.SessionManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.database.*
 import android.content.Intent
 import android.util.Log
@@ -37,36 +44,48 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
 
     Log.d("Navigation:", "HandymanLogin launches")
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
+            .systemBarsPadding()
+            .imePadding()
+            .verticalScroll(scrollState)
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Row(
+        // Box, not a Row with SpaceEvenly: SpaceEvenly distributes the back
+        // arrow and the title across the width, which pushes the title off
+        // centre and leaves the arrow floating. Aligning them independently
+        // pins the arrow left and centres the title on the screen.
+        Box(
             modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically) {
-
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.cd_back),
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .size(32.dp)
                     .clickable { navController.popBackStack() }
             )
 
-            Text("Log In", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(R.string.log_in_caps_title),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         Image(
             painter = painterResource(id = R.drawable.character_handyman),
-            contentDescription = "Handyman Illustration",
+            contentDescription = stringResource(R.string.cd_handyman_illustration),
             modifier = Modifier.size(140.dp)
         )
 
@@ -75,8 +94,10 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
-            placeholder = { Text("email") },
+            label = { Text(stringResource(R.string.email_label)) },
+            isError = email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches(),
+            supportingText = { if (email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) Text(stringResource(R.string.error_email_invalid)) },
+            placeholder = { Text(stringResource(R.string.email_placeholder)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
@@ -85,8 +106,10 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
-            placeholder = { Text("at least 8 characters") },
+            label = { Text(stringResource(R.string.password_label)) },
+            isError = password.isNotBlank() && password.length < 8,
+            supportingText = { if (password.isNotBlank() && password.length < 8) Text(stringResource(R.string.error_password_too_short)) },
+            placeholder = { Text(stringResource(R.string.password_placeholder_min8)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 Icon(
@@ -108,7 +131,7 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Forgot password?",
+            text = stringResource(R.string.forgot_password_link),
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(bottom = 8.dp),
@@ -120,52 +143,30 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
 
         Button(
             onClick = {
-                val userRef = FirebaseDatabase.getInstance().getReference("Handyman")
-                val query = userRef.orderByChild("email").equalTo(email)
-
-                query.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            var authenticated = false
-                            var isVerified = ""
-                            for (child in snapshot.children) {
-                                val userPass = child.child("password").getValue(String::class.java)
-                                val verified = child.child("verificationStatus").getValue(String::class.java) ?: "unverified"
-                                if (userPass == password) {
-                                    authenticated = true
-                                    isVerified = verified
-                                    SessionManager.currentUserID = child.key
-                                    SessionManager.currentUserName = child.child("firstName").getValue(String::class.java)
-                                    break
-                                }
-                            }
-                            if (authenticated) {
-                                val userId = SessionManager.currentUserID ?: ""
-                                val firstName = SessionManager.currentUserName ?: "Handyman"
-                                SessionManager.saveSession(context, email, userId, firstName)
-                                if (isVerified.equals("approved", ignoreCase = true)) {
-                                    val intent = Intent(context, MainJobBoard::class.java).apply {
-                                        putExtra("user_type", "handyman")
-                                    }
-                                    context.startActivity(intent)
-                                } else if (isVerified.equals("pending", ignoreCase = true)) {
-                                    navController.navigate("handymanHomeKYCProcessing")
-                                } else {
-                                    // Empty status or "unverified" both go here
-                                    navController.navigate("handymanHomeUnverified")
-                                }
-                            } else {
-                                Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
-                            }
-                        } else {
-                            Toast.makeText(context, "Handyman account not found", Toast.LENGTH_LONG).show()
+                FirebaseAuth.getInstance().signInWithEmailAndPassword(email.trim(), password)
+                    .addOnSuccessListener { _ ->
+                        loadHandymanProfileAndNavigate(
+                            context = context,
+                            navController = navController,
+                            email = email.trim(),
+                        )
+                    }
+                    .addOnFailureListener { exc ->
+                        val isUserMissing = exc is FirebaseAuthInvalidUserException ||
+                            (exc is FirebaseAuthInvalidCredentialsException) ||
+                            exc.message?.contains("user-not-found") == true ||
+                            exc.message?.contains("invalid-credential") == true
+                        if (!isUserMissing) {
+                            Toast.makeText(context, exc.localizedMessage ?: context.getString(R.string.login_failed_default_message), Toast.LENGTH_LONG).show()
+                            return@addOnFailureListener
                         }
+                        attemptHandymanRtdbMigration(
+                            context = context,
+                            navController = navController,
+                            email = email.trim(),
+                            password = password,
+                        )
                     }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(context, "Login failed: ${error.message}", Toast.LENGTH_LONG).show()
-                    }
-                })
             },
             enabled = isValid,
             modifier = Modifier
@@ -174,21 +175,140 @@ fun HandymanLogin(modifier: Modifier = Modifier,navController: NavController) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isValid) Color(0xFF2D2E5E) else Color.LightGray
             ),
-            shape = MaterialTheme.shapes.large
+            shape = MaterialTheme.shapes.large,
         ) {
-            Text("Login", fontSize = 18.sp, color = Color.White)
+            Text(stringResource(R.string.login_btn), fontSize = 18.sp, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Don’t have an account?", fontSize = 14.sp)
+        Text(stringResource(R.string.dont_have_account_message), fontSize = 14.sp)
         Text(
-            text = "Sign Up",
+            text = stringResource(R.string.sign_up_btn),
             color = Color(0xFF2D2E5E),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.clickable {
                 navController.navigate("handymanSignup")
             }
         )
+    }
+}
+
+private fun loadHandymanProfileAndNavigate(
+    context: Context,
+    navController: NavController,
+    email: String,
+) {
+    val userRef = FirebaseDatabase.getInstance().getReference("Handyman")
+    userRef.orderByChild("email").equalTo(email)
+        .addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(context, context.getString(R.string.handyman_profile_not_found_message), Toast.LENGTH_LONG).show()
+                    return
+                }
+                val child = snapshot.children.first()
+                val userId = child.key ?: ""
+                val firstName = child.child("firstName").getValue(String::class.java) ?: "Handyman"
+                val city = child.child("city").getValue(String::class.java) ?: ""
+                val verificationStatus =
+                    child.child("verificationStatus").getValue(String::class.java) ?: "unverified"
+
+                SessionManager.currentUserID = userId
+                SessionManager.currentUserName = firstName
+                SessionManager.saveSession(context, email, userId, firstName, city)
+                navigateAfterHandymanLogin(context, navController, verificationStatus)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, context.getString(R.string.profile_load_failed_format, error.message), Toast.LENGTH_LONG).show()
+            }
+        })
+}
+
+private fun attemptHandymanRtdbMigration(
+    context: Context,
+    navController: NavController,
+    email: String,
+    password: String,
+) {
+    val userRef = FirebaseDatabase.getInstance().getReference("Handyman")
+    userRef.orderByChild("email").equalTo(email)
+        .addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(context, context.getString(R.string.handyman_account_not_found_message), Toast.LENGTH_LONG).show()
+                    return
+                }
+                var matchedKey: String? = null
+                var matchedFirstName: String? = null
+                var matchedCity: String? = null
+                var matchedVerification: String? = null
+                for (child in snapshot.children) {
+                    val rtdbPass = child.child("password").getValue(String::class.java)
+                    if (rtdbPass == password) {
+                        matchedKey = child.key
+                        matchedFirstName = child.child("firstName").getValue(String::class.java)
+                        matchedCity = child.child("city").getValue(String::class.java)
+                        matchedVerification =
+                            child.child("verificationStatus").getValue(String::class.java)
+                        break
+                    }
+                }
+                if (matchedKey == null) {
+                    Toast.makeText(context, context.getString(R.string.incorrect_password_message), Toast.LENGTH_LONG).show()
+                    return
+                }
+                FirebaseAuth.getInstance()
+                    .createUserWithEmailAndPassword(email, password)
+                    .addOnSuccessListener {
+                        SessionManager.currentUserID = matchedKey
+                        SessionManager.currentUserName = matchedFirstName
+                        SessionManager.saveSession(
+                            context = context,
+                            email = email,
+                            userId = matchedKey,
+                            firstName = matchedFirstName ?: "Handyman",
+                            city = matchedCity ?: "",
+                        )
+                        navigateAfterHandymanLogin(
+                            context,
+                            navController,
+                            matchedVerification ?: "unverified",
+                        )
+                    }
+                    .addOnFailureListener { createExc ->
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.login_migration_failed_format, createExc.localizedMessage ?: createExc.message),
+                            Toast.LENGTH_LONG,
+                        ).show()
+                    }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, context.getString(R.string.login_failed_format, error.message), Toast.LENGTH_LONG).show()
+            }
+        })
+}
+
+private fun navigateAfterHandymanLogin(
+    context: Context,
+    navController: NavController,
+    verificationStatus: String,
+) {
+    when {
+        verificationStatus.equals("approved", ignoreCase = true) -> {
+            val intent = Intent(context, MainJobBoard::class.java).apply {
+                putExtra("user_type", "handyman")
+            }
+            context.startActivity(intent)
+        }
+        verificationStatus.equals("pending", ignoreCase = true) -> {
+            navController.navigate("handymanHomeKYCProcessing")
+        }
+        else -> {
+            navController.navigate("handymanHomeUnverified")
+        }
     }
 }

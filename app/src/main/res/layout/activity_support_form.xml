@@ -13,7 +13,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Back"
+        android:contentDescription="@string/cd_back"
         android:padding="12dp"
         android:scaleType="fitCenter"
         android:src="@drawable/arrow_back"
@@ -25,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
-        android:text="Customer Support"
+        android:text="@string/customer_support_title"
         android:textColor="#2F3367"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Full Name"
+                android:text="@string/full_name_label"
                 android:textColor="#2F3367"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -63,14 +63,14 @@
                 android:layout_height="56dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/edit_text_background"
-                android:hint="Enter your name"
+                android:hint="@string/enter_your_name_hint"
                 android:paddingHorizontal="16dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Email Address"
+                android:text="@string/email_address_label"
                 android:textColor="#2F3367"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -81,7 +81,7 @@
                 android:layout_height="56dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/edit_text_background"
-                android:hint="Enter your email"
+                android:hint="@string/enter_your_email_hint"
                 android:inputType="textEmailAddress"
                 android:paddingHorizontal="16dp" />
 
@@ -89,7 +89,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Category"
+                android:text="@string/category_label"
                 android:textColor="#2F3367"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -105,7 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Subject"
+                android:text="@string/subject_label"
                 android:textColor="#2F3367"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -116,14 +116,14 @@
                 android:layout_height="56dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/edit_text_background"
-                android:hint="Enter subject"
+                android:hint="@string/enter_subject_hint"
                 android:paddingHorizontal="16dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Message"
+                android:text="@string/message_label"
                 android:textColor="#2F3367"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -135,7 +135,7 @@
                 android:layout_marginBottom="24dp"
                 android:background="@drawable/edit_text_background"
                 android:gravity="top"
-                android:hint="Type your message here..."
+                android:hint="@string/type_message_hint"
                 android:inputType="textMultiLine"
                 android:padding="16dp" />
 
@@ -144,7 +144,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:backgroundTint="#2F3367"
-                android:text="Submit Request"
+                android:text="@string/submit_request"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"

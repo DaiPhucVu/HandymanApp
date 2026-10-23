@@ -2,26 +2,33 @@ package com.example.handyman.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.auth.FirebaseAuth
 
 object SessionManager {
     var currentUserID: String? = null
 //    var currentUserEmail: String? = null
     var currentUserName: String? = null
     var currentUserType: String? = null
+    var currentUserCity: String? = null
   
     private const val PREF_NAME = "user_session"
     private const val KEY_EMAIL = "logged_in_email"
     private const val KEY_USER_ID = "logged_in_user_id"
     private const val KEY_USER_NAME = "logged_in_user_name"
+    private const val KEY_USER_CITY = "logged_in_user_city"
 
-    fun saveSession(context: Context, email: String, userId: String, firstName: String) {
+    fun saveSession(context: Context, email: String, userId: String, firstName: String, city: String = "") {
         val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit().apply {
             putString(KEY_EMAIL, email)
             putString(KEY_USER_ID, userId)
             putString(KEY_USER_NAME, firstName)
+            putString(KEY_USER_CITY, city)
             apply()
         }
+        currentUserID = userId
+        currentUserName = firstName
+        currentUserCity = city
     }
 
     fun saveLoggedInEmail(context: Context, email: String) {
@@ -44,14 +51,30 @@ object SessionManager {
         return prefs.getString(KEY_USER_NAME, "User") ?: "User"
     }
 
+    fun getLoggedInCity(context: Context): String {
+        val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_USER_CITY, "") ?: ""
+    }
+
+    fun saveLoggedInCity(context: Context, city: String) {
+        val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_USER_CITY, city).apply()
+        currentUserCity = city
+    }
+
     fun clearSession(context: Context) {
         val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit().clear().apply()
-    }
 
-    fun clearSessionXML(context: Context) {
-        val sharedPref = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
-        sharedPref.edit().clear().apply()
+        val legacyPrefs = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        legacyPrefs.edit().clear().apply()
+
+        currentUserID = null
+        currentUserName = null
+        currentUserType = null
+        currentUserCity = null
+
+        runCatching { FirebaseAuth.getInstance().signOut() }
     }
 
 }
