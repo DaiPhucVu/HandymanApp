@@ -31,7 +31,7 @@ data class Job(
     val custpay: String = "",
     val imageUris: List<String> = emptyList(),
     val assignedTo: String = "",
-    val jobStatus: String = "",
+    val jobStatus: String = "Open",
     val jobStatusCustomer : String? = null,
     val jobStatusHandyman : String? = null,
     val lastUpdate: String = "",

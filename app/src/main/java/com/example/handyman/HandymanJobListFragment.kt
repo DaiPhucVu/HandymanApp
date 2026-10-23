@@ -21,6 +21,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import com.example.handyman.utils.localizedJobStatusLabel
 import java.util.UUID
@@ -350,16 +352,38 @@ class HandymanJobListFragment : Fragment() {
 
     private fun declineAssignedJob(job: Job) {
         val jobRef = FirebaseDatabase.getInstance().getReference("Job").child(job.jobId)
-        val updates = mapOf<String, Any>(
-            "assignedTo" to "",
-            "jobStatus" to "",
-            "lastUpdated" to java.time.LocalDateTime.now().toString()
-        )
+        jobRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                val assignedTo = currentData.child("assignedTo").getValue(String::class.java).orEmpty()
+                val status = currentData.child("jobStatus").getValue(String::class.java).orEmpty()
+                    .trim().lowercase()
+                if (assignedTo != handymanID || (status.isNotBlank() && status != "offered")) {
+                    return Transaction.abort()
+                }
+                currentData.child("assignedTo").value = ""
+                currentData.child("assignedBy").value = null
+                currentData.child("assignedAt").value = null
+                currentData.child("assignment").value = null
+                currentData.child("jobStatus").value = "Open"
+                currentData.child("jobStatusHandyman").value = null
+                currentData.child("lastUpdated").value = java.time.LocalDateTime.now().toString()
+                return Transaction.success(currentData)
+            }
 
-        jobRef.updateChildren(updates)
-            .addOnSuccessListener {
-                jobRef.child("jobStatusHandyman").removeValue()
-
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?
+            ) {
+                if (error != null) {
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_decline_job_format, error.message), Toast.LENGTH_LONG).show()
+                    return
+                }
+                if (!committed) {
+                    Toast.makeText(requireContext(), getString(R.string.assignment_changed_message), Toast.LENGTH_LONG).show()
+                    fetchJobsForCategory(currentCategoryKey)
+                    return
+                }
                 val customerRef = FirebaseDatabase.getInstance().getReference("User").child(job.customerId)
                 val handymanRef = FirebaseDatabase.getInstance().getReference("Handyman").child(handymanID)
 
@@ -375,9 +399,7 @@ class HandymanJobListFragment : Fragment() {
                 Toast.makeText(requireContext(), getString(R.string.job_declined_message), Toast.LENGTH_SHORT).show()
                 fetchJobsForCategory(currentCategoryKey)
             }
-            .addOnFailureListener { error ->
-                Toast.makeText(requireContext(), getString(R.string.failed_to_decline_job_format, error.message), Toast.LENGTH_LONG).show()
-            }
+        })
     }
 
     private fun addJobIdIfMissing(ref: DatabaseReference, listName: String, jobId: String) {

@@ -526,6 +526,7 @@
         <string name="decline_btn">প্রত্যাখ্যান</string>
         <string name="job_declined_message">কাজ প্রত্যাখ্যান করা হয়েছে।</string>
         <string name="failed_to_decline_job_format">কাজ প্রত্যাখ্যান করতে ব্যর্থ হয়েছে: %1$s</string>
+        <string name="assignment_changed_message">অ্যাসাইনমেন্টটি পরিবর্তিত হয়েছে। কাজগুলো রিফ্রেশ করুন।</string>
 
         <!-- CustomerJobListAdapter -->
         <string name="please_assign_handyman_message">অবস্থা আপডেট করার আগে একজন হ্যান্ডিম্যান নির্ধারণ করুন!</string>
