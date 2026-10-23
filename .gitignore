@@ -17,3 +17,6 @@ local.properties
 
 functions/.env.*
 functions/.runtimeconfig.json
+
+# UI hierarchy dumps from device testing
+.tmp-*.xml
